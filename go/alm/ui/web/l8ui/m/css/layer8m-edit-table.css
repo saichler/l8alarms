@@ -1,0 +1,430 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * MobileEditTable Styles
+ */
+
+.mobile-edit-table-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Filters */
+.mobile-edit-table-filters {
+    background: var(--bg-primary);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.mobile-edit-table-filter-row {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.mobile-edit-table-column-select {
+    flex: 0 0 120px;
+    height: var(--touch-target);
+    padding: 0 var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+.mobile-edit-table-search-input {
+    flex: 1;
+    height: var(--touch-target);
+    padding: 0 var(--spacing-md);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+}
+
+.mobile-edit-table-search-input:focus {
+    outline: none;
+    border-color: var(--layer8d-primary);
+}
+
+.mobile-edit-table-search-input.invalid {
+    border-color: var(--status-terminated);
+    background: var(--status-terminated-bg);
+}
+
+/* Sort Row */
+.mobile-edit-table-sort-row {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.mobile-edit-table-sort-select {
+    flex: 1;
+    height: var(--touch-target);
+    padding: 0 var(--spacing-sm);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+.mobile-edit-table-sort-direction-btn {
+    width: var(--touch-target);
+    height: var(--touch-target);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.mobile-edit-table-sort-direction-btn:active:not(:disabled) {
+    background: var(--border-light);
+}
+
+.mobile-edit-table-sort-direction-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Pagination with Add button */
+.mobile-edit-table-pagination {
+    background: var(--bg-primary);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.mobile-edit-table-pagination-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+}
+
+.mobile-edit-table-pagination-info {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.mobile-edit-table-add-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--layer8d-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.mobile-edit-table-add-btn:active {
+    background: var(--layer8d-primary-dark);
+}
+
+/* Desktop core view Add buttons match mobile table Add button */
+#service-table-container .layer8d-btn.layer8d-btn-primary.layer8d-btn-small {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--layer8d-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    box-shadow: none;
+    transform: none;
+    transition: background var(--transition-fast);
+}
+
+#service-table-container .layer8d-btn.layer8d-btn-primary.layer8d-btn-small:hover,
+#service-table-container .layer8d-btn.layer8d-btn-primary.layer8d-btn-small:active {
+    background: var(--layer8d-primary-dark);
+    box-shadow: none;
+    transform: none;
+}
+
+.mobile-edit-table-add-btn.large {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-lg);
+}
+
+.mobile-edit-table-pagination-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-edit-table-pagination-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 var(--spacing-sm);
+    border: none;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.mobile-edit-table-pagination-btn:active:not(:disabled) {
+    background: var(--border-light);
+}
+
+.mobile-edit-table-pagination-btn.active {
+    background: var(--layer8d-primary);
+    color: white;
+}
+
+.mobile-edit-table-pagination-btn.disabled,
+.mobile-edit-table-pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mobile-edit-table-pagination-ellipsis {
+    padding: 0 var(--spacing-xs);
+    color: var(--text-muted);
+}
+
+/* Cards */
+.mobile-edit-table-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.mobile-edit-table-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.mobile-edit-table-card:active {
+    background: var(--bg-tertiary);
+    border-color: var(--layer8d-primary);
+}
+
+.mobile-edit-table-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.mobile-edit-table-card-info {
+    flex: 1;
+}
+
+.mobile-edit-table-card-title {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.mobile-edit-table-card-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: var(--spacing-xs) 0 0 0;
+}
+
+.mobile-edit-table-card-body {
+    padding: var(--spacing-md);
+}
+
+.mobile-edit-table-card-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.mobile-edit-table-card-row:last-child {
+    border-bottom: none;
+}
+
+.mobile-edit-table-card-label {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+}
+
+.mobile-edit-table-card-value {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    text-align: right;
+}
+
+/* Card actions */
+.mobile-edit-table-card-actions {
+    display: flex;
+    border-top: 1px solid var(--border-light);
+}
+
+.mobile-edit-table-action-btn {
+    flex: 1;
+    padding: var(--spacing-sm);
+    border: none;
+    background: none;
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.mobile-edit-table-action-btn:active {
+    background: var(--bg-tertiary);
+}
+
+.mobile-edit-table-action-btn.edit {
+    color: var(--layer8d-primary);
+    border-right: 1px solid var(--border-light);
+}
+
+.mobile-edit-table-action-btn.delete {
+    color: var(--status-terminated);
+}
+
+/* Loading */
+.mobile-edit-table-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    color: var(--text-secondary);
+    gap: var(--spacing-sm);
+}
+
+.mobile-edit-table-loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border-light);
+    border-top-color: var(--layer8d-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Empty state */
+.mobile-edit-table-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.mobile-edit-table-empty-icon {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+}
+
+.mobile-edit-table-empty h4 {
+    font-family: var(--font-family);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-xs) 0;
+}
+
+.mobile-edit-table-empty p {
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+/* Error state */
+.mobile-edit-table-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--status-terminated);
+}
+
+.mobile-edit-table-error span {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+}
+
+.mobile-edit-table-error h4 {
+    font-family: var(--font-family);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin: 0 0 var(--spacing-xs) 0;
+}
+
+.mobile-edit-table-error p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0 0 var(--spacing-md) 0;
+}
+
+.mobile-edit-table-error-retry {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--layer8d-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+}

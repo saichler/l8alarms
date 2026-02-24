@@ -1,0 +1,35 @@
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "api.proto";
+
+// AlarmFilter: Saved filter/view for alarm queries.
+message AlarmFilter {
+  string filter_id = 1;
+  string name = 2;
+  string description = 3;
+  string owner = 4;
+  bool is_shared = 5;
+  bool is_default = 6;
+
+  // Filter criteria
+  repeated AlarmSeverity severities = 7;
+  repeated AlarmState states = 8;
+  repeated string node_ids = 9;
+  repeated string node_types = 10;
+  repeated string locations = 11;
+  repeated string definition_ids = 12;
+  bool root_cause_only = 13;
+  bool exclude_suppressed = 14;
+  int32 max_age_hours = 15;
+
+  int64 created_at = 16;
+  int64 updated_at = 17;
+}
+
+message AlarmFilterList {
+  repeated AlarmFilter list = 1;
+  l8api.L8MetaData metadata = 2;
+}

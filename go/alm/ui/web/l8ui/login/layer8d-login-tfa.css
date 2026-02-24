@@ -1,0 +1,204 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* L8ERP - Login Page TFA Styles */
+/* Part 3 of 4 - Load after login-forms.css */
+/* TFA verification and setup sections */
+
+/* TFA Section */
+.layer8d-tfa-section {
+    display: none;
+}
+
+.layer8d-tfa-section.visible {
+    display: block;
+}
+
+.layer8d-tfa-instructions {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.layer8d-tfa-input {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 12px;
+    padding: 16px !important;
+}
+
+.layer8d-back-link {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    color: var(--noc-cyan);
+    font-size: 12px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.layer8d-back-link:hover {
+    text-decoration: underline;
+}
+
+/* TFA Setup Styles */
+.layer8d-tfa-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    color: var(--text-muted);
+}
+
+.layer8d-tfa-loading .spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(14, 165, 233, 0.2);
+    border-top-color: var(--noc-cyan);
+    margin-bottom: 12px;
+    margin-right: 0;
+}
+
+.layer8d-tfa-loading p {
+    font-size: 13px;
+}
+
+.layer8d-tfa-setup-content {
+    padding: 0;
+}
+
+.layer8d-tfa-setup-instructions {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.layer8d-tfa-setup-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.layer8d-tfa-qr-container {
+    flex-shrink: 0;
+    padding: 10px;
+    background: white;
+    border: 1px solid var(--border-emphasis);
+    border-radius: 8px;
+}
+
+.layer8d-tfa-qr-container img {
+    width: 160px;
+    height: 160px;
+    image-rendering: pixelated;
+}
+
+.layer8d-tfa-setup-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.layer8d-tfa-secret-section {
+    text-align: center;
+    padding: 10px;
+    background: var(--bg-elevated);
+    border-radius: 6px;
+    border: 1px solid var(--border-emphasis);
+}
+
+.layer8d-tfa-secret-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 6px 0;
+}
+
+.layer8d-tfa-secret-section code {
+    display: block;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--noc-cyan);
+    letter-spacing: 1px;
+    word-break: break-all;
+    padding: 6px;
+    background: var(--bg-card);
+    border-radius: 4px;
+    border: 1px dashed var(--noc-cyan);
+}
+
+#tfa-setup-form {
+    display: flex;
+    gap: 8px;
+    padding: 0;
+}
+
+.layer8d-tfa-input-small {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 6px;
+    padding: 10px 8px !important;
+}
+
+.layer8d-btn-login.layer8d-btn-small {
+    padding: 10px 16px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.layer8d-tfa-error {
+    text-align: center;
+    padding: 20px;
+}
+
+.layer8d-tfa-error p {
+    color: #ff6e40;
+    margin-bottom: 10px;
+    font-size: 13px;
+}
+
+/* Responsive for small screens */
+@media (max-width: 420px) {
+    .layer8d-tfa-setup-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .layer8d-tfa-qr-container img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .layer8d-tfa-setup-right {
+        width: 100%;
+    }
+
+    #tfa-setup-form {
+        flex-direction: column;
+    }
+
+    .layer8d-btn-login.layer8d-btn-small {
+        width: 100%;
+    }
+}

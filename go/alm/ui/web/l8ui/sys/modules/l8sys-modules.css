@@ -1,0 +1,180 @@
+/* L8SysModules - Module settings page styles */
+
+/* Dependency Map */
+.l8sys-dep-map {
+    padding: 20px;
+    margin-bottom: 24px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.l8sys-dep-map-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+}
+
+.l8sys-dep-map-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0 0 16px 0;
+}
+
+.l8sys-dep-map-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.l8sys-dep-map-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.l8sys-dep-map-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 136px;
+    height: 96px;
+    justify-content: center;
+    text-align: center;
+    gap: 2px;
+}
+
+.l8sys-dep-map-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.l8sys-dep-map-enabled {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.l8sys-dep-map-disabled {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    opacity: 0.6;
+}
+
+.l8sys-dep-map-box-icon {
+    font-size: 20px;
+}
+
+.l8sys-dep-map-box-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1e293b;
+    white-space: nowrap;
+}
+
+.l8sys-dep-map-box-status {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+
+.l8sys-dep-map-enabled .l8sys-dep-map-box-status {
+    color: #16a34a;
+    background: rgba(34, 197, 94, 0.15);
+}
+
+.l8sys-dep-map-disabled .l8sys-dep-map-box-status {
+    color: #64748b;
+    background: #e2e8f0;
+}
+
+.l8sys-dep-map-box-deps {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* Tree section */
+.l8sys-modules-tree-section {
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+}
+
+.l8sys-modules-tree-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+}
+
+.l8sys-modules-tree-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0 0 16px 0;
+}
+
+.l8sys-modules-tree-container {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+/* Action bar */
+.l8sys-modules-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 0;
+    position: sticky;
+    bottom: 0;
+    background: white;
+}
+
+.l8sys-modules-save-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    background: #0ea5e9;
+    color: white;
+    transition: all 0.2s;
+}
+
+.l8sys-modules-save-btn:hover:not(:disabled) {
+    background: #0284c7;
+}
+
+.l8sys-modules-save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.l8sys-modules-cancel-btn {
+    padding: 8px 20px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    background: transparent;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.l8sys-modules-cancel-btn:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}

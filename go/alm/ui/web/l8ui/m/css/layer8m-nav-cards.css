@@ -1,0 +1,327 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * Mobile Navigation Cards - Hierarchical navigation styling
+ */
+
+/* Navigation Container */
+.nav-container {
+    padding: var(--spacing-md);
+}
+
+/* Navigation Header with Back Button */
+.nav-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.nav-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.nav-back-btn:active {
+    transform: scale(0.95);
+    background: var(--border-light);
+}
+
+.nav-back-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.nav-title {
+    flex: 1;
+}
+
+.nav-title h1 {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.nav-title p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: var(--spacing-xs) 0 0 0;
+}
+
+/* Navigation Card Grid */
+.nav-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+}
+
+/* For larger screens, show 4 columns */
+@media (min-width: 480px) {
+    .nav-card-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Navigation Card */
+.nav-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg) var(--spacing-sm);
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    border: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-height: 100px;
+}
+
+.nav-card:active {
+    transform: scale(0.97);
+    background: var(--bg-tertiary);
+    border-color: var(--layer8d-primary);
+}
+
+.nav-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-sm);
+    transition: all var(--transition-fast);
+}
+
+.nav-card:active .nav-card-icon {
+    background: rgba(14, 165, 233, 0.15);
+}
+
+.nav-card-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--layer8d-primary);
+}
+
+.nav-card-label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    text-align: center;
+    color: var(--text-primary);
+    line-height: 1.2;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Coming Soon Card Variant */
+.nav-card.coming-soon {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.nav-card.coming-soon:active {
+    transform: none;
+    background: var(--bg-primary);
+    border-color: var(--border-light);
+}
+
+.nav-card.coming-soon .nav-card-icon {
+    background: var(--bg-tertiary);
+}
+
+.nav-card.coming-soon .nav-card-icon svg {
+    stroke: var(--text-muted);
+}
+
+.nav-card.coming-soon .nav-card-label {
+    color: var(--text-muted);
+}
+
+.nav-card-badge {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Active/Selected Card */
+.nav-card.active {
+    border-color: var(--layer8d-primary);
+    background: rgba(14, 165, 233, 0.05);
+}
+
+.nav-card.active .nav-card-icon {
+    background: rgba(14, 165, 233, 0.15);
+}
+
+/* Stats Summary (for dashboard) */
+.nav-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.nav-stat-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    border: 1px solid var(--border-light);
+}
+
+.nav-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background: rgba(14, 165, 233, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.nav-stat-icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--layer8d-primary);
+}
+
+.nav-stat-icon.success { background: var(--status-active-bg); }
+.nav-stat-icon.success svg { stroke: var(--status-active); }
+.nav-stat-icon.warning { background: var(--status-pending-bg); }
+.nav-stat-icon.warning svg { stroke: var(--status-pending); }
+
+.nav-stat-value {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.nav-stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+/* Section Title */
+.nav-section-title {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.nav-section-title:first-child {
+    margin-top: 0;
+}
+
+/* Data List Header (for service data view) */
+.data-list-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.data-list-back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.data-list-back-btn:active {
+    transform: scale(0.95);
+    background: var(--border-light);
+}
+
+.data-list-back-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.data-list-title {
+    flex: 1;
+}
+
+.data-list-title h1 {
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.data-list-title p {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin: var(--spacing-xs) 0 0 0;
+}
+
+/* Empty State for non-implemented modules */
+.nav-empty-state {
+    text-align: center;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    color: var(--text-secondary);
+}
+
+.nav-empty-state-icon {
+    font-size: 48px;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+}
+
+.nav-empty-state h3 {
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.nav-empty-state p {
+    font-size: var(--font-size-sm);
+    margin: 0;
+}

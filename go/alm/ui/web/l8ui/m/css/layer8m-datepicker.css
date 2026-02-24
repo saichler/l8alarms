@@ -1,0 +1,161 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * Mobile Date Picker Styles
+ */
+
+.mobile-datepicker {
+    padding: var(--spacing-md);
+}
+
+/* Header with month/year navigation */
+.datepicker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+}
+
+.datepicker-nav-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-elevated);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.datepicker-nav-btn:active {
+    background: var(--border);
+}
+
+.datepicker-nav-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.datepicker-month-year {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Weekday headers */
+.datepicker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.datepicker-weekdays .weekday {
+    text-align: center;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: var(--spacing-xs) 0;
+}
+
+/* Days grid */
+.datepicker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.datepicker-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+    min-height: 40px;
+}
+
+.datepicker-day:not(.disabled):not(.other-month):active {
+    background: var(--surface-elevated);
+}
+
+.datepicker-day.other-month {
+    color: var(--text-secondary);
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.datepicker-day.today {
+    border: 2px solid var(--primary);
+}
+
+.datepicker-day.selected {
+    background: var(--primary);
+    color: white;
+}
+
+.datepicker-day.selected.today {
+    border-color: transparent;
+}
+
+.datepicker-day.disabled {
+    color: var(--text-secondary);
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Action buttons */
+.datepicker-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border);
+}
+
+.datepicker-action-btn {
+    flex: 1;
+    height: 44px;
+    background: var(--surface-elevated);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.datepicker-action-btn:active {
+    background: var(--border);
+}
+
+.datepicker-action-btn.today-btn {
+    background: var(--primary);
+    color: white;
+}
+
+.datepicker-action-btn.today-btn:active {
+    background: var(--primary-dark);
+}

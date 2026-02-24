@@ -1,0 +1,147 @@
+<!--
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ERP by Layer 8</title>
+    <!-- Login Styles (load in order) -->
+    <link rel="stylesheet" href="layer8d-login-base.css">
+    <link rel="stylesheet" href="layer8d-login-forms.css">
+    <link rel="stylesheet" href="layer8d-login-tfa.css">
+    <link rel="stylesheet" href="layer8d-login-components.css">
+</head>
+<body>
+    <div class="layer8d-login-container">
+        <div class="layer8d-login-card">
+            <!-- Header with App Logo and Title -->
+            <div class="layer8d-login-header">
+                <img src="logo.gif" alt="Application Logo" class="app-logo" onerror="this.style.display='none'">
+                <div class="title-with-icon">
+                    <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <h1 id="app-title" class="app-title">ERP by Layer 8</h1>
+                </div>
+                <p id="app-description" class="app-description">Enterprise Resource Planning</p>
+            </div>
+
+            <!-- Login Form Section -->
+            <div class="layer8d-login-form">
+                <!-- Error Message -->
+                <div id="error-message" class="error-message">
+                    <p id="error-text"></p>
+                </div>
+
+                <!-- Login Section -->
+                <div id="login-section">
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" placeholder="Enter your username" autocomplete="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                        </div>
+                        <div id="remember-me-section" class="remember-me">
+                            <input type="checkbox" id="remember-me" name="remember-me">
+                            <label for="remember-me">Remember me</label>
+                        </div>
+                        <button type="submit" id="login-btn" class="layer8d-btn-login">
+                            <span id="btn-spinner" class="spinner" style="display: none;"></span>
+                            <span id="btn-text">Login</span>
+                        </button>
+                    </form>
+                    <div class="layer8d-register-link">
+                        <span>Don't have an account?</span>
+                        <a href="/register/">Register</a>
+                    </div>
+                </div>
+
+                <!-- TFA Verify Section -->
+                <div id="tfa-section" class="layer8d-tfa-section">
+                    <form id="tfa-form">
+                        <p id="tfa-instructions" class="layer8d-tfa-instructions">
+                            Enter the 6-digit code from your authenticator app
+                        </p>
+                        <div class="form-group">
+                            <input type="text" id="tfa-code" class="layer8d-tfa-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" required>
+                        </div>
+                        <button type="submit" class="layer8d-btn-login">
+                            <span id="tfa-spinner" class="spinner" style="display: none;"></span>
+                            <span id="tfa-btn-text">Verify</span>
+                        </button>
+                    </form>
+                    <a id="back-to-login" class="layer8d-back-link">Back to login</a>
+                </div>
+
+                <!-- TFA Setup Section -->
+                <div id="tfa-setup-section" class="layer8d-tfa-section">
+                    <div id="tfa-setup-loading" class="layer8d-tfa-loading">
+                        <span class="spinner"></span>
+                        <p>Loading QR code...</p>
+                    </div>
+                    <div id="tfa-setup-content" class="layer8d-tfa-setup-content" style="display: none;">
+                        <p class="layer8d-tfa-setup-instructions">Scan with your authenticator app</p>
+                        <div class="layer8d-tfa-setup-row">
+                            <div class="layer8d-tfa-qr-container">
+                                <img id="tfa-qr-image" src="" alt="TFA QR Code">
+                            </div>
+                            <div class="layer8d-tfa-setup-right">
+                                <div class="layer8d-tfa-secret-section">
+                                    <p class="layer8d-tfa-secret-label">Manual entry:</p>
+                                    <code id="tfa-secret-code"></code>
+                                </div>
+                                <form id="tfa-setup-form">
+                                    <input type="text" id="tfa-setup-code" class="layer8d-tfa-input-small" placeholder="000000" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" required>
+                                    <button type="submit" class="layer8d-btn-login layer8d-btn-small">
+                                        <span id="tfa-setup-spinner" class="spinner" style="display: none;"></span>
+                                        <span id="tfa-setup-btn-text">Verify</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tfa-setup-error" class="layer8d-tfa-error" style="display: none;">
+                        <p id="tfa-setup-error-message"></p>
+                    </div>
+                    <a id="back-to-login-setup" class="layer8d-back-link">Back to login</a>
+                </div>
+            </div>
+
+            <!-- Footer with Layer 8 Branding -->
+            <div class="layer8d-login-footer">
+                <div class="ecosystem-branding">
+                    <img src="Layer8Logo.gif" alt="Layer 8" class="ecosystem-logo" onerror="this.style.display='none'">
+                    <span class="ecosystem-text">Layer 8 Ecosystem</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <!-- Scripts (load in order) -->
+    <script src="layer8d-login-config.js"></script>
+    <script src="layer8d-login-state.js"></script>
+    <script src="layer8d-login-auth.js"></script>
+    <script src="layer8d-login-tfa.js"></script>
+    <script src="layer8d-login-ui.js"></script>
+</body>
+</html>

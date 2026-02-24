@@ -1,0 +1,178 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+Layer 8 Ecosystem - Wizard/Stepper Styles
+*/
+
+.layer8d-wizard-container {
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.layer8d-wizard {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Step indicator */
+.layer8d-wizard-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    gap: 0;
+}
+
+.layer8d-wizard-step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 60px;
+}
+
+.layer8d-wizard-step-indicator.clickable {
+    cursor: pointer;
+}
+
+.layer8d-wizard-step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    border: 2px solid var(--layer8d-border);
+    color: var(--layer8d-text-light);
+    background: var(--layer8d-bg-white);
+    transition: all 0.2s ease;
+}
+
+.layer8d-wizard-step-indicator.active .layer8d-wizard-step-number {
+    border-color: var(--layer8d-primary);
+    color: var(--layer8d-primary);
+    background: rgba(14, 165, 233, 0.08);
+}
+
+.layer8d-wizard-step-indicator.completed .layer8d-wizard-step-number {
+    border-color: #10b981;
+    background: #10b981;
+    color: #fff;
+}
+
+.layer8d-wizard-step-label {
+    font-size: 11px;
+    color: var(--layer8d-text-light);
+    text-align: center;
+}
+
+.layer8d-wizard-step-indicator.active .layer8d-wizard-step-label {
+    color: var(--layer8d-text-dark);
+    font-weight: 600;
+}
+
+.layer8d-wizard-step-connector {
+    flex: 1;
+    height: 2px;
+    background: var(--layer8d-border);
+    margin: 0 8px;
+    margin-bottom: 18px;
+}
+
+.layer8d-wizard-step-connector.completed {
+    background: #10b981;
+}
+
+/* Content */
+.layer8d-wizard-content {
+    background: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 16px;
+    min-height: 200px;
+}
+
+.layer8d-wizard-step-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--layer8d-text-dark);
+    margin: 0 0 8px 0;
+}
+
+.layer8d-wizard-step-desc {
+    font-size: 14px;
+    color: var(--layer8d-text-medium);
+    margin: 0 0 20px 0;
+}
+
+/* Form fields */
+.layer8d-wizard-step-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.layer8d-wizard-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.layer8d-wizard-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--layer8d-text-dark);
+}
+
+.layer8d-wizard-input {
+    padding: 8px 12px;
+    border: 1px solid var(--layer8d-border);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--layer8d-text-dark);
+    background: var(--layer8d-bg-white);
+}
+
+.layer8d-wizard-input:focus {
+    outline: none;
+    border-color: var(--layer8d-primary);
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
+}
+
+.layer8d-wizard-field.has-error .layer8d-wizard-input {
+    border-color: #ef4444;
+}
+
+.layer8d-wizard-error {
+    font-size: 12px;
+    color: #ef4444;
+}
+
+/* Navigation */
+.layer8d-wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.layer8d-wizard-nav-right {
+    display: flex;
+    gap: 8px;
+}
+
+/* Mobile wizard */
+.layer8m-wizard-container .layer8d-wizard-steps {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.layer8m-wizard-container .layer8d-wizard-step-connector {
+    display: none;
+}
+
+.layer8m-wizard-container .layer8d-wizard-content {
+    padding: 16px;
+}

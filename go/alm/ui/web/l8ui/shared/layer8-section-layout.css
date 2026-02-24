@@ -1,0 +1,361 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* ============================================ */
+/* LAYER 8 SECTION LAYOUT STYLES */
+/* Generic header, tabs, sidebar, and content areas */
+/* Used by all ERP modules (FIN, HCM, SCM, etc.) */
+/* ============================================ */
+
+/* Section Container */
+.l8-section {
+    position: relative;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+/* Full Frame Header */
+.l8-header-frame {
+    position: relative;
+    width: calc(100% + 14px);
+    margin: -7px -7px 20px -7px;
+    height: 120px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(14, 165, 233, 0.15);
+}
+
+/* Parallax Container */
+.l8-header-frame.parallax-container {
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.parallax-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease-out;
+}
+
+/* Background Illustration Layer */
+.l8-header-bg {
+    z-index: 1;
+}
+
+.l8-illustration {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Header Content Layer */
+.l8-header-content {
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.l8-header-title {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 30px;
+    pointer-events: auto;
+}
+
+.l8-icon {
+    flex-shrink: 0;
+    font-size: 48px;
+    filter: drop-shadow(0 4px 12px rgba(14, 165, 233, 0.3));
+    animation: l8-icon-float 3s ease-in-out infinite;
+}
+
+@keyframes l8-icon-float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.l8-title {
+    font-size: 36px;
+    color: #0f172a;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+    font-family: 'Figtree', sans-serif;
+    text-shadow: 0 2px 20px rgba(14, 165, 233, 0.2);
+    line-height: 1.2;
+}
+
+.l8-subtitle {
+    font-size: 12px;
+    color: #475569;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 6px;
+    opacity: 0.9;
+}
+
+/* ============================================ */
+/* MODULE TABS (Top-level navigation) */
+/* ============================================ */
+
+.l8-module-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 0;
+    flex-wrap: wrap;
+    background: #f8fafc;
+    margin: 0 -7px;
+    padding: 0 7px;
+}
+
+.l8-module-tab {
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: -2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.l8-module-tab:hover {
+    color: #0ea5e9;
+    background: rgba(14, 165, 233, 0.05);
+}
+
+.l8-module-tab.active {
+    color: #0ea5e9;
+    border-bottom-color: #0ea5e9;
+    font-weight: 600;
+    background: white;
+}
+
+.l8-module-tab .tab-icon {
+    font-size: 16px;
+}
+
+.l8-module-tab .tab-label {
+    display: inline;
+}
+
+/* ============================================ */
+/* MODULE CONTENT CONTAINER */
+/* ============================================ */
+
+.l8-module-content {
+    display: none;
+    animation: l8-fade-in-content 0.3s ease-out;
+}
+
+.l8-module-content.active {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+@keyframes l8-fade-in-content {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================ */
+/* SUB-NAVIGATION SIDEBAR */
+/* ============================================ */
+
+.l8-subnav {
+    width: 200px;
+    min-width: 200px;
+    background: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    padding: 16px 0;
+    margin: 0 -7px 0 -7px;
+    overflow-y: auto;
+}
+
+.l8-subnav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    text-decoration: none;
+}
+
+.l8-subnav-item:hover {
+    background: rgba(14, 165, 233, 0.08);
+    color: #0ea5e9;
+}
+
+.l8-subnav-item.active {
+    background: rgba(14, 165, 233, 0.1);
+    color: #0ea5e9;
+    border-left-color: #0ea5e9;
+    font-weight: 600;
+}
+
+.l8-subnav-item .subnav-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.l8-subnav-item .subnav-label {
+    flex: 1;
+}
+
+/* ============================================ */
+/* SERVICE CONTENT AREA */
+/* ============================================ */
+
+.l8-service-content {
+    flex: 1;
+    padding: 0;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.l8-service-view {
+    display: none;
+}
+
+.l8-service-view.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    animation: l8-fade-in-content 0.3s ease-out;
+}
+
+.l8-service-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.l8-service-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.l8-service-title .service-icon {
+    font-size: 24px;
+}
+
+.l8-service-description {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* ============================================ */
+/* TABLE CONTAINER */
+/* ============================================ */
+
+.l8-table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================ */
+/* BACKWARD COMPATIBILITY ALIASES */
+/* These allow old hcm-* classes to work during migration */
+/* ============================================ */
+
+.hcm-section { position: relative; overflow: visible; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.hcm-header-frame { position: relative; width: calc(100% + 14px); margin: -7px -7px 20px -7px; height: 120px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%); border-radius: 16px 16px 0 0; overflow: hidden; box-shadow: 0 8px 32px rgba(14, 165, 233, 0.15); }
+.hcm-header-frame.parallax-container { position: relative; transform-style: preserve-3d; }
+.hcm-header-bg { z-index: 1; }
+.hcm-illustration { width: 100%; height: 100%; display: block; }
+.hcm-header-content { z-index: 2; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.hcm-header-title { display: flex; align-items: center; gap: 20px; padding: 30px; pointer-events: auto; }
+.hcm-icon { flex-shrink: 0; font-size: 48px; filter: drop-shadow(0 4px 12px rgba(14, 165, 233, 0.3)); animation: l8-icon-float 3s ease-in-out infinite; }
+.hcm-title { font-size: 36px; color: #0f172a; font-weight: 700; margin: 0; letter-spacing: -0.5px; text-transform: uppercase; font-family: 'Figtree', sans-serif; text-shadow: 0 2px 20px rgba(14, 165, 233, 0.2); line-height: 1.2; }
+.hcm-subtitle { font-size: 12px; color: #475569; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 6px; opacity: 0.9; }
+.hcm-module-tabs { display: flex; gap: 4px; margin-bottom: 0; border-bottom: 2px solid #e2e8f0; padding: 0; flex-wrap: wrap; background: #f8fafc; margin: 0 -7px; padding: 0 7px; }
+.hcm-module-tab { padding: 12px 20px; background: transparent; border: none; border-bottom: 3px solid transparent; color: #64748b; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; position: relative; bottom: -2px; display: flex; align-items: center; gap: 8px; }
+.hcm-module-tab:hover { color: #0ea5e9; background: rgba(14, 165, 233, 0.05); }
+.hcm-module-tab.active { color: #0ea5e9; border-bottom-color: #0ea5e9; font-weight: 600; background: white; }
+.hcm-module-tab .tab-icon { font-size: 16px; }
+.hcm-module-tab .tab-label { display: inline; }
+.hcm-module-content { display: none; animation: l8-fade-in-content 0.3s ease-out; }
+.hcm-module-content.active { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.hcm-subnav { width: 200px; min-width: 200px; background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 16px 0; margin: 0 -7px 0 -7px; overflow-y: auto; }
+.hcm-subnav-item { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: #475569; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border-left: 3px solid transparent; text-decoration: none; }
+.hcm-subnav-item:hover { background: rgba(14, 165, 233, 0.08); color: #0ea5e9; }
+.hcm-subnav-item.active { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border-left-color: #0ea5e9; font-weight: 600; }
+.hcm-subnav-item .subnav-icon { font-size: 16px; width: 20px; text-align: center; }
+.hcm-subnav-item .subnav-label { flex: 1; }
+.hcm-service-content { flex: 1; padding: 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.hcm-service-view { display: none; }
+.hcm-service-view.active { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; animation: l8-fade-in-content 0.3s ease-out; }
+.hcm-service-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; padding: 16px 16px 12px; border-bottom: 1px solid #e2e8f0; }
+.hcm-service-title { font-size: 20px; font-weight: 700; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 10px; }
+.hcm-service-title .service-icon { font-size: 24px; }
+.hcm-service-description { font-size: 13px; color: #64748b; margin-top: 4px; }
+.hcm-table-container { background: white; border-radius: 12px; overflow: hidden; flex: 1; min-height: 0; display: flex; flex-direction: column; }

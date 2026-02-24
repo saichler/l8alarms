@@ -1,0 +1,144 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+Layer 8 Ecosystem - Kanban Board Styles
+*/
+
+.layer8d-kanban-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+.layer8d-kanban-toolbar {
+    padding: 8px 0;
+    margin-bottom: 8px;
+}
+
+.layer8d-kanban-board {
+    width: 100%;
+}
+
+.layer8d-kanban-lanes {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    min-height: 400px;
+}
+
+.layer8d-kanban-lane {
+    flex: 1 0 240px;
+    min-width: 240px;
+    max-width: 320px;
+    background: var(--layer8d-bg-light);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.layer8d-kanban-lane-header {
+    padding: 10px 12px;
+    border-top: 3px solid #6b7280;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.layer8d-kanban-lane-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--layer8d-text-dark);
+}
+
+.layer8d-kanban-lane-count {
+    background: var(--layer8d-bg-input);
+    color: var(--layer8d-text-medium);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.layer8d-kanban-lane-body {
+    flex: 1;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 100px;
+    transition: background 0.15s ease;
+}
+
+.layer8d-kanban-lane-body.drag-over {
+    background: var(--accent-bg, rgba(14, 165, 233, 0.08));
+    border-radius: 0 0 8px 8px;
+}
+
+/* Card */
+.layer8d-kanban-card {
+    background: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    user-select: none;
+}
+
+.layer8d-kanban-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.layer8d-kanban-card.dragging {
+    opacity: 0.5;
+    transform: rotate(2deg);
+}
+
+.layer8d-kanban-card-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--layer8d-text-dark);
+    margin-bottom: 2px;
+}
+
+.layer8d-kanban-card-subtitle {
+    font-size: 12px;
+    color: var(--layer8d-text-medium);
+    margin-bottom: 6px;
+}
+
+.layer8d-kanban-card-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--layer8d-border);
+}
+
+.layer8d-kanban-card-field {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+}
+
+.layer8d-kanban-field-label {
+    color: var(--layer8d-text-light);
+}
+
+.layer8d-kanban-field-value {
+    color: var(--layer8d-text-medium);
+    font-weight: 500;
+}
+
+/* Mobile kanban */
+.layer8m-kanban-container .layer8d-kanban-lanes {
+    flex-direction: column;
+    gap: 16px;
+}
+
+.layer8m-kanban-container .layer8d-kanban-lane {
+    max-width: none;
+    min-width: auto;
+}

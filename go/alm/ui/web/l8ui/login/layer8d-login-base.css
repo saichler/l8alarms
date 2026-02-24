@@ -1,0 +1,183 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* L8ERP - Login Page Base Styles */
+/* Part 1 of 4 - Load this file first */
+/* Variables, reset, body, container, card, header */
+
+/* ============================================ */
+/* FIGTREE FONT FACES */
+/* ============================================ */
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    /* Primary Colors - True NOC Dark Theme */
+    --noc-black: #000000;
+    --noc-dark: #0a0a0a;
+    --noc-charcoal: #121212;
+    --noc-slate: #1a1a1a;
+    --noc-gray: #1e1e1e;
+
+    /* Accent Colors */
+    --noc-cyan: #0ea5e9;
+    --noc-cyan-dark: #0284c7;
+    --noc-green: #00c853;
+
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: #b0bec5;
+    --text-muted: #78909c;
+
+    /* Background Colors */
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-card: #1a1a1a;
+    --bg-elevated: #1e1e1e;
+    --bg-input: #2d3748;
+
+    /* Border Colors */
+    --border-subtle: #212121;
+    --border-default: #2a2a2a;
+    --border-emphasis: #333333;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.layer8d-login-container {
+    width: 100%;
+    max-width: 420px;
+    transition: max-width 0.3s ease;
+}
+
+.layer8d-login-container.layer8d-tfa-setup-active {
+    max-width: 710px;
+}
+
+/* Login Card - Dark Theme */
+.layer8d-login-card {
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(14, 165, 233, 0.1);
+    overflow: hidden;
+    border: 1px solid var(--border-emphasis);
+}
+
+/* Header Section - White like main app */
+.layer8d-login-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 30px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.app-logo {
+    max-width: 80px;
+    max-height: 80px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    filter: drop-shadow(0 0 10px rgba(21, 101, 192, 0.4));
+}
+
+.title-with-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.title-icon {
+    width: 28px;
+    height: 28px;
+    stroke: var(--noc-cyan);
+    animation: iconPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.4));
+}
+
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.4));
+    }
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 12px rgba(14, 165, 233, 0.7));
+    }
+}
+
+.app-title {
+    color: #2d3748;
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0;
+    font-family: 'Figtree', sans-serif;
+}
+
+.app-description {
+    color: #718096;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}

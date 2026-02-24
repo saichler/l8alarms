@@ -1,0 +1,145 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+Layer 8 Ecosystem - Timeline Styles
+*/
+
+.layer8d-timeline-container {
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.layer8d-timeline-toolbar {
+    margin-bottom: 16px;
+}
+
+.layer8d-timeline {
+    position: relative;
+}
+
+.layer8d-timeline-line {
+    position: relative;
+    padding: 20px 0;
+}
+
+.layer8d-timeline-line::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--layer8d-border);
+    transform: translateX(-50%);
+}
+
+.layer8d-timeline-event {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    cursor: pointer;
+}
+
+.layer8d-timeline-event.left {
+    justify-content: flex-start;
+    padding-right: 52%;
+}
+
+.layer8d-timeline-event.right {
+    justify-content: flex-end;
+    padding-left: 52%;
+}
+
+.layer8d-timeline-node {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    background: var(--layer8d-primary);
+    border: 3px solid var(--layer8d-bg-white);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.layer8d-timeline-content {
+    background: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    max-width: 100%;
+    transition: box-shadow 0.15s ease;
+}
+
+.layer8d-timeline-event:hover .layer8d-timeline-content {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.layer8d-timeline-date {
+    font-size: 11px;
+    color: var(--layer8d-text-light);
+    margin-bottom: 4px;
+}
+
+.layer8d-timeline-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--layer8d-text-dark);
+    margin-bottom: 4px;
+}
+
+.layer8d-timeline-desc {
+    font-size: 13px;
+    color: var(--layer8d-text-medium);
+    margin-bottom: 4px;
+}
+
+.layer8d-timeline-actor {
+    font-size: 11px;
+    color: var(--layer8d-text-light);
+    font-style: italic;
+}
+
+.layer8d-timeline-empty {
+    text-align: center;
+    color: var(--layer8d-text-light);
+    padding: 40px 0;
+    font-size: 14px;
+}
+
+.layer8d-timeline-load-more {
+    text-align: center;
+    padding: 16px 0;
+}
+
+.layer8d-timeline-more-btn {
+    background: var(--layer8d-bg-light);
+    border: 1px solid var(--layer8d-border);
+    padding: 8px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--layer8d-text-medium);
+}
+
+.layer8d-timeline-more-btn:hover {
+    background: var(--layer8d-bg-input);
+}
+
+/* Mobile: single column */
+.layer8m-timeline-container .layer8d-timeline-line::before {
+    left: 16px;
+}
+
+.layer8m-timeline-container .layer8d-timeline-event.left,
+.layer8m-timeline-container .layer8d-timeline-event.right {
+    padding-left: 40px;
+    padding-right: 0;
+    justify-content: flex-start;
+}
+
+.layer8m-timeline-container .layer8d-timeline-node {
+    left: 16px;
+}

@@ -1,0 +1,264 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * ERP Notification Component Styles
+ * Standardized error/success/warning/info notification popups
+ */
+
+/* ============================================ */
+/* NOTIFICATION CONTAINER */
+/* ============================================ */
+
+.layer8d-notification-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    max-width: 500px;
+    width: calc(100% - 40px);
+    pointer-events: none;
+}
+
+/* ============================================ */
+/* NOTIFICATION CARD */
+/* ============================================ */
+
+.layer8d-notification {
+    background: var(--layer8d-bg-white, #ffffff);
+    border-radius: var(--layer8d-radius-lg, 12px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: erp-notification-slide-in 0.3s ease forwards;
+}
+
+.layer8d-notification.layer8d-notification-closing {
+    animation: erp-notification-slide-out 0.2s ease forwards;
+}
+
+/* ============================================ */
+/* TYPE COLORS */
+/* ============================================ */
+
+.layer8d-notification-error {
+    border-left-color: var(--layer8d-error, #ef4444);
+}
+
+.layer8d-notification-warning {
+    border-left-color: var(--layer8d-warning, #f59e0b);
+}
+
+.layer8d-notification-success {
+    border-left-color: var(--layer8d-success, #22c55e);
+}
+
+.layer8d-notification-info {
+    border-left-color: var(--layer8d-info, #3b82f6);
+}
+
+/* ============================================ */
+/* HEADER */
+/* ============================================ */
+
+.layer8d-notification-header {
+    display: flex;
+    align-items: center;
+    gap: var(--layer8d-space-sm, 8px);
+    padding: var(--layer8d-space-md, 16px) var(--layer8d-space-md, 16px) var(--layer8d-space-sm, 8px);
+}
+
+.layer8d-notification-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.layer8d-notification-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.layer8d-notification-error .layer8d-notification-icon svg {
+    fill: var(--layer8d-error, #ef4444);
+}
+
+.layer8d-notification-warning .layer8d-notification-icon svg {
+    fill: var(--layer8d-warning, #f59e0b);
+}
+
+.layer8d-notification-success .layer8d-notification-icon svg {
+    fill: var(--layer8d-success, #22c55e);
+}
+
+.layer8d-notification-info .layer8d-notification-icon svg {
+    fill: var(--layer8d-info, #3b82f6);
+}
+
+.layer8d-notification-title {
+    flex: 1;
+    font-size: var(--layer8d-font-lg, 16px);
+    font-weight: 600;
+    color: var(--layer8d-text-dark, #2d3748);
+    font-family: var(--layer8d-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    margin: 0;
+}
+
+.layer8d-notification-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: var(--layer8d-radius-sm, 4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--layer8d-text-muted, #718096);
+    transition: background-color 0.2s ease, color 0.2s ease;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.layer8d-notification-close:hover {
+    background: var(--layer8d-bg-input, #f1f5f9);
+    color: var(--layer8d-text-dark, #2d3748);
+}
+
+.layer8d-notification-close svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ============================================ */
+/* BODY */
+/* ============================================ */
+
+.layer8d-notification-body {
+    padding: 0 var(--layer8d-space-md, 16px) var(--layer8d-space-md, 16px);
+}
+
+.layer8d-notification-message {
+    font-size: var(--layer8d-font-base, 14px);
+    color: var(--layer8d-text-medium, #4a5568);
+    font-family: var(--layer8d-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    line-height: 1.5;
+    margin: 0 0 var(--layer8d-space-sm, 8px) 0;
+}
+
+.layer8d-notification-body:last-child .layer8d-notification-message:last-child {
+    margin-bottom: 0;
+}
+
+/* ============================================ */
+/* DETAILS LIST */
+/* ============================================ */
+
+.layer8d-notification-details {
+    margin: var(--layer8d-space-sm, 8px) 0 0;
+    padding: var(--layer8d-space-sm, 8px) var(--layer8d-space-md, 16px);
+    background: var(--layer8d-bg-light, #f7fafc);
+    border-radius: var(--layer8d-radius-md, 8px);
+    list-style: none;
+}
+
+.layer8d-notification-details li {
+    font-size: var(--layer8d-font-sm, 12px);
+    color: var(--layer8d-text-medium, #4a5568);
+    font-family: var(--layer8d-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+    line-height: 1.6;
+    padding: var(--layer8d-space-xs, 4px) 0;
+    position: relative;
+    padding-left: 16px;
+}
+
+.layer8d-notification-details li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--layer8d-text-light, #a0aec0);
+}
+
+.layer8d-notification-error .layer8d-notification-details li::before {
+    background: var(--layer8d-error, #ef4444);
+}
+
+.layer8d-notification-warning .layer8d-notification-details li::before {
+    background: var(--layer8d-warning, #f59e0b);
+}
+
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+
+@keyframes erp-notification-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes erp-notification-slide-out {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* ============================================ */
+/* RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 480px) {
+    .layer8d-notification-container {
+        top: 10px;
+        width: calc(100% - 20px);
+        max-width: none;
+    }
+
+    .layer8d-notification-header {
+        padding: var(--layer8d-space-sm, 8px) var(--layer8d-space-sm, 8px) var(--layer8d-space-xs, 4px);
+    }
+
+    .layer8d-notification-body {
+        padding: 0 var(--layer8d-space-sm, 8px) var(--layer8d-space-sm, 8px);
+    }
+
+    .layer8d-notification-title {
+        font-size: var(--layer8d-font-base, 14px);
+    }
+
+    .layer8d-notification-message {
+        font-size: var(--layer8d-font-sm, 12px);
+    }
+}

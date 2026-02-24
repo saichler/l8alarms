@@ -1,0 +1,124 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+Layer 8 Ecosystem - Chart Component Styles
+*/
+
+/* Chart container */
+.layer8d-chart-container {
+    position: relative;
+    width: 100%;
+    min-height: 300px;
+    background: var(--layer8d-bg-white);
+    border-radius: 8px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.layer8d-chart-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--layer8d-text-dark);
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.layer8d-chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Chart type controls */
+.layer8d-chart-controls {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.layer8d-chart-type-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--layer8d-text-medium);
+    background: var(--layer8d-bg-light);
+    border: 1px solid var(--layer8d-border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.layer8d-chart-type-btn:hover {
+    border-color: var(--layer8d-primary);
+    color: var(--layer8d-primary);
+}
+
+.layer8d-chart-type-btn.active {
+    background: var(--layer8d-primary);
+    color: #ffffff;
+    border-color: var(--layer8d-primary);
+}
+
+.layer8d-chart-type-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* Interactive elements */
+.layer8d-chart-bar {
+    transition: opacity 0.15s ease;
+}
+
+.layer8d-chart-slice {
+    transition: opacity 0.15s ease;
+}
+
+.layer8d-chart-point {
+    transition: r 0.15s ease;
+}
+
+.layer8d-chart-line {
+    transition: stroke-width 0.15s ease;
+}
+
+.layer8d-chart-area {
+    transition: opacity 0.15s ease;
+}
+
+/* Tooltip */
+.layer8d-chart-tooltip {
+    position: fixed;
+    background: var(--layer8d-text-dark);
+    color: #ffffff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateX(-50%) translateY(-100%);
+    transition: opacity 0.15s ease;
+    z-index: 10000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+}
+
+.layer8d-chart-tooltip.visible {
+    opacity: 1;
+}
+
+/* Mobile chart */
+.layer8m-chart-container {
+    position: relative;
+    width: 100%;
+    min-height: 250px;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.layer8m-chart-container .layer8d-chart-svg {
+    max-height: 300px;
+}

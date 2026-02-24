@@ -1,0 +1,53 @@
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "api.proto";
+
+// CorrelationRule: Defines how alarms are correlated for root cause analysis.
+message CorrelationRule {
+  string rule_id = 1;
+  string name = 2;
+  string description = 3;
+  CorrelationRuleType rule_type = 4;
+  CorrelationRuleStatus status = 5;
+  int32 priority = 6;
+
+  // Topological correlation
+  TraversalDirection traversal_direction = 7;
+  int32 traversal_depth = 8;
+  repeated string root_node_types = 9;
+  repeated string symptom_node_types = 10;
+
+  // Temporal correlation
+  int32 time_window_seconds = 11;
+
+  // Pattern matching
+  string root_alarm_pattern = 12;
+  string symptom_alarm_pattern = 13;
+
+  // Common settings
+  int32 min_symptom_count = 14;
+  bool auto_suppress_symptoms = 15;
+  bool auto_acknowledge_symptoms = 16;
+
+  // Conditions
+  repeated CorrelationCondition conditions = 17;
+
+  int64 created_at = 20;
+  int64 updated_at = 21;
+}
+
+// Child type: Individual condition in a correlation rule
+message CorrelationCondition {
+  string condition_id = 1;
+  string field = 2;
+  ConditionOperator operator = 3;
+  string value = 4;
+}
+
+message CorrelationRuleList {
+  repeated CorrelationRule list = 1;
+  l8api.L8MetaData metadata = 2;
+}

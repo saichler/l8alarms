@@ -1,0 +1,44 @@
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "api.proto";
+
+// AlarmDefinition: Template defining what conditions generate an alarm.
+message AlarmDefinition {
+  string definition_id = 1;
+  string name = 2;
+  string description = 3;
+  AlarmDefinitionStatus status = 4;
+  AlarmSeverity default_severity = 5;
+
+  // Event matching criteria
+  string event_pattern = 6;
+  EventType event_type_filter = 7;
+  string node_type_filter = 8;
+
+  // Threshold-based alarm generation
+  int32 threshold_count = 9;
+  int32 threshold_window_seconds = 10;
+
+  // Auto-clear configuration
+  bool auto_clear_enabled = 11;
+  int32 auto_clear_seconds = 12;
+  string clear_event_pattern = 13;
+
+  // Deduplication
+  bool dedup_enabled = 14;
+  string dedup_key_expression = 15;
+
+  // Topology scope
+  repeated string node_type_scope = 16;
+
+  int64 created_at = 20;
+  int64 updated_at = 21;
+}
+
+message AlarmDefinitionList {
+  repeated AlarmDefinition list = 1;
+  l8api.L8MetaData metadata = 2;
+}

@@ -1,0 +1,50 @@
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "api.proto";
+
+// Event: Raw event occurrence from a managed element.
+message Event {
+  string event_id = 1;
+  EventType event_type = 2;
+  EventProcessingState processing_state = 3;
+
+  // Source (topology references by ID)
+  string node_id = 4;
+  string node_name = 5;
+  string source_identifier = 6;
+
+  // Event content
+  AlarmSeverity severity = 7;
+  string message = 8;
+  string raw_data = 9;
+
+  // Classification
+  string category = 10;
+  string subcategory = 11;
+
+  // Processing results
+  string alarm_id = 12;
+  string definition_id = 13;
+
+  // Timing
+  int64 occurred_at = 14;
+  int64 received_at = 15;
+  int64 processed_at = 16;
+
+  // Extensible attributes
+  repeated EventAttribute attributes = 17;
+}
+
+// Child type: Key-value attribute from the event
+message EventAttribute {
+  string key = 1;
+  string value = 2;
+}
+
+message EventList {
+  repeated Event list = 1;
+  l8api.L8MetaData metadata = 2;
+}

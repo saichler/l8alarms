@@ -1,0 +1,17 @@
+{
+    "login": {
+        "appTitle": "Layer 8 Alarms",
+        "appDescription": "Alarm & Event Management",
+        "authEndpoint": "/auth",
+        "redirectUrl": "/app.html",
+        "showRememberMe": true,
+        "showRegister": true,
+        "sessionTimeout": 30,
+        "tfaEnabled": true
+    },
+    "app": {
+        "dateFormat": "mm/dd/yyyy",
+        "apiPrefix": "/alm",
+        "healthPath": "/0/Health"
+    }
+}

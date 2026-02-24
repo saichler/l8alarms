@@ -1,0 +1,136 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+Layer 8 Ecosystem - Tree Grid Styles
+*/
+
+.layer8d-tree-grid-container {
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.layer8d-tree-grid-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.layer8d-tree-grid-btn {
+    background: var(--layer8d-bg-light);
+    border: 1px solid var(--layer8d-border);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--layer8d-text-medium);
+}
+
+.layer8d-tree-grid-btn:first-child {
+    background: var(--layer8d-primary);
+    color: #fff;
+    border-color: var(--layer8d-primary);
+}
+
+.layer8d-tree-grid-btn:hover {
+    opacity: 0.9;
+}
+
+.layer8d-tree-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.layer8d-tree-grid-table thead th {
+    background: var(--layer8d-bg-light);
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--layer8d-text-medium);
+    border-bottom: 2px solid var(--layer8d-border);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.layer8d-tree-grid-table tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--layer8d-border);
+    color: var(--layer8d-text-dark);
+}
+
+.layer8d-tree-grid-row {
+    cursor: pointer;
+    transition: background 0.1s ease;
+}
+
+.layer8d-tree-grid-row:hover {
+    background: var(--layer8d-bg-light);
+}
+
+.layer8d-tree-grid-cell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.layer8d-tree-grid-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    color: var(--layer8d-text-light);
+    font-size: 12px;
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+}
+
+.layer8d-tree-grid-arrow.expanded {
+    transform: rotate(90deg);
+}
+
+.layer8d-tree-grid-arrow:hover {
+    color: var(--layer8d-primary);
+}
+
+.layer8d-tree-grid-arrow-placeholder {
+    display: inline-block;
+    width: 18px;
+    flex-shrink: 0;
+}
+
+.layer8d-tree-grid-empty {
+    text-align: center;
+    color: var(--layer8d-text-light);
+    padding: 40px 12px;
+}
+
+/* Mobile tree grid - nested card view */
+.layer8m-tree-grid-container .layer8d-tree-grid-table {
+    display: block;
+}
+
+.layer8m-tree-grid-container .layer8d-tree-grid-table thead {
+    display: none;
+}
+
+.layer8m-tree-grid-container .layer8d-tree-grid-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.layer8m-tree-grid-container .layer8d-tree-grid-row {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 8px;
+    border: 1px solid var(--layer8d-border);
+    border-radius: 6px;
+}
+
+.layer8m-tree-grid-container .layer8d-tree-grid-row td {
+    border-bottom: none;
+    padding: 2px 8px;
+}

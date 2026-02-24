@@ -1,0 +1,86 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* ============================================ */
+/* Health Monitor - Detail Modal Styles         */
+/* ============================================ */
+
+/* Detail Grid Layout */
+.l8health-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 16px;
+}
+
+/* Section Cards */
+.l8health-detail-section {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.l8health-detail-section.l8health-detail-full-width {
+    grid-column: 1 / -1;
+}
+
+/* Section Title */
+.l8health-detail-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0ea5e9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Key-Value Rows */
+.l8health-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.l8health-detail-row:last-child {
+    border-bottom: none;
+}
+
+/* Labels */
+.l8health-detail-label {
+    font-size: 11px;
+    color: #718096;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Values */
+.l8health-detail-value {
+    font-size: 12px;
+    color: #2d3748;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .l8health-detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

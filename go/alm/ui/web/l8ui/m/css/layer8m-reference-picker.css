@@ -1,0 +1,157 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * Mobile Reference Picker Styles
+ */
+
+.mobile-reference-picker {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 400px;
+}
+
+/* Search input */
+.reference-search {
+    position: relative;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.reference-search-input {
+    width: 100%;
+    height: var(--touch-target);
+    padding: 0 var(--spacing-md);
+    padding-left: 44px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-md);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.reference-search-input:focus {
+    border-color: var(--primary);
+}
+
+.reference-search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.reference-search-icon {
+    position: absolute;
+    left: calc(var(--spacing-md) + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.reference-search-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* List container */
+.reference-list {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+/* List items */
+.reference-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.reference-item:active {
+    background: var(--surface-elevated);
+}
+
+.reference-item.selected {
+    background: rgba(14, 165, 233, 0.1);
+}
+
+.reference-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.reference-item-primary {
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reference-item-secondary {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.reference-item-check {
+    color: var(--primary);
+    font-size: 18px;
+    font-weight: bold;
+    margin-left: var(--spacing-md);
+    flex-shrink: 0;
+}
+
+/* Loading states */
+.reference-loading,
+.reference-loading-more {
+    padding: var(--spacing-lg);
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: var(--font-size-md);
+}
+
+.reference-loading-more {
+    padding: var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+/* Empty state */
+.reference-empty {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.reference-empty p {
+    margin: 0;
+    font-size: var(--font-size-md);
+}
+
+.reference-empty .hint {
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    opacity: 0.7;
+}

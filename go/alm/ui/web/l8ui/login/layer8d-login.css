@@ -1,0 +1,32 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* L8ERP - Login Page Styles */
+/*
+ * This file has been split into multiple files for maintainability.
+ * The module is split across multiple files:
+ *
+ *   - login-base.css       : Variables, reset, body, container, card, header
+ *   - login-forms.css      : Form inputs, buttons, error messages
+ *   - login-tfa.css        : TFA verification and setup sections
+ *   - login-components.css : Footer, toast, spinner, responsive, scrollbar
+ *
+ * Load all CSS files in index.html in order:
+ *   1. login-base.css
+ *   2. login-forms.css
+ *   3. login-tfa.css
+ *   4. login-components.css
+ *
+ * This file is kept for backwards compatibility but should not be loaded.
+ */

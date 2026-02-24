@@ -1,0 +1,40 @@
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "api.proto";
+
+// MaintenanceWindow: Scheduled period during which alarms are suppressed.
+message MaintenanceWindow {
+  string window_id = 1;
+  string name = 2;
+  string description = 3;
+  MaintenanceWindowStatus status = 4;
+
+  // Time window
+  int64 start_time = 5;
+  int64 end_time = 6;
+
+  // Recurrence
+  RecurrenceType recurrence = 7;
+  int32 recurrence_interval = 8;
+
+  // Scope
+  repeated string node_ids = 9;
+  repeated string node_types = 10;
+  repeated string locations = 11;
+
+  // Behavior
+  bool suppress_alarms = 12;
+  bool suppress_notifications = 13;
+
+  string created_by = 14;
+  int64 created_at = 15;
+  int64 updated_at = 16;
+}
+
+message MaintenanceWindowList {
+  repeated MaintenanceWindow list = 1;
+  l8api.L8MetaData metadata = 2;
+}

@@ -1,0 +1,239 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+Layer 8 Ecosystem - Calendar View Styles
+*/
+
+.layer8d-calendar-container {
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.layer8d-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.layer8d-calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.layer8d-calendar-nav-btn {
+    background: var(--layer8d-bg-light);
+    border: 1px solid var(--layer8d-border);
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--layer8d-text-dark);
+}
+
+.layer8d-calendar-nav-btn:hover {
+    background: var(--layer8d-bg-input);
+}
+
+.layer8d-calendar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--layer8d-text-dark);
+    min-width: 180px;
+    text-align: center;
+}
+
+.layer8d-calendar-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.layer8d-calendar-btn {
+    background: var(--layer8d-bg-light);
+    border: 1px solid var(--layer8d-border);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--layer8d-text-medium);
+}
+
+.layer8d-calendar-btn.active {
+    background: var(--layer8d-primary);
+    color: #fff;
+    border-color: var(--layer8d-primary);
+}
+
+.layer8d-calendar-add-btn {
+    margin-left: 8px;
+}
+
+/* Month grid */
+.layer8d-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border: 1px solid var(--layer8d-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.layer8d-calendar-day-header {
+    background: var(--layer8d-bg-light);
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--layer8d-text-medium);
+    border-bottom: 1px solid var(--layer8d-border);
+}
+
+.layer8d-calendar-day {
+    min-height: 90px;
+    padding: 4px;
+    border-bottom: 1px solid var(--layer8d-border);
+    border-right: 1px solid var(--layer8d-border);
+    background: var(--layer8d-bg-white);
+}
+
+.layer8d-calendar-day.empty {
+    background: var(--layer8d-bg-light);
+}
+
+.layer8d-calendar-day.today {
+    background: rgba(14, 165, 233, 0.04);
+}
+
+.layer8d-calendar-day-num {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--layer8d-text-medium);
+    margin-bottom: 4px;
+    padding: 2px 4px;
+}
+
+.layer8d-calendar-day-num.today {
+    background: var(--layer8d-primary);
+    color: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.layer8d-calendar-day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.layer8d-calendar-event {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    color: #fff;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+}
+
+.layer8d-calendar-event:hover {
+    opacity: 0.85;
+}
+
+.layer8d-calendar-more {
+    font-size: 11px;
+    color: var(--layer8d-text-light);
+    padding: 2px 4px;
+    cursor: pointer;
+}
+
+/* Week view */
+.layer8d-calendar-week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.layer8d-calendar-week-day {
+    background: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-border);
+    border-radius: 8px;
+    padding: 8px;
+    min-height: 200px;
+}
+
+.layer8d-calendar-week-day.today {
+    border-color: var(--layer8d-primary);
+}
+
+.layer8d-calendar-week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--layer8d-border);
+}
+
+.layer8d-calendar-week-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--layer8d-text-medium);
+}
+
+.layer8d-calendar-week-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--layer8d-text-dark);
+}
+
+.layer8d-calendar-week-date.today {
+    background: var(--layer8d-primary);
+    color: #fff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.layer8d-calendar-week-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Mobile calendar - list by day */
+.layer8m-calendar-container .layer8d-calendar-grid {
+    grid-template-columns: 1fr;
+}
+
+.layer8m-calendar-container .layer8d-calendar-day-header {
+    display: none;
+}
+
+.layer8m-calendar-container .layer8d-calendar-day.empty {
+    display: none;
+}
+
+.layer8m-calendar-container .layer8d-calendar-day {
+    min-height: auto;
+    padding: 8px 12px;
+}
+
+.layer8m-calendar-container .layer8d-calendar-week {
+    grid-template-columns: 1fr;
+}

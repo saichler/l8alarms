@@ -1,0 +1,474 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* Layer 8 Ecosystem - Abstract Table Component Styles */
+
+/* Figtree Font */
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Sticky Header Configuration */
+:root {
+    --l8-header-height: 41px;  /* Height of header row for filter positioning */
+}
+
+/* Table Wrapper */
+.l8-table-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Pagination Controls (Above Table) */
+.l8-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.l8-pagination-info {
+    font-size: 12px;
+    color: #4a5568;
+    font-family: 'Figtree', sans-serif;
+}
+
+.l8-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.l8-page-size {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.l8-page-size label {
+    font-size: 11px;
+    color: #4a5568;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.l8-page-size-select {
+    padding: 6px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Figtree', sans-serif;
+    background: white;
+    color: #2d3748;
+    cursor: pointer;
+    min-width: 60px;
+}
+
+.l8-page-size-select:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
+}
+
+.l8-page-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.l8-page-btn {
+    padding: 6px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+    color: #4a5568;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 32px;
+}
+
+.l8-page-btn:hover:not(:disabled) {
+    background: #0ea5e9;
+    color: white;
+    border-color: #0ea5e9;
+}
+
+.l8-page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.l8-page-current {
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #2d3748;
+    font-weight: 600;
+    font-family: 'Figtree', sans-serif;
+}
+
+/* Table Container */
+.l8-table-container {
+    overflow: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    flex: 1;
+    min-height: 0;
+}
+
+/* Table */
+.l8-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.l8-table th,
+.l8-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.l8-table th {
+    background: #f7fafc;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 600;
+    color: #0ea5e9;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Sortable Headers */
+.l8-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.l8-table th.sortable:hover {
+    background: rgba(14, 165, 233, 0.1);
+}
+
+.l8-table-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.l8-sort-indicator {
+    opacity: 0.5;
+    font-size: 10px;
+}
+
+/* Header row - Sticky */
+.l8-table-header-row {
+    background: #f7fafc;
+}
+
+.l8-table-header-row th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f7fafc;
+}
+
+/* Shadow for header row (tables without filter) */
+.l8-table-header-row:last-child th::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 4px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08), transparent);
+    pointer-events: none;
+}
+
+/* Position relative needed for shadow pseudo-element */
+.l8-table-header-row:last-child th {
+    position: sticky;  /* Already set, but ensure it's relative for ::after */
+}
+
+/* Filter Row - Sticky below header */
+.l8-table-filter-row {
+    background: #f7fafc;
+}
+
+.l8-table-filter-row th {
+    position: sticky;
+    top: var(--l8-header-height);
+    z-index: 9;
+    background: #f7fafc;
+}
+
+/* Visual separator shadow for sticky header */
+.l8-table-filter-row th::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 4px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08), transparent);
+    pointer-events: none;
+}
+
+.l8-table-filter {
+    padding: 8px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    position: relative;  /* For the shadow pseudo-element */
+}
+
+.l8-filter-input {
+    width: 100%;
+    padding: 6px 10px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #2d3748;
+    font-size: 11px;
+    font-family: 'Figtree', sans-serif;
+    transition: all 0.2s ease;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.l8-filter-input:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.1);
+}
+
+.l8-filter-input::placeholder {
+    color: #a0aec0;
+    font-size: 10px;
+}
+
+.l8-filter-input.invalid {
+    border-color: #e53e3e;
+    background-color: #fff5f5;
+    color: #e53e3e;
+}
+
+.l8-table td {
+    color: #4a5568;
+    font-size: 12px;
+    font-family: 'Figtree', sans-serif;
+}
+
+.l8-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.l8-table tbody tr:hover {
+    background: rgba(14, 165, 233, 0.05);
+}
+
+.l8-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Clickable Rows */
+.l8-table tbody tr.l8-clickable-row {
+    cursor: pointer;
+}
+
+.l8-table tbody tr.l8-clickable-row:hover {
+    background: rgba(14, 165, 233, 0.1);
+}
+
+/* Action Buttons */
+.l8-action-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.l8-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    font-family: 'Figtree', sans-serif;
+}
+
+.l8-btn-primary {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+}
+
+.l8-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+    background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+}
+
+.l8-btn-small {
+    padding: 6px 12px;
+    font-size: 10px;
+    background: #f7fafc;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.l8-btn-small:hover {
+    background: #e2e8f0;
+}
+
+.l8-btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+    border: none;
+}
+
+.l8-btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+}
+
+.l8-btn-danger.l8-btn-small {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+}
+
+.l8-btn-toggle {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    font-size: 16px;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.l8-btn-toggle:hover {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: #0ea5e9;
+    transform: scale(1.1);
+}
+
+/* Tags/Badges */
+.l8-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(14, 165, 233, 0.1);
+    color: #0ea5e9;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 2px;
+}
+
+.l8-tag-up {
+    background: rgba(0, 200, 83, 0.1);
+    color: #00c853;
+}
+
+.l8-tag-down {
+    background: rgba(117, 117, 117, 0.1);
+    color: #757575;
+}
+
+.l8-tag-allow {
+    background: rgba(0, 200, 83, 0.1);
+    color: #00c853;
+}
+
+.l8-tag-deny {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+/* Empty State */
+.l8-empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #718096;
+}
+
+.l8-empty-state p {
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .l8-pagination {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .l8-pagination-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .l8-table th,
+    .l8-table td {
+        padding: 10px 12px;
+    }
+
+    .l8-action-btns {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .l8-page-current {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .l8-page-size {
+        display: none;
+    }
+}

@@ -1,0 +1,91 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+Layer 8 Ecosystem - Gantt Chart Styles
+*/
+
+.layer8d-gantt-container {
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.layer8d-gantt-toolbar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.layer8d-gantt-btn {
+    background: var(--layer8d-bg-light);
+    border: 1px solid var(--layer8d-border);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--layer8d-text-medium);
+}
+
+.layer8d-gantt-btn.active {
+    background: var(--layer8d-primary);
+    color: #fff;
+    border-color: var(--layer8d-primary);
+}
+
+.layer8d-gantt-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    position: relative;
+    border: 1px solid var(--layer8d-border);
+    border-radius: 8px;
+    background: var(--layer8d-bg-white);
+}
+
+.layer8d-gantt-svg {
+    display: block;
+}
+
+.layer8d-gantt-bar {
+    transition: opacity 0.15s ease;
+}
+
+.layer8d-gantt-bar-click:hover {
+    stroke-width: 2;
+}
+
+/* Labels column */
+.layer8d-gantt-labels {
+    position: absolute;
+    left: 0;
+    width: 200px;
+    z-index: 2;
+    background: var(--layer8d-bg-white);
+    border-right: 1px solid var(--layer8d-border);
+}
+
+.layer8d-gantt-label {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--layer8d-text-dark);
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--layer8d-border);
+}
+
+.layer8d-gantt-label:hover {
+    background: var(--layer8d-bg-light);
+}
+
+/* Mobile */
+.layer8m-gantt-container .layer8d-gantt-labels {
+    width: 120px;
+}
+
+.layer8m-gantt-container .layer8d-gantt-label {
+    font-size: 11px;
+    padding: 0 8px;
+}

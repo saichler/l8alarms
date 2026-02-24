@@ -1,0 +1,79 @@
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "api.proto";
+
+// Alarm: Active or historical alarm instance.
+message Alarm {
+  string alarm_id = 1;
+  string definition_id = 2;
+  string name = 3;
+  string description = 4;
+
+  // State and severity
+  AlarmState state = 5;
+  AlarmSeverity severity = 6;
+  AlarmSeverity original_severity = 7;
+
+  // Source (topology references by ID)
+  string node_id = 8;
+  string node_name = 9;
+  string link_id = 10;
+  string location = 11;
+  string source_identifier = 12;
+
+  // Correlation / RCA
+  string root_cause_alarm_id = 13;
+  string correlation_rule_id = 14;
+  bool is_root_cause = 15;
+  int32 symptom_count = 16;
+
+  // Timing
+  int64 first_occurrence = 17;
+  int64 last_occurrence = 18;
+  int64 acknowledged_at = 19;
+  string acknowledged_by = 20;
+  int64 cleared_at = 21;
+  string cleared_by = 22;
+
+  // Occurrence tracking
+  int32 occurrence_count = 23;
+  string dedup_key = 24;
+
+  // Suppression
+  bool is_suppressed = 25;
+  string suppressed_by = 26;
+
+  // Additional context
+  string event_id = 27;
+  map<string, string> attributes = 28;
+
+  // Embedded children
+  repeated AlarmNote notes = 29;
+  repeated AlarmStateChange state_history = 30;
+}
+
+// Child type: Note/comment on an alarm
+message AlarmNote {
+  string note_id = 1;
+  string author = 2;
+  string text = 3;
+  int64 created_at = 4;
+}
+
+// Child type: State transition record
+message AlarmStateChange {
+  string change_id = 1;
+  AlarmState from_state = 2;
+  AlarmState to_state = 3;
+  string changed_by = 4;
+  string reason = 5;
+  int64 changed_at = 6;
+}
+
+message AlarmList {
+  repeated Alarm list = 1;
+  l8api.L8MetaData metadata = 2;
+}

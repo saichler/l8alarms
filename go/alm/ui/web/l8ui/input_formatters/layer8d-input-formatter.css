@@ -1,0 +1,266 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * ERP Input Formatter - Styles
+ * Styling for formatted input fields
+ */
+
+/* ========================================
+   BASE FORMATTED INPUT STYLES
+   ======================================== */
+
+.formatted-input {
+    font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', monospace;
+    letter-spacing: 0.5px;
+}
+
+.formatted-input-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+/* ========================================
+   TYPE-SPECIFIC STYLES
+   ======================================== */
+
+/* Currency - right aligned */
+.formatted-input-currency {
+    text-align: right;
+}
+
+/* Percentage - right aligned */
+.formatted-input-percentage {
+    text-align: right;
+}
+
+/* SSN - extra letter spacing for readability */
+.formatted-input-ssn {
+    letter-spacing: 1px;
+}
+
+/* Phone - extra letter spacing */
+.formatted-input-phone {
+    letter-spacing: 0.5px;
+}
+
+/* Routing Number */
+.formatted-input-routingNumber {
+    letter-spacing: 1px;
+}
+
+/* EIN */
+.formatted-input-ein {
+    letter-spacing: 1px;
+}
+
+/* Color Code - with color preview */
+.formatted-input-colorCode {
+    padding-left: 28px !important;
+}
+
+.formatted-input-wrapper[data-formatter="colorCode"]::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid var(--layer8d-border-light, #e2e8f0);
+    background: var(--preview-color, #ffffff);
+}
+
+/* Email - lowercase hint */
+.formatted-input-email {
+    text-transform: lowercase;
+}
+
+/* URL */
+.formatted-input-url {
+    word-break: break-all;
+}
+
+/* Rating */
+.formatted-input-rating {
+    text-align: center;
+    width: 60px !important;
+}
+
+/* Hours duration */
+.formatted-input-hours {
+    text-align: center;
+    width: 80px !important;
+}
+
+/* ========================================
+   VALIDATION STATES
+   ======================================== */
+
+/* Invalid state */
+.formatted-input.invalid {
+    border-color: var(--layer8d-error, #e53e3e) !important;
+    background-color: rgba(229, 62, 62, 0.05);
+}
+
+.formatted-input.invalid:focus {
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+}
+
+/* Valid state (optional - shown after successful validation) */
+.formatted-input.valid {
+    border-color: var(--layer8d-success, #38a169) !important;
+}
+
+.formatted-input.valid:focus {
+    box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
+}
+
+/* ========================================
+   ERROR MESSAGE
+   ======================================== */
+
+.formatted-input-error {
+    color: var(--layer8d-error, #e53e3e);
+    font-size: 11px;
+    margin-top: 4px;
+    padding-left: 2px;
+    line-height: 1.4;
+}
+
+/* Animate error appearance */
+.formatted-input-error {
+    animation: slideInError 0.2s ease-out;
+}
+
+@keyframes slideInError {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   PLACEHOLDER STYLING
+   ======================================== */
+
+.formatted-input::placeholder {
+    color: var(--layer8d-text-muted, #a0aec0);
+    font-family: inherit;
+    letter-spacing: inherit;
+}
+
+/* ========================================
+   DISABLED STATE
+   ======================================== */
+
+.formatted-input:disabled {
+    background-color: var(--layer8d-bg-subtle, #f7fafc);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* ========================================
+   READONLY STATE
+   ======================================== */
+
+.formatted-input[readonly] {
+    background-color: var(--layer8d-bg-subtle, #f7fafc);
+    cursor: default;
+}
+
+/* ========================================
+   FOCUS STATE
+   ======================================== */
+
+.formatted-input:focus {
+    outline: none;
+    border-color: var(--layer8d-primary, #0ea5e9);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+/* ========================================
+   ICON ADDONS (optional)
+   ======================================== */
+
+.formatted-input-wrapper.has-icon-left .formatted-input {
+    padding-left: 36px;
+}
+
+.formatted-input-wrapper.has-icon-right .formatted-input {
+    padding-right: 36px;
+}
+
+.formatted-input-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--layer8d-text-muted, #a0aec0);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.formatted-input-icon.icon-left {
+    left: 10px;
+}
+
+.formatted-input-icon.icon-right {
+    right: 10px;
+}
+
+/* ========================================
+   RESPONSIVE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .formatted-input-rating {
+        width: 50px !important;
+    }
+
+    .formatted-input-hours {
+        width: 70px !important;
+    }
+}
+
+/* ========================================
+   DARK MODE SUPPORT (if theme uses it)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    .formatted-input.invalid {
+        background-color: rgba(229, 62, 62, 0.1);
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .formatted-input {
+        border: none !important;
+        background: none !important;
+        box-shadow: none !important;
+    }
+
+    .formatted-input-error {
+        display: none;
+    }
+}

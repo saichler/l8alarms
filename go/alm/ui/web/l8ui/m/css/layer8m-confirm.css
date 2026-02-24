@@ -1,0 +1,102 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * MobileConfirm Styles
+ */
+
+.mobile-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.mobile-confirm-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-confirm {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 320px;
+    overflow: hidden;
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
+
+.mobile-confirm-overlay.open .mobile-confirm {
+    transform: scale(1);
+}
+
+.mobile-confirm-content {
+    padding: var(--spacing-lg);
+    text-align: center;
+}
+
+.mobile-confirm-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.mobile-confirm-message {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.mobile-confirm-actions {
+    display: flex;
+    border-top: 1px solid var(--border-light);
+}
+
+.mobile-confirm-btn {
+    flex: 1;
+    padding: var(--spacing-md);
+    border: none;
+    background: none;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+.mobile-confirm-btn:active {
+    background: var(--bg-tertiary);
+}
+
+.mobile-confirm-btn-cancel {
+    color: var(--text-secondary);
+    border-right: 1px solid var(--border-light);
+}
+
+.mobile-confirm-btn-primary {
+    color: var(--layer8d-primary);
+}
+
+.mobile-confirm-btn-danger {
+    color: var(--status-terminated);
+}

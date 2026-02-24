@@ -1,0 +1,131 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+*/
+/* Inline Table - embedded repeated child entities inside forms */
+/* Used by both edit mode (add/edit/delete) and detail mode (read-only clickable rows) */
+
+.form-inline-table {
+    border: 1px solid var(--layer8d-border, #e2e8f0);
+    border-radius: var(--layer8d-radius-md, 8px);
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.form-inline-table-header {
+    display: grid;
+    background: var(--layer8d-bg-input, #f1f5f9);
+    padding: 8px 12px;
+    font-weight: var(--layer8d-font-weight-semibold, 600);
+    font-size: var(--layer8d-font-xs, 11px);
+    color: var(--layer8d-primary, #0ea5e9);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--layer8d-border, #e2e8f0);
+    font-family: var(--layer8d-font-family, 'Figtree', sans-serif);
+}
+
+.form-inline-table-body {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.form-inline-table-row {
+    display: grid;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--layer8d-border, #e2e8f0);
+    align-items: center;
+    font-size: 13px;
+    font-family: var(--layer8d-font-family, 'Figtree', sans-serif);
+    color: var(--layer8d-text-dark, #2d3748);
+}
+
+.form-inline-table-row:last-child {
+    border-bottom: none;
+}
+
+.form-inline-table-row:hover {
+    background: var(--layer8d-bg-light, #f7fafc);
+}
+
+/* Detail mode: clickable rows */
+.form-inline-table-row.l8-clickable-row {
+    cursor: pointer;
+}
+
+.form-inline-table-row.l8-clickable-row:hover {
+    background: rgba(14, 165, 233, 0.05);
+}
+
+.form-inline-table-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 8px;
+}
+
+/* Edit mode: action buttons per row */
+.form-inline-table-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+}
+
+.form-inline-table-btn {
+    padding: 4px 10px;
+    border: 1px solid var(--layer8d-border, #e2e8f0);
+    border-radius: var(--layer8d-radius-sm, 4px);
+    background: var(--layer8d-bg-white, white);
+    cursor: pointer;
+    font-size: var(--layer8d-font-xs, 11px);
+    font-family: var(--layer8d-font-family, 'Figtree', sans-serif);
+    font-weight: var(--layer8d-font-weight-medium, 500);
+    color: var(--layer8d-text-medium, #4a5568);
+    transition: all 0.2s ease;
+}
+
+.form-inline-table-btn:hover {
+    background: var(--layer8d-bg-light, #f7fafc);
+    border-color: var(--layer8d-border-dark, #cbd5e0);
+}
+
+.form-inline-table-btn.edit:hover {
+    color: var(--layer8d-primary, #0ea5e9);
+    border-color: var(--layer8d-primary, #0ea5e9);
+}
+
+.form-inline-table-btn.delete {
+    color: var(--layer8d-error, #ef4444);
+    border-color: var(--layer8d-error, #ef4444);
+}
+
+.form-inline-table-btn.delete:hover {
+    background: var(--layer8d-error-bg, #fef2f2);
+}
+
+.form-inline-table-footer {
+    padding: 8px 12px;
+}
+
+.form-inline-table-btn.add {
+    width: 100%;
+    padding: 8px;
+    border-style: dashed;
+    color: var(--layer8d-primary, #0ea5e9);
+    border-color: var(--layer8d-primary, #0ea5e9);
+    background: transparent;
+}
+
+.form-inline-table-btn.add:hover {
+    background: rgba(14, 165, 233, 0.05);
+}
+
+.form-inline-table-empty {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--layer8d-text-muted, #718096);
+    font-size: var(--layer8d-font-sm, 12px);
+    font-style: italic;
+    font-family: var(--layer8d-font-family, 'Figtree', sans-serif);
+}

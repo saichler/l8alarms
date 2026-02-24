@@ -1,0 +1,76 @@
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "api.proto";
+
+// NotificationPolicy: Defines when and how to send notifications for alarms.
+message NotificationPolicy {
+  string policy_id = 1;
+  string name = 2;
+  string description = 3;
+  PolicyStatus status = 4;
+
+  // Trigger conditions
+  AlarmSeverity min_severity = 5;
+  repeated string alarm_definition_ids = 6;
+  repeated string node_type_filter = 7;
+  bool notify_on_state_change = 8;
+
+  // Throttling
+  int32 cooldown_seconds = 9;
+  int32 max_notifications_per_hour = 10;
+
+  // Targets (child)
+  repeated NotificationTarget targets = 11;
+
+  int64 created_at = 15;
+  int64 updated_at = 16;
+}
+
+// Child type: Notification target
+message NotificationTarget {
+  string target_id = 1;
+  NotificationChannel channel = 2;
+  string endpoint = 3;
+  string template = 4;
+}
+
+message NotificationPolicyList {
+  repeated NotificationPolicy list = 1;
+  l8api.L8MetaData metadata = 2;
+}
+
+// EscalationPolicy: Defines time-based escalation for unacknowledged alarms.
+message EscalationPolicy {
+  string policy_id = 1;
+  string name = 2;
+  string description = 3;
+  PolicyStatus status = 4;
+
+  // Scope
+  AlarmSeverity min_severity = 5;
+  repeated string alarm_definition_ids = 6;
+
+  // Escalation steps (child)
+  repeated EscalationStep steps = 7;
+
+  int64 created_at = 10;
+  int64 updated_at = 11;
+}
+
+// Child type: Single escalation step
+message EscalationStep {
+  string step_id = 1;
+  int32 step_order = 2;
+  int32 delay_minutes = 3;
+  NotificationChannel channel = 4;
+  string endpoint = 5;
+  string message_template = 6;
+}
+
+message EscalationPolicyList {
+  repeated EscalationPolicy list = 1;
+  l8api.L8MetaData metadata = 2;
+}

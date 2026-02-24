@@ -1,0 +1,437 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * MobileForms Styles
+ */
+
+.mobile-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.mobile-form-section {
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-light);
+}
+
+.mobile-form-section-title {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 var(--spacing-md) 0;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-light);
+}
+
+/* Form field */
+.mobile-form-field {
+    margin-bottom: var(--spacing-md);
+}
+
+.mobile-form-field:last-child {
+    margin-bottom: 0;
+}
+
+.mobile-form-label {
+    display: block;
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.mobile-form-input,
+.mobile-form-select,
+.mobile-form-textarea {
+    width: 100%;
+    height: var(--touch-target);
+    padding: 0 var(--spacing-md);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.mobile-form-input:focus,
+.mobile-form-select:focus,
+.mobile-form-textarea:focus {
+    outline: none;
+    border-color: var(--layer8d-primary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.mobile-form-input.error,
+.mobile-form-select.error,
+.mobile-form-textarea.error {
+    border-color: var(--status-terminated);
+}
+
+.mobile-form-input::placeholder {
+    color: var(--text-muted);
+}
+
+.mobile-form-input[readonly],
+.mobile-form-select[disabled],
+.mobile-form-textarea[readonly] {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+/* Textarea */
+.mobile-form-textarea {
+    height: auto;
+    min-height: 100px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    resize: vertical;
+}
+
+/* Select */
+.mobile-form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+/* Input group (prefix/suffix) */
+.mobile-form-input-group {
+    display: flex;
+    align-items: center;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.mobile-form-input-group:focus-within {
+    border-color: var(--layer8d-primary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.mobile-form-input-prefix,
+.mobile-form-input-suffix {
+    padding: 0 var(--spacing-sm);
+    color: var(--text-secondary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    background: var(--bg-secondary);
+    height: var(--touch-target);
+    display: flex;
+    align-items: center;
+}
+
+.mobile-form-input.with-prefix,
+.mobile-form-input.with-suffix {
+    border: none;
+    background: transparent;
+}
+
+.mobile-form-input.with-prefix:focus,
+.mobile-form-input.with-suffix:focus {
+    box-shadow: none;
+}
+
+/* Checkbox */
+.mobile-form-field-checkbox {
+    margin-bottom: var(--spacing-sm);
+}
+
+.mobile-form-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    padding: var(--spacing-sm) 0;
+}
+
+.mobile-form-checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    accent-color: var(--layer8d-primary);
+}
+
+.mobile-form-checkbox-text {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    color: var(--text-primary);
+}
+
+/* Reference field */
+.mobile-form-reference {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--touch-target);
+    padding: 0 var(--spacing-md);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+
+.mobile-form-reference-value {
+    flex: 1;
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+}
+
+.mobile-form-reference-value:empty::before {
+    content: 'Select...';
+    color: var(--text-muted);
+}
+
+.mobile-form-reference-icon {
+    color: var(--text-muted);
+    font-size: var(--font-size-lg);
+}
+
+.mobile-form-reference-display {
+    height: var(--touch-target);
+    padding: 0 var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    font-size: var(--font-size-base);
+}
+
+/* Form errors */
+.mobile-form-errors {
+    background: var(--status-terminated-bg);
+    border: 1px solid var(--status-terminated);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.mobile-form-error {
+    color: var(--status-terminated);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    padding: var(--spacing-xs) 0;
+}
+
+/* Color input */
+.mobile-form-color-input {
+    width: 50px;
+    height: var(--touch-target);
+    padding: 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.mobile-form-color-input::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.mobile-form-color-input::-webkit-color-swatch {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+}
+
+.color-text-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+}
+
+.color-text-input:focus {
+    box-shadow: none;
+}
+
+/* Form actions */
+.mobile-form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-light);
+}
+
+.mobile-form-actions .btn {
+    flex: 1;
+}
+
+/* Money input group - currency dropdown + amount */
+.mobile-money-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.mobile-money-input-group .mobile-money-currency-select {
+    width: 80px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.mobile-money-input-group .mobile-money-amount {
+    flex: 1;
+}
+
+/* Period field (3 cascading selects) */
+.period-input-group { display: flex; gap: 8px; align-items: center; }
+.period-input-group select { flex: 1; min-width: 0; }
+
+/* Inline Table (embedded repeated child entities - card layout) */
+.mobile-form-inline-table {
+    margin-top: var(--spacing-sm);
+}
+
+.mobile-form-inline-card {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-sm);
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+.mobile-form-inline-card.l8-clickable-row {
+    cursor: pointer;
+}
+
+.mobile-form-inline-card.l8-clickable-row:active {
+    background: var(--bg-secondary);
+}
+
+.mobile-form-inline-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.mobile-form-inline-card-title {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mobile-form-inline-card-actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-shrink: 0;
+}
+
+.mobile-form-inline-card-actions button {
+    padding: 6px 12px;
+    min-height: 32px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.mobile-form-inline-card-actions button[data-action="edit-row"] {
+    color: var(--layer8d-primary);
+    border-color: var(--layer8d-primary);
+}
+
+.mobile-form-inline-card-actions button[data-action="delete-row"] {
+    color: var(--status-terminated);
+    border-color: var(--status-terminated);
+}
+
+.mobile-form-inline-card-body {
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.mobile-form-inline-card-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.mobile-form-inline-card-row:last-child {
+    border-bottom: none;
+}
+
+.mobile-form-inline-card-label {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+}
+
+.mobile-form-inline-card-value {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.mobile-form-inline-add {
+    width: 100%;
+    min-height: var(--touch-target);
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-md);
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--layer8d-primary);
+    margin-top: var(--spacing-sm);
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.mobile-form-inline-add:active {
+    background: rgba(14, 165, 233, 0.05);
+    border-color: var(--layer8d-primary);
+}
+
+.mobile-form-inline-empty {
+    text-align: center;
+    padding: var(--spacing-lg) var(--spacing-md);
+    color: var(--text-muted);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+}

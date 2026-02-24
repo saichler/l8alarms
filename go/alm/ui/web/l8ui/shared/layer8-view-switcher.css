@@ -1,0 +1,92 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+Layer 8 Ecosystem - View Switcher Styles
+*/
+
+/* Slot: absolute top-right, no vertical space */
+.l8-view-switcher-slot {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 20;
+}
+
+/* Anchor for dropdown positioning */
+.l8-view-switcher {
+    position: relative;
+    display: inline-block;
+}
+
+/* Icon button */
+.l8-view-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--layer8d-border);
+    background: var(--layer8d-bg-white);
+    border-radius: 6px;
+    color: var(--layer8d-text-medium);
+    cursor: pointer;
+    padding: 0;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.l8-view-toggle:hover {
+    border-color: var(--layer8d-primary);
+    color: var(--layer8d-primary);
+}
+
+/* Floating dropdown menu */
+.l8-view-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    min-width: 150px;
+    background: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 4px 0;
+    z-index: 100;
+}
+
+.l8-view-menu.open {
+    display: block;
+}
+
+.l8-view-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 7px 12px;
+    font-size: 13px;
+    color: var(--layer8d-text-dark);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.1s ease;
+}
+
+.l8-view-menu-item:hover {
+    background: var(--layer8d-bg-light);
+}
+
+.l8-view-menu-item.active {
+    color: var(--layer8d-primary);
+    font-weight: 500;
+}
+
+.l8-view-menu-check {
+    display: inline-block;
+    width: 18px;
+    font-size: 12px;
+    color: var(--layer8d-primary);
+    flex-shrink: 0;
+}
+
+/* Reserve space for switcher icon so it doesn't overlap the Add button */
+.l8-view-switcher-slot:not(:empty) ~ .l8-table-container .l8-pagination-controls {
+    padding-right: 36px;
+}

@@ -1,0 +1,194 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* Probler Generic Popup Component - Base Styles */
+
+/* Design Tokens */
+:root {
+    /* Typography */
+    --popup-font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --popup-font-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
+
+    /* Spacing (8px baseline) */
+    --popup-space-sm: 8px;
+    --popup-space-md: 16px;
+    --popup-space-lg: 24px;
+    --popup-space-xl: 32px;
+
+    /* Colors */
+    --popup-primary: #0ea5e9;
+    --popup-primary-dark: #0284c7;
+    --popup-text-dark: #2d3748;
+    --popup-text-medium: #4a5568;
+    --popup-text-muted: #718096;
+    --popup-border: #e2e8f0;
+    --popup-bg-light: #f7fafc;
+    --popup-bg-input: #f1f5f9;
+    --popup-error: #ef4444;
+    --popup-success: #00c853;
+
+    /* Effects */
+    --popup-focus-ring: 0 0 0 3px rgba(14, 165, 233, 0.15);
+    --popup-radius: 8px;
+}
+
+/* Overlay - covers entire screen */
+.probler-popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+}
+
+.probler-popup-overlay.active {
+    display: flex;
+}
+
+/* Container - the popup box */
+.probler-popup-container {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(14, 165, 233, 0.2);
+    animation: probler-popup-slide-in 0.3s ease-out;
+}
+
+/* Size variants */
+.probler-popup-container.probler-popup-small {
+    max-width: 400px;
+}
+
+.probler-popup-container.probler-popup-medium {
+    max-width: 550px;
+}
+
+.probler-popup-container.probler-popup-large {
+    max-width: 960px;
+}
+
+.probler-popup-container.probler-popup-xlarge {
+    max-width: 1200px;
+    min-height: 500px;
+}
+
+/* Header */
+.probler-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    border-radius: 16px 16px 0 0;
+    flex-shrink: 0;
+}
+
+.probler-popup-title {
+    font-size: 16px;
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    font-family: 'Figtree', sans-serif;
+}
+
+.probler-popup-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: white;
+    line-height: 1;
+    transition: all 0.2s ease;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.probler-popup-close:hover {
+    color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.1);
+}
+
+/* Body - scrollable content area */
+.probler-popup-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    color: #2d3748;
+}
+
+/* Footer - action buttons */
+.probler-popup-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid #e2e8f0;
+    background: #f7fafc;
+    flex-shrink: 0;
+}
+
+/* Stacked modal - slightly offset and dimmed */
+.probler-popup-overlay.stacked {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.probler-popup-overlay.stacked .probler-popup-container {
+    transform: scale(0.95);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Animation */
+@keyframes probler-popup-slide-in {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.probler-popup-overlay.closing .probler-popup-container {
+    animation: probler-popup-slide-out 0.2s ease-in forwards;
+}
+
+@keyframes probler-popup-slide-out {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+}

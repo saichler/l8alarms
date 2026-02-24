@@ -1,0 +1,185 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/* L8ERP - Login Page Form Styles */
+/* Part 2 of 4 - Load after login-base.css */
+/* Form section, inputs, buttons, error messages */
+
+/* Form Section - Dark Theme */
+.layer8d-login-form {
+    padding: 30px;
+    background: var(--bg-card);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-emphasis);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Figtree', sans-serif;
+    transition: all 0.2s ease;
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--noc-cyan);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+    background: var(--bg-elevated);
+}
+
+.form-group input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Remember Me Checkbox */
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: var(--noc-cyan);
+}
+
+.remember-me label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Register Link */
+.layer8d-register-link {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-emphasis);
+}
+
+.layer8d-register-link span {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.layer8d-register-link a {
+    color: var(--noc-cyan);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.layer8d-register-link a:hover {
+    text-decoration: underline;
+}
+
+/* Demo Credentials */
+.demo-credentials {
+    text-align: center;
+    margin-top: 12px;
+    padding: 10px;
+    background: rgba(14, 165, 233, 0.1);
+    border: 1px dashed var(--noc-cyan);
+    border-radius: 6px;
+}
+
+.demo-credentials span {
+    font-size: 11px;
+    color: var(--noc-cyan);
+    font-family: 'Roboto Mono', monospace;
+}
+
+/* Login Button */
+.layer8d-btn-login {
+    width: 100%;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease;
+    font-family: 'Figtree', sans-serif;
+    background: linear-gradient(135deg, var(--noc-cyan) 0%, var(--noc-cyan-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+}
+
+.layer8d-btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+    background: linear-gradient(135deg, var(--noc-cyan-dark) 0%, var(--noc-cyan) 100%);
+}
+
+.layer8d-btn-login:active {
+    transform: translateY(0);
+}
+
+.layer8d-btn-login:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Error Message */
+.error-message {
+    background: rgba(255, 61, 0, 0.1);
+    border: 1px solid rgba(255, 61, 0, 0.3);
+    border-left: 4px solid #ff3d00;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: none;
+}
+
+.error-message.visible {
+    display: block;
+    animation: shake 0.4s ease-in-out;
+}
+
+.error-message p {
+    color: #ff6e40;
+    font-size: 12px;
+    margin: 0;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}

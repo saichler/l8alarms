@@ -1,0 +1,392 @@
+/*
+© 2025 Sharon Aicler (saichler@gmail.com)
+
+Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
+You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+ * ERP Shared Theme
+ * CSS variables and base styles for consistent look & feel
+ */
+
+/* ============================================ */
+/* FIGTREE FONT FACES */
+/* ============================================ */
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Figtree';
+    src: url('../font/static/Figtree-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============================================ */
+/* CSS VARIABLES (Design Tokens) */
+/* ============================================ */
+
+:root {
+    /* Primary Colors */
+    --layer8d-primary: #0ea5e9;
+    --layer8d-primary-dark: #0284c7;
+    --layer8d-primary-light: #7dd3fc;
+
+    /* Text Colors */
+    --layer8d-text-dark: #2d3748;
+    --layer8d-text-medium: #4a5568;
+    --layer8d-text-muted: #718096;
+    --layer8d-text-light: #a0aec0;
+
+    /* Background Colors */
+    --layer8d-bg-white: #ffffff;
+    --layer8d-bg-light: #f7fafc;
+    --layer8d-bg-input: #f1f5f9;
+
+    /* Border Colors */
+    --layer8d-border: #e2e8f0;
+    --layer8d-border-dark: #cbd5e0;
+
+    /* Status Colors - Core */
+    --layer8d-success: #22c55e;
+    --layer8d-success-bg: rgba(34, 197, 94, 0.1);
+    --layer8d-warning: #f59e0b;
+    --layer8d-warning-bg: rgba(245, 158, 11, 0.1);
+    --layer8d-error: #ef4444;
+    --layer8d-error-bg: rgba(239, 68, 68, 0.1);
+    --layer8d-info: #3b82f6;
+    --layer8d-info-bg: rgba(59, 130, 246, 0.1);
+
+    /* Semantic Status Colors - Tailwind Palette */
+    /* Green (Success/Active/Completed) */
+    --layer8d-green-light-bg: #bbf7d0;
+    --layer8d-green-light-text: #166534;
+    --layer8d-green-bg: #d1fae5;
+    --layer8d-green-text: #065f46;
+
+    /* Red (Error/Critical/Rejected) */
+    --layer8d-red-bg: #fecaca;
+    --layer8d-red-text: #991b1b;
+
+    /* Yellow (Warning/Pending) */
+    --layer8d-yellow-bg: #fef3c7;
+    --layer8d-yellow-text: #92400e;
+
+    /* Orange (High Priority/Urgent) */
+    --layer8d-orange-bg: #fed7aa;
+    --layer8d-orange-text: #9a3412;
+
+    /* Blue (Info/New/Open) */
+    --layer8d-blue-bg: #dbeafe;
+    --layer8d-blue-text: #1e40af;
+
+    /* Indigo (Prospecting/Pending) */
+    --layer8d-indigo-bg: #e0e7ff;
+    --layer8d-indigo-text: #3730a3;
+
+    /* Gray (Inactive/Closed/Low) */
+    --layer8d-gray-bg: #e5e7eb;
+    --layer8d-gray-text: #374151;
+    --layer8d-gray-light-bg: #f3f4f6;
+    --layer8d-gray-light-text: #6b7280;
+
+    /* Typography */
+    --layer8d-font-family: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --layer8d-font-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
+
+    /* Font Weights */
+    --layer8d-font-weight-normal: 400;   /* Regular - for input text, body content */
+    --layer8d-font-weight-medium: 500;   /* Medium - for labels */
+    --layer8d-font-weight-semibold: 600; /* SemiBold - for headers, buttons */
+
+    /* Font Sizes */
+    --layer8d-font-xs: 11px;
+    --layer8d-font-sm: 12px;
+    --layer8d-font-base: 14px;
+    --layer8d-font-lg: 16px;
+    --layer8d-font-xl: 18px;
+
+    /* Spacing (8px baseline) */
+    --layer8d-space-xs: 4px;
+    --layer8d-space-sm: 8px;
+    --layer8d-space-md: 16px;
+    --layer8d-space-lg: 24px;
+    --layer8d-space-xl: 32px;
+
+    /* Border Radius */
+    --layer8d-radius-sm: 4px;
+    --layer8d-radius-md: 8px;
+    --layer8d-radius-lg: 12px;
+
+    /* Shadows */
+    --layer8d-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --layer8d-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --layer8d-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+    /* Focus Ring */
+    --layer8d-focus-ring: 0 0 0 3px rgba(14, 165, 233, 0.15);
+
+    /* Bridge: generic names used by view components → canonical tokens */
+    --accent-color: var(--layer8d-primary);
+    --accent-bg: rgba(14, 165, 233, 0.08);
+    --bg-primary: var(--layer8d-bg-white);
+    --bg-secondary: var(--layer8d-bg-light);
+    --bg-tertiary: var(--layer8d-bg-input);
+    --text-primary: var(--layer8d-text-dark);
+    --text-secondary: var(--layer8d-text-medium);
+    --text-tertiary: var(--layer8d-text-light);
+    --border-color: var(--layer8d-border);
+}
+
+/* Dark mode: override canonical tokens + bridge */
+[data-theme="dark"] {
+    /* Canonical token overrides */
+    --layer8d-bg-white: #0f172a;
+    --layer8d-bg-light: #1e293b;
+    --layer8d-bg-input: #334155;
+    --layer8d-text-dark: #f1f5f9;
+    --layer8d-text-medium: #94a3b8;
+    --layer8d-text-muted: #64748b;
+    --layer8d-text-light: #64748b;
+    --layer8d-border: #334155;
+    --layer8d-border-dark: #475569;
+
+    /* Bridge overrides (resolve via updated tokens) */
+    --accent-bg: rgba(14, 165, 233, 0.12);
+}
+
+/* ============================================ */
+/* STATUS BADGES */
+/* ============================================ */
+
+.layer8d-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: var(--layer8d-radius-sm);
+    font-size: var(--layer8d-font-xs);
+    font-weight: 600;
+    font-family: var(--layer8d-font-family);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.layer8d-status-active {
+    background: var(--layer8d-success-bg);
+    color: var(--layer8d-success);
+}
+
+.layer8d-status-pending {
+    background: var(--layer8d-warning-bg);
+    color: var(--layer8d-warning);
+}
+
+.layer8d-status-inactive {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+}
+
+.layer8d-status-terminated {
+    background: var(--layer8d-error-bg);
+    color: var(--layer8d-error);
+}
+
+.layer8d-status-info {
+    background: var(--layer8d-info-bg);
+    color: var(--layer8d-info);
+}
+
+/* ============================================ */
+/* TAGS */
+/* ============================================ */
+
+.layer8d-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--layer8d-radius-sm);
+    font-size: var(--layer8d-font-xs);
+    font-weight: 500;
+    background: var(--layer8d-bg-input);
+    color: var(--layer8d-text-medium);
+}
+
+/* ============================================ */
+/* EMPTY STATE */
+/* ============================================ */
+
+.layer8d-empty {
+    color: var(--layer8d-text-light);
+    font-style: italic;
+}
+
+/* ============================================ */
+/* BUTTONS */
+/* ============================================ */
+
+.layer8d-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--layer8d-space-sm);
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--layer8d-radius-md);
+    font-size: 13px;
+    font-weight: var(--layer8d-font-weight-semibold);
+    font-family: var(--layer8d-font-family);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.layer8d-btn-primary {
+    background: var(--layer8d-primary);
+    color: white;
+    box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
+}
+
+.layer8d-btn-primary:hover {
+    background: var(--layer8d-primary-dark);
+    box-shadow: 0 4px 8px rgba(14, 165, 233, 0.25);
+    transform: translateY(-1px);
+}
+
+.layer8d-btn-secondary {
+    background: var(--layer8d-bg-white);
+    color: var(--layer8d-text-medium);
+    border: 1px solid var(--layer8d-border);
+}
+
+.layer8d-btn-secondary:hover {
+    background: var(--layer8d-bg-light);
+    border-color: var(--layer8d-border-dark);
+    color: var(--layer8d-text-dark);
+}
+
+.layer8d-btn-danger {
+    background: var(--layer8d-error);
+    color: white;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.layer8d-btn-danger:hover {
+    background: #dc2626;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.25);
+    transform: translateY(-1px);
+}
+
+.layer8d-btn-small {
+    padding: 8px 16px;
+    font-size: var(--layer8d-font-sm);
+}
+
+/* ============================================ */
+/* FORM ELEMENTS */
+/* ============================================ */
+
+.layer8d-form-group {
+    margin-bottom: var(--layer8d-space-lg);
+}
+
+.layer8d-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.layer8d-form-label {
+    display: block;
+    margin-bottom: var(--layer8d-space-sm);
+    font-weight: var(--layer8d-font-weight-medium);
+    font-size: 13px;
+    color: var(--layer8d-text-dark);
+    font-family: var(--layer8d-font-family);
+}
+
+.layer8d-form-input,
+.layer8d-form-select,
+.layer8d-form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--layer8d-border);
+    border-radius: var(--layer8d-radius-md);
+    font-size: var(--layer8d-font-base);
+    font-family: var(--layer8d-font-family);
+    color: var(--layer8d-text-dark);
+    background: var(--layer8d-bg-white);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.layer8d-form-input:focus,
+.layer8d-form-select:focus,
+.layer8d-form-textarea:focus {
+    outline: none;
+    border-color: var(--layer8d-primary);
+    box-shadow: var(--layer8d-focus-ring);
+}
+
+.layer8d-form-input:disabled,
+.layer8d-form-select:disabled,
+.layer8d-form-textarea:disabled {
+    background: var(--layer8d-bg-input);
+    color: var(--layer8d-text-muted);
+    cursor: not-allowed;
+}
+
+.layer8d-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--layer8d-space-lg);
+}
+
+/* ============================================ */
+/* CARDS */
+/* ============================================ */
+
+.layer8d-card {
+    background: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-border);
+    border-radius: var(--layer8d-radius-lg);
+    padding: var(--layer8d-space-lg);
+}
+
+.layer8d-card-header {
+    font-size: var(--layer8d-font-lg);
+    font-weight: var(--layer8d-font-weight-semibold);
+    font-family: var(--layer8d-font-family);
+    color: var(--layer8d-primary);
+    margin-bottom: var(--layer8d-space-md);
+    padding-bottom: var(--layer8d-space-sm);
+    border-bottom: 1px solid var(--layer8d-border);
+}
+
+/* ============================================ */
+/* RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 768px) {
+    .layer8d-form-row {
+        grid-template-columns: 1fr;
+    }
+}
