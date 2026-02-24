@@ -56,7 +56,14 @@ func (b *VB[T]) Custom(fn func(*T, ifs.IVNic) error) *VB[T] {
 	return b
 }
 
-// After adds a function to run after successful persistence (PUT/PATCH only).
+// BeforeAction adds an action-aware validator that runs before persistence.
+// Unlike Custom, it receives the CRUD action so it can branch on POST/PUT/etc.
+func (b *VB[T]) BeforeAction(fn ActionValidateFunc[T]) *VB[T] {
+	b.actionValidators = append(b.actionValidators, fn)
+	return b
+}
+
+// After adds a function to run after successful persistence.
 func (b *VB[T]) After(fn ActionValidateFunc[T]) *VB[T] {
 	b.afterActions = append(b.afterActions, fn)
 	return b

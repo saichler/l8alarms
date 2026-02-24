@@ -14,6 +14,9 @@ func newAlarmServiceCallback() ifs.IServiceCallback {
 		Require(func(e *alm.Alarm) string { return e.NodeId }, "NodeId").
 		Enum(func(e *alm.Alarm) int32 { return int32(e.State) }, alm.AlarmState_name, "State").
 		Enum(func(e *alm.Alarm) int32 { return int32(e.Severity) }, alm.AlarmSeverity_name, "Severity").
+		BeforeAction(checkMaintenanceWindow).
 		After(runCorrelation).
+		After(runNotification).
+		After(runEscalation).
 		Build()
 }
