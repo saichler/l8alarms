@@ -87,3 +87,47 @@ func GetEntity[T any](serviceName string, serviceArea byte, filter *T, vnic ifs.
 	}
 	return nil, nil
 }
+
+// GetEntities retrieves multiple entities by filter.
+func GetEntities[T any](serviceName string, serviceArea byte, filter *T, vnic ifs.IVNic) ([]*T, error) {
+	handler, ok := ServiceHandler(serviceName, serviceArea, vnic)
+	if ok {
+		resp := handler.Get(object.New(nil, filter), vnic)
+		if resp.Error() != nil {
+			return nil, resp.Error()
+		}
+		return extractElements[T](resp.Elements()), nil
+	}
+	resp := vnic.Request("", serviceName, serviceArea, ifs.GET, filter, 30)
+	if resp.Error() != nil {
+		return nil, resp.Error()
+	}
+	return extractElements[T](resp.Elements()), nil
+}
+
+func extractElements[T any](elems []interface{}) []*T {
+	result := make([]*T, 0, len(elems))
+	for _, e := range elems {
+		if t, ok := e.(*T); ok {
+			result = append(result, t)
+		}
+	}
+	return result
+}
+
+// PutEntity updates an entity via its service handler.
+func PutEntity[T any](serviceName string, serviceArea byte, entity *T, vnic ifs.IVNic) error {
+	handler, ok := ServiceHandler(serviceName, serviceArea, vnic)
+	if ok {
+		resp := handler.Put(object.New(nil, entity), vnic)
+		if resp.Error() != nil {
+			return resp.Error()
+		}
+		return nil
+	}
+	resp := vnic.Request("", serviceName, serviceArea, ifs.PUT, entity, 30)
+	if resp.Error() != nil {
+		return resp.Error()
+	}
+	return nil
+}

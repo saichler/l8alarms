@@ -16,12 +16,14 @@ github.com/saichler/l8services v0.0.0-20260222022720-4dee316c2323 h1:6p+YtCUjW/2
 github.com/saichler/l8services v0.0.0-20260222022720-4dee316c2323/go.mod h1:9c3fnIfjQmQ4kyk5Nm3+LsrRWOwmbXvIzK2Xmjf8f1c=
 github.com/saichler/l8srlz v0.0.0-20251226163123-de32dc54dd4b h1:Hqep80S1do7Zfe0w62xHj5t++Nn1SXz5zBkgWlBSRwE=
 github.com/saichler/l8srlz v0.0.0-20251226163123-de32dc54dd4b/go.mod h1:uDYNwF/5JUA39cg47kX8k+Qh5sI5WjfxgrfmCX5zmwo=
-github.com/saichler/l8topology/go v0.0.0-20260224010143-faed3b5c1b9a h1:RxV31L+h68/y1mbctGrS9ifZBVODsZp/1crbB0zmspA=
-github.com/saichler/l8topology/go v0.0.0-20260224010143-faed3b5c1b9a/go.mod h1:HW8qwhkcsPRu0DdEpdDRskcMv7GsGsarnyq4UXtAVvc=
+github.com/saichler/l8topology/go v0.0.0-20260224220402-d6d3f3258f10 h1:LCXBbF/kpRQeP0A6bFN7PawX4sWpRhdXZ3l7ZrLQ4yA=
+github.com/saichler/l8topology/go v0.0.0-20260224220402-d6d3f3258f10/go.mod h1:4KL0D//ULU27+3p8FJoteg/lypT4rW9eMMK6i/L65as=
 github.com/saichler/l8types v0.0.0-20260220135640-63802a435416 h1:Ah33DPYC1LnJYwyhqzRoXhKGpjlb65I77rn7vcTk+0E=
 github.com/saichler/l8types v0.0.0-20260220135640-63802a435416/go.mod h1:0+Snl9PYq+caqTu6OBVaw7mQVn0TrRY9OJz+GelHuM4=
 github.com/saichler/l8utils v0.0.0-20260211151437-9b2ec4a159ae h1:llccLrKXvU3TdoXFaejfxBA5mkjWlRKcaCXN90CR7kA=
 github.com/saichler/l8utils v0.0.0-20260211151437-9b2ec4a159ae/go.mod h1:nKdvYAEGLyHfxPg09oR6OfkJ0SniSbPb+Zi6wr/D5LU=
+github.com/saichler/l8web v0.0.0-20260224202612-c973e8a2c2db h1:QwaiOc530I4+c8tj1dbJb4igyuXtA0/ZSoKE48it/lA=
+github.com/saichler/l8web v0.0.0-20260224202612-c973e8a2c2db/go.mod h1:r2j6dgKs41L+dwaSh3hQ9OJN0RnQP0C8NWxAbAn+c8c=
 golang.org/x/sys v0.41.0 h1:Ivj+2Cp/ylzLiEU89QhWblYnOE9zerudt9Ftecq2C6k=
 golang.org/x/sys v0.41.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
 google.golang.org/protobuf v1.36.11 h1:fV6ZwhNocDyBLK0dj+fg8ektcVegBBuEolpbTQyBNVE=

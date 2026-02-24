@@ -66,7 +66,7 @@ func (cb *genericCallback[T]) Before(any interface{}, action ifs.Action, cont bo
 }
 
 func (cb *genericCallback[T]) After(any interface{}, action ifs.Action, cont bool, vnic ifs.IVNic) (interface{}, bool, error) {
-	if (action != ifs.PUT && action != ifs.PATCH) || len(cb.afterActions) == 0 {
+	if len(cb.afterActions) == 0 {
 		return nil, true, nil
 	}
 	entity, ok := any.(*T)

@@ -2,72 +2,73 @@ package enrichment
 
 import (
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8topology/go/types/l8topo"
 )
 
-// NodeOverlay represents alarm overlay data for a topology node.
-type NodeOverlay struct {
-	NodeId          string
-	AlarmCount      int32
-	HighestSeverity alm.AlarmSeverity
-	ActiveAlarms    []*alm.Alarm
-}
+// EnrichTopology populates alarm_count and highest_alarm_severity
+// on each node and link in the given topology based on active alarms.
+func EnrichTopology(topo *l8topo.L8Topology, activeAlarms []*alm.Alarm) {
+	if topo == nil {
+		return
+	}
 
-// LinkOverlay represents alarm overlay data for a topology link.
-type LinkOverlay struct {
-	LinkId          string
-	AlarmCount      int32
-	HighestSeverity alm.AlarmSeverity
-}
-
-// ComputeNodeOverlays computes alarm overlay data for each topology node.
-func ComputeNodeOverlays(activeAlarms []*alm.Alarm) map[string]*NodeOverlay {
-	overlays := make(map[string]*NodeOverlay)
+	// Build maps of nodeId/linkId -> alarm aggregates
+	nodeAlarms := make(map[string]*alarmAgg)
+	linkAlarms := make(map[string]*alarmAgg)
 
 	for _, a := range activeAlarms {
-		if a.NodeId == "" {
-			continue
-		}
 		if a.State == alm.AlarmState_ALARM_STATE_CLEARED || a.State == alm.AlarmState_ALARM_STATE_SUPPRESSED {
 			continue
 		}
-
-		overlay, ok := overlays[a.NodeId]
-		if !ok {
-			overlay = &NodeOverlay{NodeId: a.NodeId}
-			overlays[a.NodeId] = overlay
+		if a.NodeId != "" {
+			agg := getOrCreate(nodeAlarms, a.NodeId)
+			agg.count++
+			if int32(a.Severity) > agg.maxSeverity {
+				agg.maxSeverity = int32(a.Severity)
+			}
 		}
-		overlay.AlarmCount++
-		overlay.ActiveAlarms = append(overlay.ActiveAlarms, a)
-		if a.Severity > overlay.HighestSeverity {
-			overlay.HighestSeverity = a.Severity
+		if a.LinkId != "" {
+			agg := getOrCreate(linkAlarms, a.LinkId)
+			agg.count++
+			if int32(a.Severity) > agg.maxSeverity {
+				agg.maxSeverity = int32(a.Severity)
+			}
 		}
 	}
 
-	return overlays
+	// Apply to topology nodes
+	for nodeId, node := range topo.Nodes {
+		if agg, ok := nodeAlarms[nodeId]; ok {
+			node.AlarmCount = agg.count
+			node.HighestAlarmSeverity = agg.maxSeverity
+		} else {
+			node.AlarmCount = 0
+			node.HighestAlarmSeverity = 0
+		}
+	}
+
+	// Apply to topology links
+	for linkId, link := range topo.Links {
+		if agg, ok := linkAlarms[linkId]; ok {
+			link.AlarmCount = agg.count
+			link.HighestAlarmSeverity = agg.maxSeverity
+		} else {
+			link.AlarmCount = 0
+			link.HighestAlarmSeverity = 0
+		}
+	}
 }
 
-// ComputeLinkOverlays computes alarm overlay data for each topology link.
-func ComputeLinkOverlays(activeAlarms []*alm.Alarm) map[string]*LinkOverlay {
-	overlays := make(map[string]*LinkOverlay)
+type alarmAgg struct {
+	count       int32
+	maxSeverity int32
+}
 
-	for _, a := range activeAlarms {
-		if a.LinkId == "" {
-			continue
-		}
-		if a.State == alm.AlarmState_ALARM_STATE_CLEARED || a.State == alm.AlarmState_ALARM_STATE_SUPPRESSED {
-			continue
-		}
-
-		overlay, ok := overlays[a.LinkId]
-		if !ok {
-			overlay = &LinkOverlay{LinkId: a.LinkId}
-			overlays[a.LinkId] = overlay
-		}
-		overlay.AlarmCount++
-		if a.Severity > overlay.HighestSeverity {
-			overlay.HighestSeverity = a.Severity
-		}
+func getOrCreate(m map[string]*alarmAgg, key string) *alarmAgg {
+	agg, ok := m[key]
+	if !ok {
+		agg = &alarmAgg{}
+		m[key] = agg
 	}
-
-	return overlays
+	return agg
 }
