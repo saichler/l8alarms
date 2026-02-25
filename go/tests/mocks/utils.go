@@ -14,14 +14,22 @@ func pickRef(ids []string, index int) string {
 	return ids[index%len(ids)]
 }
 
+// safeIntn returns rand.Intn(n) if n > 0, else 0.
+func safeIntn(n int) int {
+	if n <= 0 {
+		return 0
+	}
+	return rand.Intn(n)
+}
+
 // randomPastDate returns Unix timestamp randomly in the past.
 func randomPastDate(maxMonths, maxDays int) int64 {
-	return time.Now().AddDate(0, -rand.Intn(maxMonths), -rand.Intn(maxDays)).Unix()
+	return time.Now().AddDate(0, -safeIntn(maxMonths), -safeIntn(maxDays)).Unix()
 }
 
 // randomFutureDate returns Unix timestamp randomly in the future.
 func randomFutureDate(maxMonths, maxDays int) int64 {
-	return time.Now().AddDate(0, rand.Intn(maxMonths), rand.Intn(maxDays)).Unix()
+	return time.Now().AddDate(0, safeIntn(maxMonths), safeIntn(maxDays)).Unix()
 }
 
 // genID creates an ID like "prefix-001".
