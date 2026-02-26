@@ -97,34 +97,50 @@ func assignAlarmStateAndSeverity(a *alm.Alarm, i, total int) {
 }
 
 func assignCorrelation(a *alm.Alarm, i int, result []*alm.Alarm, store *MockDataStore) {
-	// Make the first 3 alarms root causes, and some later alarms their symptoms
-	switch {
-	case i == 0:
-		// Root cause: core router failure
+	// Multi-level correlation trees:
+	// Tree 1 (4 levels): 0 -> {3,4,5}, 3 -> {8,9}, 4 -> {10}, 8 -> {12}
+	// Tree 2 (3 levels): 1 -> {6,7}, 6 -> {11}
+	type corrEntry struct {
+		parentIdx    int   // -1 = tree root
+		symptomCount int32 // 0 = leaf
+	}
+	corrMap := map[int]corrEntry{
+		0:  {-1, 3}, // Tree 1 root
+		1:  {-1, 2}, // Tree 2 root
+		3:  {0, 2},  // L2: child of 0, parent of {8,9}
+		4:  {0, 1},  // L2: child of 0, parent of {10}
+		5:  {0, 0},  // L2: leaf child of 0
+		6:  {1, 1},  // L2: child of 1, parent of {11}
+		7:  {1, 0},  // L2: leaf child of 1
+		8:  {3, 1},  // L3: child of 3, parent of {12}
+		9:  {3, 0},  // L3: leaf child of 3
+		10: {4, 0},  // L3: leaf child of 4
+		11: {6, 0},  // L3: leaf child of 6
+		12: {8, 0},  // L4: leaf child of 8
+	}
+
+	entry, ok := corrMap[i]
+	if !ok {
+		return
+	}
+
+	if entry.parentIdx == -1 {
 		a.IsRootCause = true
-		a.SymptomCount = 3
+		a.SymptomCount = entry.symptomCount
 		a.Severity = alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL
 		a.State = alm.AlarmState_ALARM_STATE_ACTIVE
-	case i == 1:
-		// Root cause: firewall failure
+		return
+	}
+
+	parentID := genID("alm", entry.parentIdx)
+	a.RootCauseAlarmId = parentID
+	a.CorrelationRuleId = pickRef(store.CorrRuleIDs, entry.parentIdx)
+	a.State = alm.AlarmState_ALARM_STATE_SUPPRESSED
+	a.IsSuppressed = true
+	a.SuppressedBy = parentID
+	if entry.symptomCount > 0 {
 		a.IsRootCause = true
-		a.SymptomCount = 2
-		a.Severity = alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL
-		a.State = alm.AlarmState_ALARM_STATE_ACTIVE
-	case i >= 3 && i <= 5:
-		// Symptoms of alarm 0 (core router)
-		a.RootCauseAlarmId = genID("alm", 0)
-		a.CorrelationRuleId = pickRef(store.CorrRuleIDs, 0)
-		a.State = alm.AlarmState_ALARM_STATE_SUPPRESSED
-		a.IsSuppressed = true
-		a.SuppressedBy = genID("alm", 0)
-	case i >= 6 && i <= 7:
-		// Symptoms of alarm 1 (firewall)
-		a.RootCauseAlarmId = genID("alm", 1)
-		a.CorrelationRuleId = pickRef(store.CorrRuleIDs, 1)
-		a.State = alm.AlarmState_ALARM_STATE_SUPPRESSED
-		a.IsSuppressed = true
-		a.SuppressedBy = genID("alm", 1)
+		a.SymptomCount = entry.symptomCount
 	}
 }
 

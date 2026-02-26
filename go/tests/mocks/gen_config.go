@@ -51,8 +51,8 @@ func generateCorrelationRules(store *MockDataStore) []*alm.CorrelationRule {
 			rule.MinSymptomCount = 2
 			rule.AutoSuppressSymptoms = true
 		case alm.CorrelationRuleType_CORRELATION_RULE_TYPE_PATTERN:
-			rule.RootAlarmPattern = "powerSupply.*fail|fan.*fail"
-			rule.SymptomAlarmPattern = "tempAboveThreshold|overheating"
+			rule.RootAlarmPattern = "(?i)powerSupply.*fail|fan.*fail"
+			rule.SymptomAlarmPattern = "(?i)tempAboveThreshold|overheating"
 		}
 
 		// Add conditions for some rules

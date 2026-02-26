@@ -23,18 +23,18 @@ func testCRUD(t *testing.T, client *mocks.Client) {
 func testCRUDAlarmDefinition(t *testing.T, client *mocks.Client) {
 	defId := ifs.NewUuid()
 	def := map[string]interface{}{
-		"definitionId":    defId,
-		"name":            "CRUD Test Definition",
-		"description":     "Created by CRUD test",
-		"status":          1,
-		"defaultSeverity": 1,
+		"definition_id":    defId,
+		"name":             "CRUD Test Definition",
+		"description":      "Created by CRUD test",
+		"status":           1,
+		"default_severity": 1,
 	}
 	_, err := client.Post("/alm/10/AlmDef", def)
 	if err != nil {
 		t.Fatalf("POST AlarmDefinition failed: %v", err)
 	}
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from AlarmDefinition where definitionId=%s", defId))
+	q := mocks.L8QueryText(fmt.Sprintf("select * from AlarmDefinition where DefinitionId=%s", defId))
 	getResp, err := client.Get("/alm/10/AlmDef", q)
 	if err != nil {
 		t.Fatalf("GET AlarmDefinition failed: %v", err)
@@ -49,7 +49,7 @@ func testCRUDAlarmDefinition(t *testing.T, client *mocks.Client) {
 		t.Fatalf("PUT AlarmDefinition failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from AlarmDefinition where definitionId=%s", defId))
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from AlarmDefinition where DefinitionId=%s", defId))
 	_, err = client.Delete("/alm/10/AlmDef", delQ)
 	if err != nil {
 		t.Fatalf("DELETE AlarmDefinition failed: %v", err)
@@ -59,19 +59,19 @@ func testCRUDAlarmDefinition(t *testing.T, client *mocks.Client) {
 func testCRUDAlarm(t *testing.T, client *mocks.Client) {
 	alarmId := ifs.NewUuid()
 	alarm := map[string]interface{}{
-		"alarmId":      alarmId,
-		"definitionId": testStore.DefinitionIDs[0],
-		"nodeId":       "test-node-001",
-		"state":        1,
-		"severity":     1,
-		"name":         "CRUD Test Alarm",
+		"alarm_id":      alarmId,
+		"definition_id": testStore.DefinitionIDs[0],
+		"node_id":       "test-node-001",
+		"state":         1,
+		"severity":      1,
+		"name":          "CRUD Test Alarm",
 	}
 	_, err := client.Post("/alm/10/Alarm", alarm)
 	if err != nil {
 		t.Fatalf("POST Alarm failed: %v", err)
 	}
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where alarmId=%s", alarmId))
+	q := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarmId))
 	getResp, err := client.Get("/alm/10/Alarm", q)
 	if err != nil {
 		t.Fatalf("GET Alarm failed: %v", err)
@@ -86,7 +86,7 @@ func testCRUDAlarm(t *testing.T, client *mocks.Client) {
 		t.Fatalf("PUT Alarm failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where alarmId=%s", alarmId))
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarmId))
 	_, err = client.Delete("/alm/10/Alarm", delQ)
 	if err != nil {
 		t.Fatalf("DELETE Alarm failed: %v", err)
@@ -96,17 +96,17 @@ func testCRUDAlarm(t *testing.T, client *mocks.Client) {
 func testCRUDEvent(t *testing.T, client *mocks.Client) {
 	eventId := ifs.NewUuid()
 	event := map[string]interface{}{
-		"eventId":   eventId,
-		"eventType": 1,
-		"nodeId":    "test-node-001",
-		"message":   "CRUD Test Event",
+		"event_id":   eventId,
+		"event_type": 1,
+		"node_id":    "test-node-001",
+		"message":    "CRUD Test Event",
 	}
 	_, err := client.Post("/alm/10/Event", event)
 	if err != nil {
 		t.Fatalf("POST Event failed: %v", err)
 	}
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from Event where eventId=%s", eventId))
+	q := mocks.L8QueryText(fmt.Sprintf("select * from Event where EventId=%s", eventId))
 	getResp, err := client.Get("/alm/10/Event", q)
 	if err != nil {
 		t.Fatalf("GET Event failed: %v", err)
@@ -121,7 +121,7 @@ func testCRUDEvent(t *testing.T, client *mocks.Client) {
 		t.Fatalf("PUT Event failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Event where eventId=%s", eventId))
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Event where EventId=%s", eventId))
 	_, err = client.Delete("/alm/10/Event", delQ)
 	if err != nil {
 		t.Fatalf("DELETE Event failed: %v", err)
@@ -131,17 +131,17 @@ func testCRUDEvent(t *testing.T, client *mocks.Client) {
 func testCRUDCorrelationRule(t *testing.T, client *mocks.Client) {
 	ruleId := ifs.NewUuid()
 	rule := map[string]interface{}{
-		"ruleId":   ruleId,
-		"name":     "CRUD Test Rule",
-		"ruleType": 1,
-		"status":   2,
+		"rule_id":   ruleId,
+		"name":      "CRUD Test Rule",
+		"rule_type": 1,
+		"status":    2,
 	}
 	_, err := client.Post("/alm/10/CorrRule", rule)
 	if err != nil {
 		t.Fatalf("POST CorrelationRule failed: %v", err)
 	}
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from CorrelationRule where ruleId=%s", ruleId))
+	q := mocks.L8QueryText(fmt.Sprintf("select * from CorrelationRule where RuleId=%s", ruleId))
 	getResp, err := client.Get("/alm/10/CorrRule", q)
 	if err != nil {
 		t.Fatalf("GET CorrelationRule failed: %v", err)
@@ -156,7 +156,7 @@ func testCRUDCorrelationRule(t *testing.T, client *mocks.Client) {
 		t.Fatalf("PUT CorrelationRule failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from CorrelationRule where ruleId=%s", ruleId))
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from CorrelationRule where RuleId=%s", ruleId))
 	_, err = client.Delete("/alm/10/CorrRule", delQ)
 	if err != nil {
 		t.Fatalf("DELETE CorrelationRule failed: %v", err)
@@ -166,16 +166,16 @@ func testCRUDCorrelationRule(t *testing.T, client *mocks.Client) {
 func testCRUDNotificationPolicy(t *testing.T, client *mocks.Client) {
 	policyId := ifs.NewUuid()
 	policy := map[string]interface{}{
-		"policyId": policyId,
-		"name":     "CRUD Test Notification Policy",
-		"status":   1,
+		"policy_id": policyId,
+		"name":      "CRUD Test Notification Policy",
+		"status":    1,
 	}
 	_, err := client.Post("/alm/10/NotifPol", policy)
 	if err != nil {
 		t.Fatalf("POST NotificationPolicy failed: %v", err)
 	}
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from NotificationPolicy where policyId=%s", policyId))
+	q := mocks.L8QueryText(fmt.Sprintf("select * from NotificationPolicy where PolicyId=%s", policyId))
 	getResp, err := client.Get("/alm/10/NotifPol", q)
 	if err != nil {
 		t.Fatalf("GET NotificationPolicy failed: %v", err)
@@ -190,7 +190,7 @@ func testCRUDNotificationPolicy(t *testing.T, client *mocks.Client) {
 		t.Fatalf("PUT NotificationPolicy failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from NotificationPolicy where policyId=%s", policyId))
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from NotificationPolicy where PolicyId=%s", policyId))
 	_, err = client.Delete("/alm/10/NotifPol", delQ)
 	if err != nil {
 		t.Fatalf("DELETE NotificationPolicy failed: %v", err)
@@ -200,16 +200,16 @@ func testCRUDNotificationPolicy(t *testing.T, client *mocks.Client) {
 func testCRUDEscalationPolicy(t *testing.T, client *mocks.Client) {
 	policyId := ifs.NewUuid()
 	policy := map[string]interface{}{
-		"policyId": policyId,
-		"name":     "CRUD Test Escalation Policy",
-		"status":   1,
+		"policy_id": policyId,
+		"name":      "CRUD Test Escalation Policy",
+		"status":    1,
 	}
 	_, err := client.Post("/alm/10/EscPolicy", policy)
 	if err != nil {
 		t.Fatalf("POST EscalationPolicy failed: %v", err)
 	}
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from EscalationPolicy where policyId=%s", policyId))
+	q := mocks.L8QueryText(fmt.Sprintf("select * from EscalationPolicy where PolicyId=%s", policyId))
 	getResp, err := client.Get("/alm/10/EscPolicy", q)
 	if err != nil {
 		t.Fatalf("GET EscalationPolicy failed: %v", err)
@@ -224,7 +224,7 @@ func testCRUDEscalationPolicy(t *testing.T, client *mocks.Client) {
 		t.Fatalf("PUT EscalationPolicy failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from EscalationPolicy where policyId=%s", policyId))
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from EscalationPolicy where PolicyId=%s", policyId))
 	_, err = client.Delete("/alm/10/EscPolicy", delQ)
 	if err != nil {
 		t.Fatalf("DELETE EscalationPolicy failed: %v", err)
@@ -235,18 +235,18 @@ func testCRUDMaintenanceWindow(t *testing.T, client *mocks.Client) {
 	windowId := ifs.NewUuid()
 	now := time.Now().Unix()
 	window := map[string]interface{}{
-		"windowId":  windowId,
-		"name":      "CRUD Test Maintenance Window",
-		"status":    2,
-		"startTime": now,
-		"endTime":   now + 3600,
+		"window_id":  windowId,
+		"name":       "CRUD Test Maintenance Window",
+		"status":     2,
+		"start_time": now,
+		"end_time":   now + 3600,
 	}
 	_, err := client.Post("/alm/10/MaintWin", window)
 	if err != nil {
 		t.Fatalf("POST MaintenanceWindow failed: %v", err)
 	}
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from MaintenanceWindow where windowId=%s", windowId))
+	q := mocks.L8QueryText(fmt.Sprintf("select * from MaintenanceWindow where WindowId=%s", windowId))
 	getResp, err := client.Get("/alm/10/MaintWin", q)
 	if err != nil {
 		t.Fatalf("GET MaintenanceWindow failed: %v", err)
@@ -261,7 +261,7 @@ func testCRUDMaintenanceWindow(t *testing.T, client *mocks.Client) {
 		t.Fatalf("PUT MaintenanceWindow failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from MaintenanceWindow where windowId=%s", windowId))
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from MaintenanceWindow where WindowId=%s", windowId))
 	_, err = client.Delete("/alm/10/MaintWin", delQ)
 	if err != nil {
 		t.Fatalf("DELETE MaintenanceWindow failed: %v", err)
@@ -271,16 +271,16 @@ func testCRUDMaintenanceWindow(t *testing.T, client *mocks.Client) {
 func testCRUDAlarmFilter(t *testing.T, client *mocks.Client) {
 	filterId := ifs.NewUuid()
 	filter := map[string]interface{}{
-		"filterId": filterId,
-		"name":     "CRUD Test Filter",
-		"owner":    "test-user",
+		"filter_id": filterId,
+		"name":      "CRUD Test Filter",
+		"owner":     "test-user",
 	}
 	_, err := client.Post("/alm/10/AlmFilter", filter)
 	if err != nil {
 		t.Fatalf("POST AlarmFilter failed: %v", err)
 	}
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from AlarmFilter where filterId=%s", filterId))
+	q := mocks.L8QueryText(fmt.Sprintf("select * from AlarmFilter where FilterId=%s", filterId))
 	getResp, err := client.Get("/alm/10/AlmFilter", q)
 	if err != nil {
 		t.Fatalf("GET AlarmFilter failed: %v", err)
@@ -295,7 +295,7 @@ func testCRUDAlarmFilter(t *testing.T, client *mocks.Client) {
 		t.Fatalf("PUT AlarmFilter failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from AlarmFilter where filterId=%s", filterId))
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from AlarmFilter where FilterId=%s", filterId))
 	_, err = client.Delete("/alm/10/AlmFilter", delQ)
 	if err != nil {
 		t.Fatalf("DELETE AlarmFilter failed: %v", err)

@@ -3,6 +3,7 @@ package ui
 import (
 	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8topology/go/types/l8topo"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -22,4 +23,8 @@ func RegisterAlmTypes(resources ifs.IResources) {
 	// Operations
 	common.RegisterType[alm.MaintenanceWindow, alm.MaintenanceWindowList](resources, "WindowId")
 	common.RegisterType[alm.AlarmFilter, alm.AlarmFilterList](resources, "FilterId")
+
+	// External types used by EnrichmentService
+	resources.Registry().Register(&l8topo.L8Topology{})
+	common.RegisterType[l8topo.L8TopologyMetadata, l8topo.L8TopologyMetadataList](resources, "ServiceName", "ServiceArea")
 }

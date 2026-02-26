@@ -95,4 +95,7 @@ func TestAllServices(t *testing.T) {
 
 	// 9. Test validation
 	testValidation(t, client)
+
+	// 10. Test correlation engine, maintenance windows
+	testCorrelation(t, client)
 }

@@ -25,12 +25,6 @@ Uses Layer8FormFactory for reduced boilerplate
                 ...f.text('location', 'Location'),
                 ...f.text('sourceIdentifier', 'Source Identifier')
             ]),
-            f.section('Root Cause Analysis', [
-                ...f.text('rootCauseAlarmId', 'Root Cause Alarm ID'),
-                ...f.text('correlationRuleId', 'Correlation Rule ID'),
-                ...f.checkbox('isRootCause', 'Is Root Cause'),
-                ...f.number('symptomCount', 'Symptom Count')
-            ]),
             f.section('Notes', [
                 ...f.inlineTable('notes', 'Notes', [
                     { key: 'noteId', label: 'ID', hidden: true },

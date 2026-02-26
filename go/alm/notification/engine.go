@@ -39,9 +39,10 @@ func (e *Engine) Notify(alarm *alm.Alarm, action ifs.Action, suppressNotificatio
 		return
 	}
 
-	policies, err := common.GetEntities(
+	policies, err := common.GetEntities[alm.NotificationPolicy](
 		notificationpolicies.ServiceName, notificationpolicies.ServiceArea,
-		&alm.NotificationPolicy{Status: alm.PolicyStatus_POLICY_STATUS_ACTIVE},
+		fmt.Sprintf("select * from NotificationPolicy where Status=%d",
+			alm.PolicyStatus_POLICY_STATUS_ACTIVE),
 		vnic,
 	)
 	if err != nil || len(policies) == 0 {

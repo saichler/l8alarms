@@ -1,6 +1,7 @@
 package enrichment
 
 import (
+	"fmt"
 	"github.com/saichler/l8alarms/go/alm/alarms"
 	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
@@ -74,9 +75,10 @@ func (s *EnrichmentService) Get(elements ifs.IElements, vnic ifs.IVNic) ifs.IEle
 	}
 
 	// Fetch active alarms
-	activeAlarms, err := common.GetEntities(
+	activeAlarms, err := common.GetEntities[alm.Alarm](
 		alarms.ServiceName, alarms.ServiceArea,
-		&alm.Alarm{State: alm.AlarmState_ALARM_STATE_ACTIVE},
+		fmt.Sprintf("select * from Alarm where State=%d",
+			alm.AlarmState_ALARM_STATE_ACTIVE),
 		vnic,
 	)
 	if err != nil {

@@ -88,17 +88,22 @@ func GetEntity[T any](serviceName string, serviceArea byte, filter *T, vnic ifs.
 	return nil, nil
 }
 
-// GetEntities retrieves multiple entities by filter.
-func GetEntities[T any](serviceName string, serviceArea byte, filter *T, vnic ifs.IVNic) ([]*T, error) {
+// GetEntities retrieves multiple entities using an L8Query.
+func GetEntities[T any](serviceName string, serviceArea byte, query string, vnic ifs.IVNic) ([]*T, error) {
 	handler, ok := ServiceHandler(serviceName, serviceArea, vnic)
 	if ok {
-		resp := handler.Get(object.New(nil, filter), vnic)
+		elems, err := object.NewQuery(query, vnic.Resources())
+		if err != nil {
+			return nil, err
+		}
+		resp := handler.Get(elems, vnic)
 		if resp.Error() != nil {
 			return nil, resp.Error()
 		}
 		return extractElements[T](resp.Elements()), nil
 	}
-	resp := vnic.Request("", serviceName, serviceArea, ifs.GET, filter, 30)
+	q := &l8api.L8Query{Text: query}
+	resp := vnic.Request("", serviceName, serviceArea, ifs.GET, q, 30)
 	if resp.Error() != nil {
 		return nil, resp.Error()
 	}

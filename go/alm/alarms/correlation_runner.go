@@ -26,9 +26,10 @@ func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
 	}
 
 	// Fetch active correlation rules
-	rules, err := common.GetEntities(
+	rules, err := common.GetEntities[alm.CorrelationRule](
 		correlationrules.ServiceName, correlationrules.ServiceArea,
-		&alm.CorrelationRule{Status: alm.CorrelationRuleStatus_CORRELATION_RULE_STATUS_ACTIVE},
+		fmt.Sprintf("select * from CorrelationRule where Status=%d",
+			alm.CorrelationRuleStatus_CORRELATION_RULE_STATUS_ACTIVE),
 		vnic,
 	)
 	if err != nil {
@@ -39,9 +40,10 @@ func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
 	}
 
 	// Fetch active alarms
-	activeAlarms, err := common.GetEntities(
+	activeAlarms, err := common.GetEntities[alm.Alarm](
 		ServiceName, ServiceArea,
-		&alm.Alarm{State: alm.AlarmState_ALARM_STATE_ACTIVE},
+		fmt.Sprintf("select * from Alarm where State=%d",
+			alm.AlarmState_ALARM_STATE_ACTIVE),
 		vnic,
 	)
 	if err != nil {

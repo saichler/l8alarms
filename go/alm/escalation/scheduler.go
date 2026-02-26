@@ -42,9 +42,10 @@ func (s *Scheduler) Schedule(alarm *alm.Alarm, vnic ifs.IVNic) {
 		return
 	}
 
-	policies, err := common.GetEntities(
+	policies, err := common.GetEntities[alm.EscalationPolicy](
 		escalationpolicies.ServiceName, escalationpolicies.ServiceArea,
-		&alm.EscalationPolicy{Status: alm.PolicyStatus_POLICY_STATUS_ACTIVE},
+		fmt.Sprintf("select * from EscalationPolicy where Status=%d",
+			alm.PolicyStatus_POLICY_STATUS_ACTIVE),
 		vnic,
 	)
 	if err != nil || len(policies) == 0 {

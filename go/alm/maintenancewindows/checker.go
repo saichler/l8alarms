@@ -1,6 +1,7 @@
 package maintenancewindows
 
 import (
+	"fmt"
 	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"github.com/saichler/l8types/go/ifs"
@@ -17,9 +18,10 @@ type CheckResult struct {
 
 // Check evaluates whether an alarm falls within an active maintenance window.
 func Check(alarm *alm.Alarm, vnic ifs.IVNic) CheckResult {
-	windows, err := common.GetEntities(
+	windows, err := common.GetEntities[alm.MaintenanceWindow](
 		ServiceName, ServiceArea,
-		&alm.MaintenanceWindow{Status: alm.MaintenanceWindowStatus_MAINTENANCE_WINDOW_STATUS_ACTIVE},
+		fmt.Sprintf("select * from MaintenanceWindow where Status=%d",
+			alm.MaintenanceWindowStatus_MAINTENANCE_WINDOW_STATUS_ACTIVE),
 		vnic,
 	)
 	if err != nil || len(windows) == 0 {
