@@ -6,7 +6,7 @@ set -e
 wget -q https://raw.githubusercontent.com/saichler/l8types/refs/heads/main/proto/api.proto
 
 # Generate bindings for all alarms proto files
-docker run --user "$(id -u):$(id -g)" -e PROTO="alm-common.proto alm-definitions.proto alm-alarms.proto alm-events.proto alm-correlation.proto alm-policies.proto alm-maintenance.proto alm-filters.proto" --mount type=bind,source="$PWD",target=/home/proto/ -it saichler/protoc:latest
+docker run --user "$(id -u):$(id -g)" -e PROTO="alm-common.proto alm-definitions.proto alm-alarms.proto alm-events.proto alm-correlation.proto alm-policies.proto alm-maintenance.proto alm-filters.proto alm-archive.proto" --mount type=bind,source="$PWD",target=/home/proto/ -it saichler/protoc:latest
 
 # Move generated bindings to the types directory and clean up
 rm -rf ../go/types

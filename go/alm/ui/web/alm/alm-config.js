@@ -18,7 +18,7 @@ Layer8ModuleConfigFactory.create({
         'events': {
             label: 'Events',
             services: [
-                { key: 'events', label: 'Events', endpoint: '/10/Event', model: 'Event' }
+                { key: 'events', label: 'Events', endpoint: '/10/Event', model: 'Event', readOnly: true }
             ]
         },
         'correlation': {
@@ -39,7 +39,14 @@ Layer8ModuleConfigFactory.create({
             services: [
                 { key: 'maintenance-windows', label: 'Windows', endpoint: '/10/MaintWin', model: 'MaintenanceWindow', supportedViews: ['table', 'calendar'] }
             ]
+        },
+        'archive': {
+            label: 'Archive',
+            services: [
+                { key: 'archived-alarms', label: 'Archived Alarms', endpoint: '/10/ArcAlarm', model: 'ArchivedAlarm', readOnly: true },
+                { key: 'archived-events', label: 'Archived Events', endpoint: '/10/ArcEvent', model: 'ArchivedEvent', readOnly: true }
+            ]
         }
     },
-    submodules: ['AlmAlarms', 'AlmEvents', 'AlmCorrelation', 'AlmPolicies', 'AlmMaintenance']
+    submodules: ['AlmAlarms', 'AlmEvents', 'AlmCorrelation', 'AlmPolicies', 'AlmMaintenance', 'AlmArchive']
 });

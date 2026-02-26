@@ -32,7 +32,7 @@ limitations under the License.
             ...col.col('nodeName', 'Node Name'),
             ...col.col('message', 'Message'),
             ...col.col('category', 'Category'),
-            ...col.date('occurredAt', 'Occurred At')
+            ...col.datetime('occurredAt', 'Occurred At')
         ]
     };
 

@@ -84,6 +84,8 @@ limitations under the License.
         const primaryKey = getPrimaryKey(parentModule, service.model);
         const viewType = service.viewType || 'table';
 
+        const isReadOnly = service.readOnly === true;
+
         const viewOptions = {
             containerId: containerId,
             endpoint: Layer8DConfig.resolveEndpoint(service.endpoint),
@@ -91,9 +93,9 @@ limitations under the License.
             columns: columns,
             primaryKey: primaryKey,
             pageSize: 10,
-            onAdd: () => moduleNS._openAddModal(service),
-            onEdit: (id) => moduleNS._openEditModal(service, id),
-            onDelete: (id) => moduleNS._confirmDeleteItem(service, id),
+            onAdd: isReadOnly ? null : () => moduleNS._openAddModal(service),
+            onEdit: isReadOnly ? null : (id) => moduleNS._openEditModal(service, id),
+            onDelete: isReadOnly ? null : (id) => moduleNS._confirmDeleteItem(service, id),
             onRowClick: (item, id) => moduleNS._showDetailsModal(service, item, id),
             addButtonText: `Add ${service.label.replace(/s$/, '')}`,
             viewConfig: service.viewConfig || {}

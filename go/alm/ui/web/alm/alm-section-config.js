@@ -47,6 +47,13 @@ Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
                 services: [
                     { key: 'maintenance-windows', label: 'Windows', isDefault: true }
                 ]
+            },
+            {
+                key: 'archive', label: 'Archive',
+                services: [
+                    { key: 'archived-alarms', label: 'Archived Alarms', isDefault: true },
+                    { key: 'archived-events', label: 'Archived Events' }
+                ]
             }
         ]
     });

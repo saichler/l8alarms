@@ -31,7 +31,7 @@ limitations under the License.
 (function() {
     'use strict';
 
-    const { renderBoolean, renderDate, renderMoney, renderPeriod } = window.Layer8DRenderers || {};
+    const { renderBoolean, renderDate, renderDateTime, renderMoney, renderPeriod } = window.Layer8DRenderers || {};
 
     window.Layer8ColumnFactory = {
         /**
@@ -152,6 +152,22 @@ limitations under the License.
                 sortKey: key,
                 type: 'date',
                 render: (item) => renderDate(item[key])
+            }];
+        },
+
+        /**
+         * Create a datetime column (date + time display).
+         * @param {string} key - The field key
+         * @param {string} [label] - Optional label
+         * @returns {Array} - Single column in array format
+         */
+        datetime: function(key, label) {
+            return [{
+                key: key,
+                label: label || this._toTitleCase(key),
+                sortKey: key,
+                type: 'datetime',
+                render: (item) => renderDateTime(item[key])
             }];
         },
 

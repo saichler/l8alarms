@@ -17,4 +17,8 @@ type MockDataStore struct {
 
 	// Phase 4: Alarms
 	AlarmIDs []string // Alarm IDs
+
+	// Phase 5: Archive
+	ArchivedAlarmIDs []string // ArchivedAlarm IDs
+	ArchivedEventIDs []string // ArchivedEvent IDs
 }

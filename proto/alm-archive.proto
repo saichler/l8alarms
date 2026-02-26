@@ -1,0 +1,109 @@
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "alm-alarms.proto";
+import "alm-events.proto";
+import "api.proto";
+
+// ArchivedAlarm: Immutable copy of a cleared/resolved alarm.
+message ArchivedAlarm {
+  string alarm_id = 1;
+  string definition_id = 2;
+  string name = 3;
+  string description = 4;
+
+  // State and severity
+  AlarmState state = 5;
+  AlarmSeverity severity = 6;
+  AlarmSeverity original_severity = 7;
+
+  // Source (topology references by ID)
+  string node_id = 8;
+  string node_name = 9;
+  string link_id = 10;
+  string location = 11;
+  string source_identifier = 12;
+
+  // Correlation / RCA
+  string root_cause_alarm_id = 13;
+  string correlation_rule_id = 14;
+  bool is_root_cause = 15;
+  int32 symptom_count = 16;
+
+  // Timing
+  int64 first_occurrence = 17;
+  int64 last_occurrence = 18;
+  int64 acknowledged_at = 19;
+  string acknowledged_by = 20;
+  int64 cleared_at = 21;
+  string cleared_by = 22;
+
+  // Occurrence tracking
+  int32 occurrence_count = 23;
+  string dedup_key = 24;
+
+  // Suppression
+  bool is_suppressed = 25;
+  string suppressed_by = 26;
+
+  // Additional context
+  string event_id = 27;
+  map<string, string> attributes = 28;
+
+  // Embedded children
+  repeated AlarmNote notes = 29;
+  repeated AlarmStateChange state_history = 30;
+
+  // Archive metadata
+  int64 archived_at = 31;
+  string archived_by = 32;
+}
+
+// ArchivedEvent: Immutable copy of a processed event.
+message ArchivedEvent {
+  string event_id = 1;
+  EventType event_type = 2;
+  EventProcessingState processing_state = 3;
+
+  // Source (topology references by ID)
+  string node_id = 4;
+  string node_name = 5;
+  string source_identifier = 6;
+
+  // Event content
+  AlarmSeverity severity = 7;
+  string message = 8;
+  string raw_data = 9;
+
+  // Classification
+  string category = 10;
+  string subcategory = 11;
+
+  // Processing results
+  string alarm_id = 12;
+  string definition_id = 13;
+
+  // Timing
+  int64 occurred_at = 14;
+  int64 received_at = 15;
+  int64 processed_at = 16;
+
+  // Extensible attributes
+  repeated EventAttribute attributes = 17;
+
+  // Archive metadata
+  int64 archived_at = 18;
+  string archived_by = 19;
+}
+
+message ArchivedAlarmList {
+  repeated ArchivedAlarm list = 1;
+  l8api.L8MetaData metadata = 2;
+}
+
+message ArchivedEventList {
+  repeated ArchivedEvent list = 1;
+  l8api.L8MetaData metadata = 2;
+}

@@ -313,13 +313,13 @@ limitations under the License.
         },
 
         /**
-         * Create a datetime field (renders as text input for datetime values).
+         * Create a display-only datetime field (date + time).
          */
         datetime: function(key, label, required) {
             const field = {
                 key: key,
                 label: label || this._toTitleCase(key),
-                type: 'text'
+                type: 'datetime'
             };
             if (required) field.required = true;
             return [field];

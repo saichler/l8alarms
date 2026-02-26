@@ -84,6 +84,26 @@ Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
         const required = field.required ? 'required' : '';
         const requiredMark = field.required ? ' <span style="color: var(--layer8d-error);">*</span>' : '';
 
+        // Field-level readOnly: render as display-only span
+        if (field.readOnly) {
+            let displayValue = '-';
+            if (value !== null && value !== undefined && value !== '' && value !== 0) {
+                if (field.type === 'select' && field.options && field.options[value] !== undefined) {
+                    displayValue = field.options[value];
+                } else if (field.type === 'checkbox' || field.type === 'toggle') {
+                    displayValue = value ? 'Yes' : 'No';
+                } else {
+                    displayValue = String(value);
+                }
+            }
+            return `
+                <div class="form-group">
+                    <label for="field-${field.key}">${escapeHtml(field.label)}</label>
+                    <span class="form-display-value">${escapeHtml(displayValue)}</span>
+                </div>
+            `;
+        }
+
         let inputHtml = '';
 
         switch (field.type) {
@@ -135,6 +155,12 @@ Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
             case 'hours':
                 inputHtml = generateFormattedInput(field, value);
                 break;
+
+            case 'datetime': {
+                const dtDisplay = (value && value !== 0) ? Layer8DUtils.formatDateTime(value) : '-';
+                inputHtml = `<span class="form-display-value">${escapeHtml(dtDisplay)}</span>`;
+                break;
+            }
 
             case 'date':
                 inputHtml = generateDateInput(field, value);

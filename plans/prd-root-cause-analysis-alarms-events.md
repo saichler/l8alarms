@@ -140,6 +140,8 @@ Each entity below has been evaluated against the four Prime Object criteria:
 | EscalationPolicy | Yes | Yes (active/disabled) | Yes ("show all escalations") | Yes | **Yes** |
 | MaintenanceWindow | Yes | Yes (scheduled/active/expired) | Yes ("show all windows") | Yes | **Yes** |
 | AlarmFilter | Yes | Yes (user manages saved filters) | Yes ("show my saved filters") | Yes | **Yes** |
+| ArchivedAlarm | Yes | Yes (archived, immutable) | Yes ("show archived alarms from last year") | Yes | **Yes** |
+| ArchivedEvent | Yes | Yes (archived, immutable) | Yes ("show archived events for node X") | Yes | **Yes** |
 | AlarmNote | No | No (part of alarm) | No | No | **No** (child) |
 | AlarmStateChange | No | No (part of alarm) | No | No | **No** (child) |
 | CorrelationCondition | No | No (part of rule) | No | No | **No** (child) |
@@ -355,55 +357,65 @@ import "api.proto";
 // ─── Alarm ───
 // Prime Object: Active or historical alarm instance.
 // Independent lifecycle (active -> ack -> cleared). Queried directly.
+//
+// MUTABILITY: An Alarm is a mutable entity with two categories of fields:
+//   - System-managed fields: Set and updated only by the system (correlation
+//     engine, event processing, auto-clear, maintenance windows). The UI
+//     should display these as read-only. The service callback must reject
+//     user attempts to modify them via PUT.
+//   - Operator-editable fields: Can be modified by operators through the UI
+//     (acknowledge, clear, override severity, add notes).
 
 message Alarm {
   string alarm_id = 1;
-  string definition_id = 2;          // Reference to AlarmDefinition
+
+  // ── System-managed (read-only to operators) ──
+  string definition_id = 2;          // Reference to AlarmDefinition (set at creation)
   string name = 3;                   // Copied from definition at creation
-  string description = 4;
+  string description = 4;            // Copied from definition at creation
+  AlarmSeverity original_severity = 7; // Original severity from definition (never changes)
 
-  // State and severity
-  AlarmState state = 5;
-  AlarmSeverity severity = 6;
-  AlarmSeverity original_severity = 7; // Before any operator override
-
-  // Source (topology references by ID per Prime Object rules)
+  // Source (set at creation, immutable)
   string node_id = 8;                // L8TopologyNode.node_id
   string node_name = 9;              // Denormalized for display
   string link_id = 10;               // L8TopologyLink.link_id (optional)
   string location = 11;              // L8TopologyLocation.location (optional)
   string source_identifier = 12;     // Sub-element (e.g., interface name, process)
 
-  // Correlation / RCA
+  // Correlation / RCA (system-managed by correlation engine)
   string root_cause_alarm_id = 13;   // If this is a symptom, points to root cause
   string correlation_rule_id = 14;   // Which rule correlated this alarm
   bool is_root_cause = 15;           // True if this alarm was identified as root cause
   int32 symptom_count = 16;          // Number of symptoms correlated to this alarm
 
-  // Timing
+  // Timing (system-managed)
   int64 first_occurrence = 17;       // Unix timestamp of first event
   int64 last_occurrence = 18;        // Unix timestamp of most recent event
-  int64 acknowledged_at = 19;        // When operator acknowledged
-  string acknowledged_by = 20;       // Who acknowledged
-  int64 cleared_at = 21;             // When alarm was cleared
-  string cleared_by = 22;            // Who/what cleared (operator or auto-clear)
+  int64 acknowledged_at = 19;        // Set by system when operator acknowledges
+  int64 cleared_at = 21;             // Set by system when alarm is cleared
 
-  // Occurrence tracking
+  // Occurrence tracking (system-managed)
   int32 occurrence_count = 23;       // Number of times this alarm fired (dedup)
   string dedup_key = 24;             // Deduplication key
 
-  // Suppression
+  // Suppression (system-managed by maintenance windows and RCA)
   bool is_suppressed = 25;           // Suppressed by maintenance window or RCA
   string suppressed_by = 26;         // maintenance_window_id or root_cause_alarm_id
 
-  // Additional context
+  // Additional context (set at creation, immutable)
   string event_id = 27;              // Reference to triggering Event
   map<string, string> attributes = 28; // Key-value context from the event
 
-  // Embedded child: Notes
+  // ── Operator-editable fields ──
+  AlarmState state = 5;              // Operator can acknowledge, clear
+  AlarmSeverity severity = 6;        // Operator can override severity
+  string acknowledged_by = 20;       // Set when operator acknowledges
+  string cleared_by = 22;            // Who/what cleared (operator or auto-clear)
+
+  // Embedded child: Notes (operator can add)
   repeated AlarmNote notes = 29;
 
-  // Embedded child: State change history
+  // Embedded child: State change history (system-appended on each state transition)
   repeated AlarmStateChange state_history = 30;
 }
 
@@ -444,6 +456,13 @@ import "api.proto";
 // ─── Event ───
 // Prime Object: Raw event occurrence from a managed element.
 // Independent entity, queried directly ("show events from node X in last hour").
+//
+// IMMUTABILITY: An Event is an immutable record — a fact that occurred at a
+// point in time. Once created (POST), it must never be modified (no PUT/UPDATE).
+// The service callback must reject PUT requests. Events are append-only:
+// new occurrences create new Event records, they do not update existing ones.
+// The only mutable field is processing_state, which the system (not the user)
+// transitions from NEW -> PROCESSED/DISCARDED -> ARCHIVED.
 
 message Event {
   string event_id = 1;
@@ -728,6 +747,120 @@ message AlarmFilterList {
 }
 ```
 
+#### File: `proto/alm-archive.proto`
+
+```protobuf
+syntax = "proto3";
+package alm;
+option go_package = "./types/alm";
+
+import "alm-common.proto";
+import "alm-alarms.proto";
+import "alm-events.proto";
+import "api.proto";
+
+// ─── Archived Alarm ───
+// Prime Object: An alarm that has been archived by the archiving engine.
+// Structurally identical to Alarm — preserves all original data at time of archival.
+//
+// IMMUTABILITY: Once archived, the record is immutable. The service callback
+// must reject PUT requests. Only POST (from AlarmService during archival)
+// and GET (for historical queries) are permitted. DELETE may be allowed
+// for retention policy enforcement.
+
+message ArchivedAlarm {
+  string alarm_id = 1;               // Same ID as the original Alarm
+  string definition_id = 2;
+  string name = 3;
+  string description = 4;
+
+  AlarmState state = 5;
+  AlarmSeverity severity = 6;
+  AlarmSeverity original_severity = 7;
+
+  string node_id = 8;
+  string node_name = 9;
+  string link_id = 10;
+  string location = 11;
+  string source_identifier = 12;
+
+  string root_cause_alarm_id = 13;
+  string correlation_rule_id = 14;
+  bool is_root_cause = 15;
+  int32 symptom_count = 16;
+
+  int64 first_occurrence = 17;
+  int64 last_occurrence = 18;
+  int64 acknowledged_at = 19;
+  string acknowledged_by = 20;
+  int64 cleared_at = 21;
+  string cleared_by = 22;
+
+  int32 occurrence_count = 23;
+  string dedup_key = 24;
+
+  bool is_suppressed = 25;
+  string suppressed_by = 26;
+
+  string event_id = 27;
+  map<string, string> attributes = 28;
+
+  repeated AlarmNote notes = 29;
+  repeated AlarmStateChange state_history = 30;
+
+  // Archive metadata
+  int64 archived_at = 31;            // When the alarm was archived
+  string archived_by = 32;           // Archiving rule or operator that triggered it
+}
+
+message ArchivedAlarmList {
+  repeated ArchivedAlarm list = 1;
+  l8api.L8MetaData metadata = 2;
+}
+
+// ─── Archived Event ───
+// Prime Object: An event that has been archived alongside its alarm.
+// Structurally identical to Event — preserves all original data at time of archival.
+//
+// IMMUTABILITY: Same as ArchivedAlarm — reject PUT, allow POST (from
+// AlarmService during archival) and GET only.
+
+message ArchivedEvent {
+  string event_id = 1;               // Same ID as the original Event
+  EventType event_type = 2;
+  EventProcessingState processing_state = 3;
+
+  string node_id = 4;
+  string node_name = 5;
+  string source_identifier = 6;
+
+  AlarmSeverity severity = 7;
+  string message = 8;
+  string raw_data = 9;
+
+  string category = 10;
+  string subcategory = 11;
+
+  string alarm_id = 12;
+  string definition_id = 13;
+
+  int64 occurred_at = 14;
+  int64 received_at = 15;
+  int64 processed_at = 16;
+
+  repeated EventAttribute attributes = 17;
+
+  // Archive metadata
+  int64 archived_at = 18;            // When the event was archived
+  string archived_by = 19;           // Archiving rule or operator that triggered it
+}
+
+message ArchivedEventList {
+  repeated ArchivedEvent list = 1;
+  l8api.L8MetaData metadata = 2;
+}
+```
+
 ### 5.3 Enum Summary
 
 | Enum | Zero Value | Count | File |
@@ -946,6 +1079,8 @@ New Alarm Created
 | 6 | EscalationPolicy | EscPolicy | 10 | PolicyId | Escalation policies |
 | 7 | MaintenanceWindow | MaintWin | 10 | WindowId | Maintenance windows |
 | 8 | AlarmFilter | AlmFilter | 10 | FilterId | Saved alarm filters |
+| 9 | ArchivedAlarm | ArcAlarm | 10 | AlarmId | Archived alarm records |
+| 10 | ArchivedEvent | ArcEvent | 10 | EventId | Archived event records |
 
 All ServiceNames are 10 characters or fewer.
 
@@ -954,13 +1089,91 @@ All ServiceNames are 10 characters or fewer.
 | Service | Required Fields | Enum Validations | Special Logic |
 |---------|----------------|-----------------|---------------|
 | AlmDef | name | status, default_severity, event_type_filter | Auto-generate definition_id on POST |
-| Alarm | definition_id, node_id | state, severity, original_severity | Auto-generate alarm_id on POST; trigger correlation engine on POST |
-| Event | event_type, node_id, message | event_type, processing_state, severity | Auto-generate event_id on POST; match against AlarmDefinitions |
+| Alarm | definition_id, node_id | state, severity, original_severity | Auto-generate alarm_id on POST; trigger correlation engine on POST. **PUT must reject changes to system-managed fields** (definition_id, name, description, original_severity, node_id, node_name, link_id, location, source_identifier, root_cause_alarm_id, correlation_rule_id, is_root_cause, symptom_count, first_occurrence, last_occurrence, occurrence_count, dedup_key, is_suppressed, suppressed_by, event_id, attributes). Only operator-editable fields allowed on PUT: state, severity, acknowledged_by, cleared_by, notes. |
+| Event | event_type, node_id, message | event_type, processing_state, severity | Auto-generate event_id on POST; match against AlarmDefinitions. **Immutable: reject all PUT requests.** Events are append-only records. Only processing_state is updated by the system internally (not via user PUT). |
 | CorrRule | name, rule_type | rule_type, status, traversal_direction | Auto-generate rule_id on POST |
 | NotifPol | name | status, min_severity | Auto-generate policy_id on POST |
 | EscPolicy | name | status, min_severity | Auto-generate policy_id on POST |
 | MaintWin | name, start_time, end_time | status, recurrence | Auto-generate window_id on POST |
 | AlmFilter | name, owner | - | Auto-generate filter_id on POST |
+| ArcAlarm | alarm_id | - | **Immutable: reject all PUT requests.** POST only from AlarmService during archival. No user-initiated creation. |
+| ArcEvent | event_id | - | **Immutable: reject all PUT requests.** POST only from AlarmService during archival. No user-initiated creation. |
+
+---
+
+## 8.3 Archiving Engine
+
+The archiving engine is a non-service component (like `correlation/`, `notification/`, `escalation/`) that monitors active alarms and archives them based on configurable time + rules criteria.
+
+### Archival Flow
+
+```
+Archiving Engine (periodic monitor)
+      |
+      +---> Query active Alarms matching archival criteria
+      |     (e.g., cleared alarms older than 30 days,
+      |      suppressed alarms older than 7 days)
+      |
+      +---> For each alarm to archive:
+      |     |
+      |     +---> POST alarm to ArchivedAlarms service (with archived_at, archived_by)
+      |     +---> Query Events linked to this alarm (Event.alarm_id = alarm.alarm_id)
+      |     +---> POST each event to ArchivedEvents service (with archived_at, archived_by)
+      |     +---> If alarm.is_root_cause: also archive all correlated symptom alarms
+      |     |     (query Alarms where root_cause_alarm_id = alarm.alarm_id, recurse)
+      |     +---> DELETE alarm from active Alarm service
+      |     +---> DELETE events from active Event service
+      |
+      v
+ Active services stay lean; historical data preserved in archive
+```
+
+### Key Behaviors
+
+1. **Correlation-aware archival**: When archiving a root cause alarm, all its symptom alarms and their events are archived together as a unit. This preserves the complete correlation tree in the archive.
+
+2. **Atomic archival**: The archive operation for a correlation group should be all-or-nothing. If any part fails, the entire group remains in active services.
+
+3. **Archive metadata**: Each archived record gets `archived_at` (timestamp) and `archived_by` (rule name or "system") fields appended during archival.
+
+4. **No user creation**: Users cannot POST directly to ArchivedAlarms/ArchivedEvents. Only the AlarmService (triggered by the archiving engine) writes to these services.
+
+### Project Structure Addition
+
+```
+go/alm/
+├── archiving/                        # Archiving engine (NOT a service)
+│   └── engine.go                     # Monitors and triggers archival
+├── archivedalarms/                   # ArchivedAlarm service (ServiceName: ArcAlarm)
+│   ├── ArchivedAlarmService.go
+│   └── ArchivedAlarmServiceCallback.go
+└── archivedevents/                   # ArchivedEvent service (ServiceName: ArcEvent)
+    ├── ArchivedEventService.go
+    └── ArchivedEventServiceCallback.go
+```
+
+### 8.4 Security Provider Access Rules
+
+The following rules enforce the boundary between **user (web) access** and **service-to-service access**. When applied to the security provider, web/user requests matching a `deny` rule are rejected; internal service-to-service calls are unaffected.
+
+| Action | Model | Method | Attributes |
+|--------|-------|--------|------------|
+| deny | Event | PUT | * |
+| deny | Event | POST | * |
+| deny | Event | DELETE | * |
+| deny | ArchivedAlarm | PUT | * |
+| deny | ArchivedAlarm | POST | * |
+| deny | ArchivedAlarm | DELETE | * |
+| deny | ArchivedEvent | PUT | * |
+| deny | ArchivedEvent | POST | * |
+| deny | ArchivedEvent | DELETE | * |
+| deny | Alarm | PUT | definitionId, name, description, originalSeverity, nodeId, nodeName, linkId, location, sourceIdentifier, rootCauseAlarmId, correlationRuleId, isRootCause, symptomCount, firstOccurrence, lastOccurrence, acknowledgedAt, clearedAt, occurrenceCount, dedupKey, isSuppressed, suppressedBy, eventId |
+
+**Rationale:**
+
+- **Event** — Immutable append-only records. Only the system (event ingestion pipeline) creates events. Users can only read (GET).
+- **ArchivedAlarm / ArchivedEvent** — Created exclusively by the archiving engine during the archival flow. Users can only read (GET) for historical queries.
+- **Alarm (attribute-level)** — The listed attributes are system-managed fields set by the correlation engine, maintenance window check, dedup logic, and state machine. Users may only PUT the operator-editable fields: `state`, `severity`, `acknowledgedBy`, `clearedBy`, `notes`.
 
 ---
 
@@ -982,6 +1195,7 @@ Following the l8erp configuration-driven UI pattern using l8ui components.
 | 2 | events | Events | events |
 | 3 | correlation | Correlation | correlation-rules |
 | 4 | policies | Policies | notification-policies, escalation-policies |
+| 6 | archive | Archive | archived-alarms, archived-events |
 | 5 | maintenance | Maintenance | maintenance-windows |
 
 ### 9.2 Supported Views
@@ -1023,7 +1237,33 @@ viewConfig: {
 }
 ```
 
-### 9.5 UI File Structure
+### 9.5 DateTime Display Component (l8ui)
+
+Alarm and Event models contain `int64` Unix timestamp fields that represent date+time (not just date). The existing `col.date()` and `f.date()` components render only the date portion, omitting the time. A new **datetime** component is required in the l8ui shared library.
+
+#### Requirements
+
+1. **Display-only** — These timestamp fields are system-managed and never user-editable. The component renders a formatted date+time string with no picker or input. Always read-only.
+
+2. **Table column renderer** (`col.datetime(key, label)`) — Renders an `int64` Unix timestamp as a formatted date+time string in table cells (e.g., `2026-02-26 14:30:05`).
+
+3. **Form field renderer** (`f.datetime(key, label)`) — Renders the timestamp as a read-only display field in detail forms. No input element, no picker.
+
+4. **Applicable fields:**
+   - **Alarm**: `firstOccurrence`, `lastOccurrence`, `acknowledgedAt`, `clearedAt`
+   - **Event**: `occurredAt`, `receivedAt`, `processedAt`
+   - **AlarmStateChange** (child): `changedAt`
+   - **AlarmNote** (child): `createdAt`
+   - **AlarmDefinition**: `createdAt`, `updatedAt`
+   - **CorrelationRule**: `createdAt`, `updatedAt`
+   - **NotificationPolicy**: `createdAt`, `updatedAt`
+   - **EscalationPolicy**: `createdAt`, `updatedAt`
+   - **MaintenanceWindow**: `createdAt`, `updatedAt`
+   - **AlarmFilter**: `createdAt`, `updatedAt`
+
+5. **Desktop and mobile parity** — Both platforms must support the datetime renderer.
+
+### 9.6 UI File Structure
 
 ```
 go/alm/ui/web/
@@ -1220,6 +1460,14 @@ Layer8DModuleFactory.create({
 │   │   ├── alarmfilters/
 │   │   │   ├── AlarmFilterService.go
 │   │   │   └── AlarmFilterServiceCallback.go
+│   │   ├── archivedalarms/          # ArchivedAlarm service (ServiceName: ArcAlarm)
+│   │   │   ├── ArchivedAlarmService.go
+│   │   │   └── ArchivedAlarmServiceCallback.go
+│   │   ├── archivedevents/          # ArchivedEvent service (ServiceName: ArcEvent)
+│   │   │   ├── ArchivedEventService.go
+│   │   │   └── ArchivedEventServiceCallback.go
+│   │   ├── archiving/               # Archiving engine (NOT a service)
+│   │   │   └── engine.go            # Monitors and triggers archival
 │   │   ├── correlation/             # RCA engine (NOT a service)
 │   │   │   ├── engine.go            # Correlation orchestrator
 │   │   │   ├── topological.go       # Topological strategy
@@ -1297,10 +1545,21 @@ Layer8DModuleFactory.create({
 4. Implement maintenance window checking
 
 ### Phase 6: Mock Data & Testing
-1. Implement mock data generators for all 8 services
+1. Implement mock data generators for all 10 services
 2. Implement phase orchestration (dependency-ordered)
 3. Generate realistic alarm/event scenarios with correlations
 4. End-to-end integration testing
+
+### Phase 7: Archiving
+1. Create `alm-archive.proto` with ArchivedAlarm and ArchivedEvent messages
+2. Generate protobuf bindings (`cd proto && ./make-bindings.sh`)
+3. Implement ArchivedAlarm service (ArcAlarm) — POST and GET only, reject PUT
+4. Implement ArchivedEvent service (ArcEvent) — POST and GET only, reject PUT
+5. Implement archiving engine (`archiving/engine.go`) — periodic monitor with configurable rules
+6. Wire archiving into AlarmService — on archival trigger, move alarm + correlated alarms + events to archive services, then delete from active
+7. Add archive UI submodule (table views for archived-alarms and archived-events)
+8. Add mock data for archived records
+9. Test: verify correlation-aware archival (root cause + all symptoms archived together)
 
 ---
 
@@ -1310,7 +1569,7 @@ Layer8DModuleFactory.create({
 |------|-----------|-------|
 | Plan Approval Workflow | Yes | This PRD is in `./plans/` |
 | File Size < 500 lines | Yes | Correlation engine split into 5 files |
-| Prime Object Rules | Yes | 8 prime objects, 6 child types embedded |
+| Prime Object Rules | Yes | 10 prime objects, 6 child types embedded |
 | Cross-ref by ID only | Yes | Topology refs are string IDs (node_id, link_id) |
 | Proto List Convention | Yes | All lists use `repeated X list = 1; metadata = 2` |
 | Enum Zero Value | Yes | All 13 enums have UNSPECIFIED = 0 |

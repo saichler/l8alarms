@@ -11,19 +11,33 @@ Uses Layer8FormFactory for reduced boilerplate
     const f = window.Layer8FormFactory;
     const enums = AlmAlarms.enums;
 
+    // Mark fields as read-only (system-managed, not user-editable)
+    function ro(fields) {
+        return fields.map(function(field) { field.readOnly = true; return field; });
+    }
+
     AlmAlarms.forms = {
         Alarm: f.form('Alarm', [
             f.section('Alarm Details', [
-                ...f.text('name', 'Name'),
-                ...f.textarea('description', 'Description'),
-                ...f.reference('definitionId', 'Definition', 'AlarmDefinition'),
+                // System-managed identity fields (read-only)
+                ...ro(f.text('name', 'Name')),
+                ...ro(f.textarea('description', 'Description')),
+                ...ro(f.reference('definitionId', 'Definition', 'AlarmDefinition')),
+                // Operator-editable fields
                 ...f.select('severity', 'Severity', enums.ALARM_SEVERITY),
                 ...f.select('state', 'State', enums.ALARM_STATE),
-                ...f.text('nodeId', 'Node ID'),
-                ...f.text('nodeName', 'Node Name'),
-                ...f.text('linkId', 'Link ID'),
-                ...f.text('location', 'Location'),
-                ...f.text('sourceIdentifier', 'Source Identifier')
+                // System-managed source fields (read-only)
+                ...ro(f.text('nodeId', 'Node ID')),
+                ...ro(f.text('nodeName', 'Node Name')),
+                ...ro(f.text('linkId', 'Link ID')),
+                ...ro(f.text('location', 'Location')),
+                ...ro(f.text('sourceIdentifier', 'Source Identifier'))
+            ]),
+            f.section('Timing', [
+                ...f.datetime('firstOccurrence', 'First Occurrence'),
+                ...f.datetime('lastOccurrence', 'Last Occurrence'),
+                ...f.datetime('acknowledgedAt', 'Acknowledged At'),
+                ...f.datetime('clearedAt', 'Cleared At')
             ]),
             f.section('Notes', [
                 ...f.inlineTable('notes', 'Notes', [

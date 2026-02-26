@@ -48,9 +48,9 @@ limitations under the License.
                 ...f.reference('definitionId', 'Alarm Definition', 'AlarmDefinition')
             ]),
             f.section('Timing', [
-                ...f.date('occurredAt', 'Occurred At'),
-                ...f.date('receivedAt', 'Received At'),
-                ...f.date('processedAt', 'Processed At')
+                ...f.datetime('occurredAt', 'Occurred At'),
+                ...f.datetime('receivedAt', 'Received At'),
+                ...f.datetime('processedAt', 'Processed At')
             ])
         ])
     };

@@ -24,6 +24,10 @@ func RegisterAlmTypes(resources ifs.IResources) {
 	common.RegisterType[alm.MaintenanceWindow, alm.MaintenanceWindowList](resources, "WindowId")
 	common.RegisterType[alm.AlarmFilter, alm.AlarmFilterList](resources, "FilterId")
 
+	// Archive
+	common.RegisterType[alm.ArchivedAlarm, alm.ArchivedAlarmList](resources, "AlarmId")
+	common.RegisterType[alm.ArchivedEvent, alm.ArchivedEventList](resources, "EventId")
+
 	// External types used by EnrichmentService
 	resources.Registry().Register(&l8topo.L8Topology{})
 	common.RegisterType[l8topo.L8TopologyMetadata, l8topo.L8TopologyMetadataList](resources, "ServiceName", "ServiceArea")

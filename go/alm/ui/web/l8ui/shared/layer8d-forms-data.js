@@ -60,6 +60,9 @@ Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
                 // Money fields use compound sub-elements (fieldKey.__amount, fieldKey.__currencyId)
                 // Inline tables use a hidden input with data-inline-table-data attribute
                 // so form.elements[field.key] won't find a match — skip the guard for them
+                // datetime and readOnly fields are display-only — never collect them
+                if (field.type === 'datetime' || field.readOnly) return;
+
                 const element = form.elements[field.key];
                 if (!element && field.type !== 'money' && field.type !== 'period' && field.type !== 'inlineTable' && field.type !== 'tags' && field.type !== 'multiselect' && field.type !== 'richtext') return;
 

@@ -19,7 +19,7 @@ limitations under the License.
 (function() {
     'use strict';
 
-    const { escapeHtml, formatDate, formatMoney, formatPercentage } = Layer8DUtils;
+    const { escapeHtml, formatDate, formatDateTime, formatMoney, formatPercentage } = Layer8DUtils;
 
     // ========================================
     // STATUS CLASSES (configurable per module)
@@ -112,6 +112,13 @@ limitations under the License.
      */
     function renderDate(value, options = {}) {
         return formatDate(value, options);
+    }
+
+    /**
+     * Render a datetime value (date + time)
+     */
+    function renderDateTime(value) {
+        return formatDateTime(value);
     }
 
     /**
@@ -216,6 +223,7 @@ limitations under the License.
         createStatusRenderer,
         renderBoolean,
         renderDate,
+        renderDateTime,
         renderMoney,
         renderPercentage,
         renderFileSize,

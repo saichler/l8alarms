@@ -9,7 +9,6 @@ Table column definitions for Alarm, AlarmDefinition, AlarmFilter
     window.AlmAlarms = window.AlmAlarms || {};
 
     const col = window.Layer8ColumnFactory;
-    const { renderDate } = Layer8DRenderers;
     const render = AlmAlarms.render;
 
     AlmAlarms.columns = {
@@ -19,7 +18,7 @@ Table column definitions for Alarm, AlarmDefinition, AlarmFilter
             ...col.status('severity', 'Severity', null, render.severity),
             ...col.status('state', 'State', null, render.state),
             ...col.col('nodeName', 'Node'),
-            ...col.date('firstOccurrence', 'First Occurrence'),
+            ...col.datetime('firstOccurrence', 'First Occurrence'),
             ...col.col('occurrenceCount', 'Count'),
             ...col.boolean('isRootCause', 'Root Cause'),
             ...col.col('symptomCount', 'Symptoms')

@@ -1470,7 +1470,18 @@ Same schema for both desktop and mobile:
 
 ### Supported Field Types
 
-`text`, `email`, `tel`, `number`, `textarea`, `date`, `select`, `checkbox`, `currency`, `percentage`, `phone`, `ssn`, `reference`, `url`, `rating`, `hours`, `ein`, `routingNumber`, `colorCode`, `period`
+`text`, `email`, `tel`, `number`, `textarea`, `date`, `datetime`, `select`, `checkbox`, `currency`, `percentage`, `phone`, `ssn`, `reference`, `url`, `rating`, `hours`, `ein`, `routingNumber`, `colorCode`, `period`
+
+### Field-Level Read-Only
+
+Any field can be marked `readOnly: true` to render as a display-only span instead of an editable input. Read-only fields are skipped during form data collection (never sent to the server on POST/PUT).
+
+```js
+{ key: 'nodeId', label: 'Node ID', type: 'text', readOnly: true }
+{ key: 'severity', label: 'Severity', type: 'select', options: SEVERITY_ENUM, readOnly: true }
+```
+
+Use this for system-managed fields that the user can see but not modify (e.g., alarm identity fields, computed values). The `datetime` type is inherently display-only and does not need `readOnly`.
 
 ### Data Collection Behaviors
 

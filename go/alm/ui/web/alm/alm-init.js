@@ -11,6 +11,6 @@ Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
         defaultService: 'alarms',
         sectionSelector: 'alarms',
         initializerName: 'initializeAlm',
-        requiredNamespaces: ['AlmAlarms', 'AlmEvents', 'AlmCorrelation', 'AlmPolicies', 'AlmMaintenance']
+        requiredNamespaces: ['AlmAlarms', 'AlmEvents', 'AlmCorrelation', 'AlmPolicies', 'AlmMaintenance', 'AlmArchive']
     });
 })();

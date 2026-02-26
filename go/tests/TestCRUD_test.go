@@ -18,6 +18,8 @@ func testCRUD(t *testing.T, client *mocks.Client) {
 	testCRUDEscalationPolicy(t, client)
 	testCRUDMaintenanceWindow(t, client)
 	testCRUDAlarmFilter(t, client)
+	testCRUDArchivedAlarm(t, client)
+	testCRUDArchivedEvent(t, client)
 }
 
 func testCRUDAlarmDefinition(t *testing.T, client *mocks.Client) {
@@ -80,7 +82,8 @@ func testCRUDAlarm(t *testing.T, client *mocks.Client) {
 		t.Fatalf("GET Alarm did not return expected name, got: %s", getResp)
 	}
 
-	alarm["description"] = "Updated by CRUD test"
+	// PUT: only change user-editable fields (state, severity); system fields must stay the same
+	alarm["state"] = 2
 	_, err = client.Put("/alm/10/Alarm", alarm)
 	if err != nil {
 		t.Fatalf("PUT Alarm failed: %v", err)
@@ -115,11 +118,7 @@ func testCRUDEvent(t *testing.T, client *mocks.Client) {
 		t.Fatalf("GET Event did not return expected message, got: %s", getResp)
 	}
 
-	event["message"] = "Updated by CRUD test"
-	_, err = client.Put("/alm/10/Event", event)
-	if err != nil {
-		t.Fatalf("PUT Event failed: %v", err)
-	}
+	// Events are immutable — no PUT test (see testValidationEventImmutability)
 
 	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Event where EventId=%s", eventId))
 	_, err = client.Delete("/alm/10/Event", delQ)
@@ -299,5 +298,90 @@ func testCRUDAlarmFilter(t *testing.T, client *mocks.Client) {
 	_, err = client.Delete("/alm/10/AlmFilter", delQ)
 	if err != nil {
 		t.Fatalf("DELETE AlarmFilter failed: %v", err)
+	}
+}
+
+func testCRUDArchivedAlarm(t *testing.T, client *mocks.Client) {
+	alarmId := ifs.NewUuid()
+	now := time.Now().Unix()
+	arcAlarm := map[string]interface{}{
+		"alarm_id":    alarmId,
+		"name":        "CRUD Test Archived Alarm",
+		"state":       4, // CLEARED
+		"severity":    2,
+		"node_id":     "test-node-001",
+		"archived_at": now,
+		"archived_by": "test-user",
+	}
+	_, err := client.Post("/alm/10/ArcAlarm", arcAlarm)
+	if err != nil {
+		t.Fatalf("POST ArchivedAlarm failed: %v", err)
+	}
+
+	q := mocks.L8QueryText(fmt.Sprintf("select * from ArchivedAlarm where AlarmId=%s", alarmId))
+	getResp, err := client.Get("/alm/10/ArcAlarm", q)
+	if err != nil {
+		t.Fatalf("GET ArchivedAlarm failed: %v", err)
+	}
+	if !strings.Contains(getResp, "CRUD Test Archived Alarm") {
+		t.Fatalf("GET ArchivedAlarm did not return expected name, got: %s", getResp)
+	}
+
+	// PUT should be rejected — archived alarms are immutable
+	arcAlarm["name"] = "Should Not Update"
+	_, err = client.Put("/alm/10/ArcAlarm", arcAlarm)
+	if err == nil {
+		t.Fatal("PUT ArchivedAlarm should have been rejected (immutable)")
+	}
+	if !strings.Contains(err.Error(), "immutable") {
+		t.Fatalf("Expected immutability error, got: %v", err)
+	}
+
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from ArchivedAlarm where AlarmId=%s", alarmId))
+	_, err = client.Delete("/alm/10/ArcAlarm", delQ)
+	if err != nil {
+		t.Fatalf("DELETE ArchivedAlarm failed: %v", err)
+	}
+}
+
+func testCRUDArchivedEvent(t *testing.T, client *mocks.Client) {
+	eventId := ifs.NewUuid()
+	now := time.Now().Unix()
+	arcEvent := map[string]interface{}{
+		"event_id":    eventId,
+		"event_type":  1,
+		"node_id":     "test-node-001",
+		"message":     "CRUD Test Archived Event",
+		"archived_at": now,
+		"archived_by": "test-user",
+	}
+	_, err := client.Post("/alm/10/ArcEvent", arcEvent)
+	if err != nil {
+		t.Fatalf("POST ArchivedEvent failed: %v", err)
+	}
+
+	q := mocks.L8QueryText(fmt.Sprintf("select * from ArchivedEvent where EventId=%s", eventId))
+	getResp, err := client.Get("/alm/10/ArcEvent", q)
+	if err != nil {
+		t.Fatalf("GET ArchivedEvent failed: %v", err)
+	}
+	if !strings.Contains(getResp, "CRUD Test Archived Event") {
+		t.Fatalf("GET ArchivedEvent did not return expected message, got: %s", getResp)
+	}
+
+	// PUT should be rejected — archived events are immutable
+	arcEvent["message"] = "Should Not Update"
+	_, err = client.Put("/alm/10/ArcEvent", arcEvent)
+	if err == nil {
+		t.Fatal("PUT ArchivedEvent should have been rejected (immutable)")
+	}
+	if !strings.Contains(err.Error(), "immutable") {
+		t.Fatalf("Expected immutability error, got: %v", err)
+	}
+
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from ArchivedEvent where EventId=%s", eventId))
+	_, err = client.Delete("/alm/10/ArcEvent", delQ)
+	if err != nil {
+		t.Fatalf("DELETE ArchivedEvent failed: %v", err)
 	}
 }

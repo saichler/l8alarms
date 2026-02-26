@@ -20,6 +20,9 @@ func RunAllPhases(client *Client, store *MockDataStore) {
 	runPhase("Phase 4: Alarms", func() error {
 		return runPhase4(client, store)
 	})
+	runPhase("Phase 5: Archive", func() error {
+		return runPhase5(client, store)
+	})
 }
 
 // Phase 1: AlarmDefinitions (no dependencies)
@@ -105,5 +108,26 @@ func runPhase4(client *Client, store *MockDataStore) error {
 		&store.AlarmIDs); err != nil {
 		return err
 	}
+	return nil
+}
+
+// Phase 5: Archive (depends on AlarmIDs, EventIDs, DefinitionIDs)
+func runPhase5(client *Client, store *MockDataStore) error {
+	arcAlarms := generateArchivedAlarms(store)
+	if err := runOp(client, "Archived Alarms", almArea+"ArcAlarm",
+		&alm.ArchivedAlarmList{List: arcAlarms},
+		extractIDs(arcAlarms, func(e *alm.ArchivedAlarm) string { return e.AlarmId }),
+		&store.ArchivedAlarmIDs); err != nil {
+		return err
+	}
+
+	arcEvents := generateArchivedEvents(store)
+	if err := runOp(client, "Archived Events", almArea+"ArcEvent",
+		&alm.ArchivedEventList{List: arcEvents},
+		extractIDs(arcEvents, func(e *alm.ArchivedEvent) string { return e.EventId }),
+		&store.ArchivedEventIDs); err != nil {
+		return err
+	}
+
 	return nil
 }

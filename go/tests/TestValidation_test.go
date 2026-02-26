@@ -1,7 +1,9 @@
 package tests
 
 import (
+	"fmt"
 	"github.com/saichler/l8alarms/go/tests/mocks"
+	"github.com/saichler/l8types/go/ifs"
 	"strings"
 	"testing"
 )
@@ -16,6 +18,8 @@ func testValidation(t *testing.T, client *mocks.Client) {
 	testValidationMaintenanceWindow(t, client)
 	testValidationAlarmFilter(t, client)
 	testValidationAutoID(t, client)
+	testValidationEventImmutability(t, client)
+	testValidationAlarmFieldProtection(t, client)
 }
 
 func testValidationAlarmDefinition(t *testing.T, client *mocks.Client) {
@@ -208,4 +212,72 @@ func testValidationAutoID(t *testing.T, client *mocks.Client) {
 	if !strings.Contains(getResp, "Auto ID Test") {
 		t.Fatalf("Auto-ID alarm definition not found in GET response: %s", getResp)
 	}
+}
+
+func testValidationEventImmutability(t *testing.T, client *mocks.Client) {
+	// POST a valid event
+	eventId := ifs.NewUuid()
+	event := map[string]interface{}{
+		"event_id":   eventId,
+		"event_type": 1,
+		"node_id":    "test-node-001",
+		"message":    "Immutability Test Event",
+	}
+	_, err := client.Post("/alm/10/Event", event)
+	if err != nil {
+		t.Fatalf("POST Event for immutability test failed: %v", err)
+	}
+
+	// PUT should be rejected
+	event["message"] = "Should Not Update"
+	_, err = client.Put("/alm/10/Event", event)
+	if err == nil {
+		t.Fatal("PUT Event should have been rejected (events are immutable)")
+	}
+	if !strings.Contains(err.Error(), "immutable") {
+		t.Fatalf("Expected immutability error, got: %v", err)
+	}
+
+	// Cleanup
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Event where EventId=%s", eventId))
+	_, _ = client.Delete("/alm/10/Event", delQ)
+}
+
+func testValidationAlarmFieldProtection(t *testing.T, client *mocks.Client) {
+	// POST a valid alarm
+	alarmId := ifs.NewUuid()
+	alarm := map[string]interface{}{
+		"alarm_id":      alarmId,
+		"definition_id": testStore.DefinitionIDs[0],
+		"node_id":       "test-node-001",
+		"state":         1,
+		"severity":      1,
+		"name":          "Field Protection Test",
+	}
+	_, err := client.Post("/alm/10/Alarm", alarm)
+	if err != nil {
+		t.Fatalf("POST Alarm for field protection test failed: %v", err)
+	}
+
+	// PUT changing a system-managed field (name) — should be rejected
+	alarm["name"] = "Changed Name"
+	_, err = client.Put("/alm/10/Alarm", alarm)
+	if err == nil {
+		t.Fatal("PUT Alarm with changed system field should have been rejected")
+	}
+	if !strings.Contains(err.Error(), "system-managed") {
+		t.Fatalf("Expected system-managed field error, got: %v", err)
+	}
+
+	// PUT changing only user-editable field (state) — should succeed
+	alarm["name"] = "Field Protection Test" // restore original
+	alarm["state"] = 2
+	_, err = client.Put("/alm/10/Alarm", alarm)
+	if err != nil {
+		t.Fatalf("PUT Alarm with only user-editable field change should succeed: %v", err)
+	}
+
+	// Cleanup
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarmId))
+	_, _ = client.Delete("/alm/10/Alarm", delQ)
 }
