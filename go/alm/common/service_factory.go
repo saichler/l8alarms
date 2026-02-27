@@ -29,11 +29,11 @@ type ServiceConfig struct {
 
 // ActivateService sets up and activates a service with the standard boilerplate.
 func ActivateService[T any, TList any, PT ProtoMessage[T], PTL ProtoMessage[TList]](cfg ServiceConfig, creds, dbname string, vnic ifs.IVNic) {
-	_, user, pass, _, err := vnic.Resources().Security().Credential(creds, dbname, vnic.Resources())
+	user, pass, port, _, err := vnic.Resources().Security().Credential(creds, dbname, vnic.Resources())
 	if err != nil {
 		panic(err)
 	}
-	db := OpenDBConnection(dbname, user, pass)
+	db := OpenDBConnection(dbname, user, pass, port)
 	p := postgres.NewPostgres(db, vnic.Resources())
 
 	sla := ifs.NewServiceLevelAgreement(&persist.OrmService{}, cfg.ServiceName, cfg.ServiceArea, true, cfg.Callback)

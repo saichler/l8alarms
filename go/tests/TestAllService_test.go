@@ -21,11 +21,11 @@ func TestMain(m *testing.M) {
 func dropAllTables(t *testing.T, vnic ifs.IVNic) {
 	creds := common.DB_CREDS
 	dbname := common.DB_NAME
-	_, user, pass, _, err := vnic.Resources().Security().Credential(creds, dbname, vnic.Resources())
+	user, pass, port, _, err := vnic.Resources().Security().Credential(creds, dbname, vnic.Resources())
 	if err != nil {
 		t.Fatalf("Failed to get credentials: %v", err)
 	}
-	db := common.OpenDBConnection(dbname, user, pass)
+	db := common.OpenDBConnection(dbname, user, pass, port)
 	_, err = db.Exec("DROP SCHEMA public CASCADE")
 	if err != nil {
 		t.Fatalf("Failed to drop schema: %v", err)

@@ -65,15 +65,18 @@ func WaitForSignal(resources ifs.IResources) {
 }
 
 // OpenDBConnection establishes a connection to the PostgreSQL database.
-func OpenDBConnection(dbname, user, pass string) *sql.DB {
+func OpenDBConnection(dbname, user, pass, port string) *sql.DB {
 	dbMtx.Lock()
 	defer dbMtx.Unlock()
 	if dbInstance != nil {
 		return dbInstance
 	}
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+	if port == "" {
+		port = "5432"
+	}
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		"127.0.0.1", 5432, user, pass, dbname)
+		"127.0.0.1", port, user, pass, dbname)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
