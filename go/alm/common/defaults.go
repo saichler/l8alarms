@@ -74,7 +74,7 @@ func OpenDBConnection(dbname, user, pass, port string) *sql.DB {
 	if port == "" {
 		port = "5432"
 	}
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
+	psqlInfo := fmt.Sprintf("host=127.0.0.1 port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		"127.0.0.1", port, user, pass, dbname)
 	db, err := sql.Open("postgres", psqlInfo)
