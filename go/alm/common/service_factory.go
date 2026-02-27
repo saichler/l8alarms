@@ -29,7 +29,7 @@ type ServiceConfig struct {
 
 // ActivateService sets up and activates a service with the standard boilerplate.
 func ActivateService[T any, TList any, PT ProtoMessage[T], PTL ProtoMessage[TList]](cfg ServiceConfig, creds, dbname string, vnic ifs.IVNic) {
-	user, pass, port, _, err := vnic.Resources().Security().Credential(creds, dbname, vnic.Resources())
+	_, user, pass, port, err := vnic.Resources().Security().Credential(creds, dbname, vnic.Resources())
 	if err != nil {
 		panic(err)
 	}
