@@ -2,6 +2,7 @@ package correlation
 
 import (
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"regexp"
 )
 
@@ -49,7 +50,7 @@ func (s *TemporalStrategy) Correlate(alarm *alm.Alarm, rule *alm.CorrelationRule
 		if candidate.AlarmId == alarm.AlarmId {
 			continue
 		}
-		if candidate.State == alm.AlarmState_ALARM_STATE_CLEARED {
+		if candidate.State == l8events.AlarmState_ALARM_STATE_CLEARED {
 			continue
 		}
 

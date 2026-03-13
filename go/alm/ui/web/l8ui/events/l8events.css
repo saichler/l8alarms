@@ -1,0 +1,181 @@
+/* L8Events — Shared event/alarm styles */
+/* Uses --layer8d-* theme tokens exclusively */
+
+/* Severity badge colors */
+.l8events-severity-critical { color: var(--layer8d-error); }
+.l8events-severity-major { color: var(--layer8d-warning); font-weight: 600; }
+.l8events-severity-minor { color: var(--layer8d-warning); }
+.l8events-severity-warning { color: var(--layer8d-info, var(--layer8d-primary)); }
+.l8events-severity-info { color: var(--layer8d-text-muted); }
+
+/* Detail sections */
+.l8events-detail-section {
+    margin-bottom: var(--layer8d-space-lg);
+}
+
+.l8events-detail-section h4 {
+    font-size: var(--layer8d-font-base);
+    font-weight: 600;
+    color: var(--layer8d-text-dark);
+    margin-bottom: var(--layer8d-space-sm);
+    padding-bottom: var(--layer8d-space-xs);
+    border-bottom: 1px solid var(--layer8d-border);
+}
+
+.l8events-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--layer8d-space-sm);
+}
+
+.l8events-detail-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.l8events-detail-field label {
+    font-size: var(--layer8d-font-sm);
+    color: var(--layer8d-text-medium);
+    font-weight: 500;
+}
+
+.l8events-detail-field span {
+    font-size: var(--layer8d-font-base);
+    color: var(--layer8d-text-dark);
+}
+
+/* State history timeline */
+.l8events-timeline {
+    position: relative;
+    padding-left: var(--layer8d-space-lg);
+}
+
+.l8events-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--layer8d-border);
+}
+
+.l8events-timeline-entry {
+    position: relative;
+    padding-bottom: var(--layer8d-space-md);
+}
+
+.l8events-timeline-dot {
+    position: absolute;
+    left: calc(-1 * var(--layer8d-space-lg) + 4px);
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--layer8d-primary);
+    border: 2px solid var(--layer8d-bg-white);
+}
+
+.l8events-timeline-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.l8events-timeline-transition {
+    font-size: var(--layer8d-font-sm);
+    font-weight: 600;
+    color: var(--layer8d-text-dark);
+}
+
+.l8events-timeline-meta {
+    font-size: var(--layer8d-font-sm);
+    color: var(--layer8d-text-muted);
+}
+
+.l8events-timeline-reason {
+    font-size: var(--layer8d-font-sm);
+    color: var(--layer8d-text-medium);
+    font-style: italic;
+}
+
+/* Notes */
+.l8events-notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--layer8d-space-sm);
+}
+
+.l8events-note {
+    padding: var(--layer8d-space-sm);
+    background: var(--layer8d-bg-light);
+    border-radius: var(--layer8d-radius-sm);
+    border: 1px solid var(--layer8d-border);
+}
+
+.l8events-note-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--layer8d-space-xs);
+}
+
+.l8events-note-author {
+    font-size: var(--layer8d-font-sm);
+    font-weight: 600;
+    color: var(--layer8d-text-dark);
+}
+
+.l8events-note-date {
+    font-size: var(--layer8d-font-sm);
+    color: var(--layer8d-text-muted);
+}
+
+.l8events-note-text {
+    font-size: var(--layer8d-font-sm);
+    color: var(--layer8d-text-medium);
+    line-height: 1.4;
+}
+
+/* State action buttons */
+.l8events-state-actions {
+    display: flex;
+    gap: var(--layer8d-space-sm);
+    padding-top: var(--layer8d-space-md);
+}
+
+.l8events-action-acknowledge {
+    background: var(--layer8d-primary);
+    color: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-primary);
+}
+
+.l8events-action-clear {
+    background: var(--layer8d-success);
+    color: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-success);
+}
+
+.l8events-action-suppress {
+    background: var(--layer8d-bg-light);
+    color: var(--layer8d-text-medium);
+    border: 1px solid var(--layer8d-border);
+}
+
+.l8events-action-reactivate {
+    background: var(--layer8d-warning);
+    color: var(--layer8d-bg-white);
+    border: 1px solid var(--layer8d-warning);
+}
+
+.l8events-no-actions {
+    font-size: var(--layer8d-font-sm);
+    color: var(--layer8d-text-muted);
+    font-style: italic;
+}
+
+/* Maintenance window highlight */
+.l8events-maintenance-active {
+    background: var(--layer8d-warning);
+    opacity: 0.1;
+}

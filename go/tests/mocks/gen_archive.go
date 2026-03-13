@@ -4,6 +4,7 @@ package mocks
 
 import (
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"time"
 )
 
@@ -28,9 +29,9 @@ func generateArchivedAlarms(store *MockDataStore) []*alm.ArchivedAlarm {
 			DefinitionId:    pickRef(store.DefinitionIDs, i),
 			Name:            archiveAlarmNames[i%len(archiveAlarmNames)],
 			Description:     "Archived alarm from cleared state",
-			State:           alm.AlarmState_ALARM_STATE_CLEARED,
-			Severity:        alm.AlarmSeverity(int32(i%5) + 1),
-			OriginalSeverity: alm.AlarmSeverity(int32(i%5) + 1),
+			State:           l8events.AlarmState_ALARM_STATE_CLEARED,
+			Severity:        l8events.Severity(int32(i%5) + 1),
+			OriginalSeverity: l8events.Severity(int32(i%5) + 1),
 			NodeId:          nodeIDs[i%len(nodeIDs)],
 			NodeName:        nodeNames[i%len(nodeNames)],
 			Location:        locations[i%len(locations)],
@@ -57,11 +58,11 @@ func generateArchivedEvents(store *MockDataStore) []*alm.ArchivedEvent {
 	now := time.Now().Unix()
 	result := make([]*alm.ArchivedEvent, count)
 
-	eventTypes := []alm.EventType{
-		alm.EventType_EVENT_TYPE_TRAP,
-		alm.EventType_EVENT_TYPE_SYSLOG,
-		alm.EventType_EVENT_TYPE_THRESHOLD,
-		alm.EventType_EVENT_TYPE_STATE_CHANGE,
+	eventTypes := []alm.AlmEventType{
+		alm.AlmEventType_ALM_EVENT_TYPE_TRAP,
+		alm.AlmEventType_ALM_EVENT_TYPE_SYSLOG,
+		alm.AlmEventType_ALM_EVENT_TYPE_THRESHOLD,
+		alm.AlmEventType_ALM_EVENT_TYPE_STATE_CHANGE,
 	}
 
 	for i := 0; i < count; i++ {
@@ -72,11 +73,11 @@ func generateArchivedEvents(store *MockDataStore) []*alm.ArchivedEvent {
 		result[i] = &alm.ArchivedEvent{
 			EventId:         genID("arc-evt", i),
 			EventType:       eventTypes[i%len(eventTypes)],
-			ProcessingState: alm.EventProcessingState_EVENT_PROCESSING_STATE_ARCHIVED,
+			ProcessingState: l8events.EventState_EVENT_STATE_ARCHIVED,
 			NodeId:          nodeIDs[i%len(nodeIDs)],
 			NodeName:        nodeNames[i%len(nodeNames)],
 			SourceIdentifier: nodeIDs[i%len(nodeIDs)] + ":SNMP",
-			Severity:        alm.AlarmSeverity(int32(i%5) + 1),
+			Severity:        l8events.Severity(int32(i%5) + 1),
 			Message:         archiveEventMessages[i%len(archiveEventMessages)],
 			Category:        categories[i%len(categories)],
 			AlarmId:         pickRef(store.ArchivedAlarmIDs, i),

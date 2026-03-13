@@ -2,6 +2,7 @@ package enrichment
 
 import (
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"github.com/saichler/l8topology/go/types/l8topo"
 )
 
@@ -17,7 +18,7 @@ func EnrichTopology(topo *l8topo.L8Topology, activeAlarms []*alm.Alarm) {
 	linkAlarms := make(map[string]*alarmAgg)
 
 	for _, a := range activeAlarms {
-		if a.State == alm.AlarmState_ALARM_STATE_CLEARED || a.State == alm.AlarmState_ALARM_STATE_SUPPRESSED {
+		if a.State == l8events.AlarmState_ALARM_STATE_CLEARED || a.State == l8events.AlarmState_ALARM_STATE_SUPPRESSED {
 			continue
 		}
 		if a.NodeId != "" {

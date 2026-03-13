@@ -3,6 +3,7 @@ package alm;
 option go_package = "./types/alm";
 
 import "alm-common.proto";
+import "l8events.proto";
 import "api.proto";
 
 // AlarmDefinition: Template defining what conditions generate an alarm.
@@ -11,11 +12,11 @@ message AlarmDefinition {
   string name = 2;
   string description = 3;
   AlarmDefinitionStatus status = 4;
-  AlarmSeverity default_severity = 5;
+  l8events.Severity default_severity = 5;
 
   // Event matching criteria
   string event_pattern = 6;
-  EventType event_type_filter = 7;
+  AlmEventType event_type_filter = 7;
   string node_type_filter = 8;
 
   // Threshold-based alarm generation

@@ -11,6 +11,6 @@ func newEscalationPolicyServiceCallback() ifs.IServiceCallback {
 		func(e *alm.EscalationPolicy) { common.GenerateID(&e.PolicyId) }).
 		Require(func(e *alm.EscalationPolicy) string { return e.PolicyId }, "PolicyId").
 		Require(func(e *alm.EscalationPolicy) string { return e.Name }, "Name").
-		Enum(func(e *alm.EscalationPolicy) int32 { return int32(e.Status) }, alm.PolicyStatus_name, "Status").
+		Enum(func(e *alm.EscalationPolicy) int32 { return int32(e.Status) }, alm.AlmPolicyStatus_name, "Status").
 		Build()
 }

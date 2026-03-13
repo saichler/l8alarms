@@ -2,7 +2,7 @@ syntax = "proto3";
 package alm;
 option go_package = "./types/alm";
 
-import "alm-common.proto";
+import "l8events.proto";
 import "api.proto";
 
 // AlarmFilter: Saved filter/view for alarm queries.
@@ -15,8 +15,8 @@ message AlarmFilter {
   bool is_default = 6;
 
   // Filter criteria
-  repeated AlarmSeverity severities = 7;
-  repeated AlarmState states = 8;
+  repeated l8events.Severity severities = 7;
+  repeated l8events.AlarmState states = 8;
   repeated string node_ids = 9;
   repeated string node_types = 10;
   repeated string locations = 11;

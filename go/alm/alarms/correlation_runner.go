@@ -6,6 +6,7 @@ import (
 	"github.com/saichler/l8alarms/go/alm/correlation"
 	"github.com/saichler/l8alarms/go/alm/correlationrules"
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8topology/go/types/l8topo"
 	"github.com/saichler/l8types/go/ifs"
@@ -21,7 +22,7 @@ func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
 	}
 
 	// Skip if alarm is already correlated or cleared
-	if alarm.RootCauseAlarmId != "" || alarm.State == alm.AlarmState_ALARM_STATE_CLEARED {
+	if alarm.RootCauseAlarmId != "" || alarm.State == l8events.AlarmState_ALARM_STATE_CLEARED {
 		return nil
 	}
 
@@ -43,7 +44,7 @@ func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
 	activeAlarms, err := common.GetEntities[alm.Alarm](
 		ServiceName, ServiceArea,
 		fmt.Sprintf("select * from Alarm where State=%d",
-			alm.AlarmState_ALARM_STATE_ACTIVE),
+			l8events.AlarmState_ALARM_STATE_ACTIVE),
 		vnic,
 	)
 	if err != nil {

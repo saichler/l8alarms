@@ -5,6 +5,7 @@ package mocks
 import (
 	"fmt"
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"math/rand"
 )
 
@@ -12,21 +13,21 @@ func generateEvents(store *MockDataStore) []*alm.Event {
 	count := 40
 	result := make([]*alm.Event, count)
 
-	severities := []alm.AlarmSeverity{
-		alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL,
-		alm.AlarmSeverity_ALARM_SEVERITY_MAJOR,
-		alm.AlarmSeverity_ALARM_SEVERITY_MAJOR,
-		alm.AlarmSeverity_ALARM_SEVERITY_MINOR,
-		alm.AlarmSeverity_ALARM_SEVERITY_WARNING,
-		alm.AlarmSeverity_ALARM_SEVERITY_INFO,
+	severities := []l8events.Severity{
+		l8events.Severity_SEVERITY_CRITICAL,
+		l8events.Severity_SEVERITY_MAJOR,
+		l8events.Severity_SEVERITY_MAJOR,
+		l8events.Severity_SEVERITY_MINOR,
+		l8events.Severity_SEVERITY_WARNING,
+		l8events.Severity_SEVERITY_INFO,
 	}
 
-	eventTypes := []alm.EventType{
-		alm.EventType_EVENT_TYPE_TRAP,
-		alm.EventType_EVENT_TYPE_SYSLOG,
-		alm.EventType_EVENT_TYPE_THRESHOLD,
-		alm.EventType_EVENT_TYPE_STATE_CHANGE,
-		alm.EventType_EVENT_TYPE_HEARTBEAT,
+	eventTypes := []alm.AlmEventType{
+		alm.AlmEventType_ALM_EVENT_TYPE_TRAP,
+		alm.AlmEventType_ALM_EVENT_TYPE_SYSLOG,
+		alm.AlmEventType_ALM_EVENT_TYPE_THRESHOLD,
+		alm.AlmEventType_ALM_EVENT_TYPE_STATE_CHANGE,
+		alm.AlmEventType_ALM_EVENT_TYPE_HEARTBEAT,
 	}
 
 	categories := []string{"network", "hardware", "security", "application", "system"}
@@ -41,7 +42,7 @@ func generateEvents(store *MockDataStore) []*alm.Event {
 		event := &alm.Event{
 			EventId:          genID("evt", i),
 			EventType:        eventTypes[i%len(eventTypes)],
-			ProcessingState:  alm.EventProcessingState_EVENT_PROCESSING_STATE_PROCESSED,
+			ProcessingState:  l8events.EventState_EVENT_STATE_PROCESSED,
 			NodeId:           nodeIDs[nodeIdx],
 			NodeName:         nodeNames[nodeIdx],
 			SourceIdentifier: fmt.Sprintf("%s:SNMP", nodeIDs[nodeIdx]),
@@ -58,9 +59,9 @@ func generateEvents(store *MockDataStore) []*alm.Event {
 
 		// Assign some events to alarms (will be populated in Phase 4)
 		if i < 5 {
-			event.ProcessingState = alm.EventProcessingState_EVENT_PROCESSING_STATE_NEW
+			event.ProcessingState = l8events.EventState_EVENT_STATE_NEW
 		} else if i > 35 {
-			event.ProcessingState = alm.EventProcessingState_EVENT_PROCESSING_STATE_DISCARDED
+			event.ProcessingState = l8events.EventState_EVENT_STATE_DISCARDED
 		}
 
 		// Add attributes

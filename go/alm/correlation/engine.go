@@ -2,6 +2,7 @@ package correlation
 
 import (
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"github.com/saichler/l8types/go/ifs"
 	"sort"
 	"sync"
@@ -92,14 +93,14 @@ func (e *Engine) Correlate(alarm *alm.Alarm, rules []*alm.CorrelationRule, ctx *
 
 		// Apply auto-suppression
 		if rule.AutoSuppressSymptoms {
-			alarm.State = alm.AlarmState_ALARM_STATE_SUPPRESSED
+			alarm.State = l8events.AlarmState_ALARM_STATE_SUPPRESSED
 			alarm.IsSuppressed = true
 			alarm.SuppressedBy = rootCause.AlarmId
 		}
 
 		// Apply auto-acknowledge if root is acknowledged
-		if rule.AutoAcknowledgeSymptoms && rootCause.State == alm.AlarmState_ALARM_STATE_ACKNOWLEDGED {
-			alarm.State = alm.AlarmState_ALARM_STATE_ACKNOWLEDGED
+		if rule.AutoAcknowledgeSymptoms && rootCause.State == l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED {
+			alarm.State = l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED
 		}
 
 		return rootCause

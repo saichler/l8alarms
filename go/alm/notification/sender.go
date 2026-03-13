@@ -1,47 +1,21 @@
 package notification
 
 import (
-	"bytes"
 	"fmt"
-	"github.com/saichler/l8alarms/go/types/alm"
-	"net/http"
-	"time"
+	"github.com/saichler/l8notify/go/channel"
+	l8notify "github.com/saichler/l8notify/go/types/l8notify"
 )
 
-// Send dispatches a notification message to the specified channel and endpoint.
-func Send(channel alm.NotificationChannel, endpoint, message string) error {
-	switch channel {
-	case alm.NotificationChannel_NOTIFICATION_CHANNEL_WEBHOOK:
-		return sendWebhook(endpoint, message)
-	case alm.NotificationChannel_NOTIFICATION_CHANNEL_EMAIL:
-		return sendLog("email", endpoint, message)
-	case alm.NotificationChannel_NOTIFICATION_CHANNEL_SLACK:
-		return sendWebhook(endpoint, fmt.Sprintf(`{"text":%q}`, message))
-	case alm.NotificationChannel_NOTIFICATION_CHANNEL_PAGERDUTY:
-		return sendLog("pagerduty", endpoint, message)
-	default:
-		return sendLog("unknown", endpoint, message)
+// Send dispatches a notification message using l8notify channel dispatch.
+// This is a convenience wrapper that constructs a NotifyTarget from channel+endpoint.
+func Send(ch l8notify.NotifyChannel, endpoint, message string) error {
+	target := &l8notify.NotifyTarget{
+		Channel:  ch,
+		Endpoint: endpoint,
 	}
-}
-
-// sendWebhook posts a JSON message to a webhook endpoint.
-func sendWebhook(url, message string) error {
-	body := fmt.Sprintf(`{"message":%q}`, message)
-	client := &http.Client{Timeout: 10 * time.Second}
-	resp, err := client.Post(url, "application/json", bytes.NewBufferString(body))
-	if err != nil {
-		return fmt.Errorf("webhook failed: %w", err)
+	result := channel.Dispatch(target, message, nil, nil)
+	if result != nil && result.ErrorMessage != "" {
+		return fmt.Errorf("%s", result.ErrorMessage)
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 300 {
-		return fmt.Errorf("webhook returned status %d", resp.StatusCode)
-	}
-	return nil
-}
-
-// sendLog is a fallback that logs the notification (for channels not yet implemented).
-func sendLog(channel, endpoint, message string) error {
-	fmt.Printf("[notification] %s -> %s: %s\n", channel, endpoint, message)
 	return nil
 }

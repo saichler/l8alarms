@@ -3,13 +3,14 @@ package alm;
 option go_package = "./types/alm";
 
 import "alm-common.proto";
+import "l8events.proto";
 import "api.proto";
 
 // Event: Raw event occurrence from a managed element.
 message Event {
   string event_id = 1;
-  EventType event_type = 2;
-  EventProcessingState processing_state = 3;
+  AlmEventType event_type = 2;
+  l8events.EventState processing_state = 3;
 
   // Source (topology references by ID)
   string node_id = 4;
@@ -17,7 +18,7 @@ message Event {
   string source_identifier = 6;
 
   // Event content
-  AlarmSeverity severity = 7;
+  l8events.Severity severity = 7;
   string message = 8;
   string raw_data = 9;
 

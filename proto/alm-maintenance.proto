@@ -2,22 +2,23 @@ syntax = "proto3";
 package alm;
 option go_package = "./types/alm";
 
-import "alm-common.proto";
+import "l8events.proto";
 import "api.proto";
 
 // MaintenanceWindow: Scheduled period during which alarms are suppressed.
+// Uses l8events.MaintenanceStatus and l8events.RecurrenceType.
 message MaintenanceWindow {
   string window_id = 1;
   string name = 2;
   string description = 3;
-  MaintenanceWindowStatus status = 4;
+  l8events.MaintenanceStatus status = 4;
 
   // Time window
   int64 start_time = 5;
   int64 end_time = 6;
 
   // Recurrence
-  RecurrenceType recurrence = 7;
+  l8events.RecurrenceType recurrence = 7;
   int32 recurrence_interval = 8;
 
   // Scope

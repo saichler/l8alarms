@@ -2,20 +2,21 @@ syntax = "proto3";
 package alm;
 option go_package = "./types/alm";
 
-import "alm-common.proto";
+import "l8events.proto";
 import "api.proto";
 
 // Alarm: Active or historical alarm instance.
+// Uses shared l8events types for state, severity, notes, and state history.
 message Alarm {
   string alarm_id = 1;
   string definition_id = 2;
   string name = 3;
   string description = 4;
 
-  // State and severity
-  AlarmState state = 5;
-  AlarmSeverity severity = 6;
-  AlarmSeverity original_severity = 7;
+  // State and severity (from l8events)
+  l8events.AlarmState state = 5;
+  l8events.Severity severity = 6;
+  l8events.Severity original_severity = 7;
 
   // Source (topology references by ID)
   string node_id = 8;
@@ -50,27 +51,9 @@ message Alarm {
   string event_id = 27;
   map<string, string> attributes = 28;
 
-  // Embedded children
-  repeated AlarmNote notes = 29;
-  repeated AlarmStateChange state_history = 30;
-}
-
-// Child type: Note/comment on an alarm
-message AlarmNote {
-  string note_id = 1;
-  string author = 2;
-  string text = 3;
-  int64 created_at = 4;
-}
-
-// Child type: State transition record
-message AlarmStateChange {
-  string change_id = 1;
-  AlarmState from_state = 2;
-  AlarmState to_state = 3;
-  string changed_by = 4;
-  string reason = 5;
-  int64 changed_at = 6;
+  // Embedded children (from l8events)
+  repeated l8events.AlarmNote notes = 29;
+  repeated l8events.AlarmStateChange state_history = 30;
 }
 
 message AlarmList {

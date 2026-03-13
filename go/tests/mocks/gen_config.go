@@ -5,6 +5,8 @@ package mocks
 import (
 	"fmt"
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
+	l8notify "github.com/saichler/l8notify/go/types/l8notify"
 	"math/rand"
 )
 
@@ -62,7 +64,7 @@ func generateCorrelationRules(store *MockDataStore) []*alm.CorrelationRule {
 					ConditionId: genID("cond", i*10),
 					Field:       "severity",
 					Operator:    alm.ConditionOperator_CONDITION_OPERATOR_GREATER_THAN,
-					Value:       "ALARM_SEVERITY_WARNING",
+					Value:       "SEVERITY_WARNING",
 				},
 			}
 		}
@@ -81,40 +83,40 @@ func generateNotificationPolicies() []*alm.NotificationPolicy {
 			PolicyId:    genID("npol", i),
 			Name:        notifPolicyNames[i],
 			Description: "Notification policy: " + notifPolicyNames[i],
-			Status:      alm.PolicyStatus_POLICY_STATUS_ACTIVE,
+			Status:      alm.AlmPolicyStatus_ALM_POLICY_STATUS_ACTIVE,
 			CreatedAt:   randomPastDate(6, 30),
 			UpdatedAt:   nowUnix(),
 		}
 
 		switch i {
 		case 0: // Critical - NOC
-			policy.MinSeverity = alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL
+			policy.MinSeverity = l8events.Severity_SEVERITY_CRITICAL
 			policy.NotifyOnStateChange = true
 			policy.CooldownSeconds = 300
 			policy.MaxNotificationsPerHour = 20
-			policy.Targets = []*alm.NotificationTarget{
-				{TargetId: genID("tgt", i*10), Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_PAGERDUTY, Endpoint: "noc-oncall@example.com"},
-				{TargetId: genID("tgt", i*10+1), Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_SLACK, Endpoint: "https://hooks.slack.com/services/T00/B00/critical"},
+			policy.Targets = []*l8notify.NotifyTarget{
+				{TargetId: genID("tgt", i*10), Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_PAGERDUTY, Endpoint: "noc-oncall@example.com"},
+				{TargetId: genID("tgt", i*10+1), Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_SLACK, Endpoint: "https://hooks.slack.com/services/T00/B00/critical"},
 			}
 		case 1: // Major - Engineering
-			policy.MinSeverity = alm.AlarmSeverity_ALARM_SEVERITY_MAJOR
+			policy.MinSeverity = l8events.Severity_SEVERITY_MAJOR
 			policy.CooldownSeconds = 600
 			policy.MaxNotificationsPerHour = 10
-			policy.Targets = []*alm.NotificationTarget{
-				{TargetId: genID("tgt", i*10), Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_EMAIL, Endpoint: "engineering@example.com"},
-				{TargetId: genID("tgt", i*10+1), Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_SLACK, Endpoint: "https://hooks.slack.com/services/T00/B00/major"},
+			policy.Targets = []*l8notify.NotifyTarget{
+				{TargetId: genID("tgt", i*10), Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_EMAIL, Endpoint: "engineering@example.com"},
+				{TargetId: genID("tgt", i*10+1), Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_SLACK, Endpoint: "https://hooks.slack.com/services/T00/B00/major"},
 			}
 		case 2: // All - Dashboard
-			policy.MinSeverity = alm.AlarmSeverity_ALARM_SEVERITY_INFO
-			policy.Targets = []*alm.NotificationTarget{
-				{TargetId: genID("tgt", i*10), Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_WEBHOOK, Endpoint: "https://dashboard.example.com/webhook/alarms"},
+			policy.MinSeverity = l8events.Severity_SEVERITY_INFO
+			policy.Targets = []*l8notify.NotifyTarget{
+				{TargetId: genID("tgt", i*10), Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_WEBHOOK, Endpoint: "https://dashboard.example.com/webhook/alarms"},
 			}
 		case 3: // Security
-			policy.MinSeverity = alm.AlarmSeverity_ALARM_SEVERITY_WARNING
+			policy.MinSeverity = l8events.Severity_SEVERITY_WARNING
 			policy.NodeTypeFilter = []string{"FIREWALL", "SERVER"}
 			policy.NotifyOnStateChange = true
-			policy.Targets = []*alm.NotificationTarget{
-				{TargetId: genID("tgt", i*10), Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_EMAIL, Endpoint: "secops@example.com"},
+			policy.Targets = []*l8notify.NotifyTarget{
+				{TargetId: genID("tgt", i*10), Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_EMAIL, Endpoint: "secops@example.com"},
 			}
 		}
 
@@ -132,24 +134,24 @@ func generateEscalationPolicies() []*alm.EscalationPolicy {
 			PolicyId:    genID("epol", i),
 			Name:        escPolicyNames[i],
 			Description: "Escalation policy: " + escPolicyNames[i],
-			Status:      alm.PolicyStatus_POLICY_STATUS_ACTIVE,
+			Status:      alm.AlmPolicyStatus_ALM_POLICY_STATUS_ACTIVE,
 			CreatedAt:   randomPastDate(6, 30),
 			UpdatedAt:   nowUnix(),
 		}
 
 		switch i {
 		case 0: // Critical path
-			policy.MinSeverity = alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL
-			policy.Steps = []*alm.EscalationStep{
-				{StepId: genID("step", i*10), StepOrder: 1, DelayMinutes: 5, Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_PAGERDUTY, Endpoint: "l1-oncall@example.com", MessageTemplate: "[ESC L1] Critical alarm {{alarm.name}} on {{alarm.nodeName}}"},
-				{StepId: genID("step", i*10+1), StepOrder: 2, DelayMinutes: 15, Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_PAGERDUTY, Endpoint: "l2-manager@example.com", MessageTemplate: "[ESC L2] Unresolved critical alarm {{alarm.name}} on {{alarm.nodeName}}"},
-				{StepId: genID("step", i*10+2), StepOrder: 3, DelayMinutes: 30, Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_EMAIL, Endpoint: "vp-engineering@example.com", MessageTemplate: "[ESC L3] Prolonged critical alarm {{alarm.name}} on {{alarm.nodeName}}"},
+			policy.MinSeverity = l8events.Severity_SEVERITY_CRITICAL
+			policy.Steps = []*l8notify.EscalationStep{
+				{StepId: genID("step", i*10), StepOrder: 1, DelayMinutes: 5, Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_PAGERDUTY, Endpoint: "l1-oncall@example.com", MessageTemplate: "[ESC L1] Critical alarm {{alarm.name}} on {{alarm.nodeName}}"},
+				{StepId: genID("step", i*10+1), StepOrder: 2, DelayMinutes: 15, Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_PAGERDUTY, Endpoint: "l2-manager@example.com", MessageTemplate: "[ESC L2] Unresolved critical alarm {{alarm.name}} on {{alarm.nodeName}}"},
+				{StepId: genID("step", i*10+2), StepOrder: 3, DelayMinutes: 30, Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_EMAIL, Endpoint: "vp-engineering@example.com", MessageTemplate: "[ESC L3] Prolonged critical alarm {{alarm.name}} on {{alarm.nodeName}}"},
 			}
 		case 1: // Major path
-			policy.MinSeverity = alm.AlarmSeverity_ALARM_SEVERITY_MAJOR
-			policy.Steps = []*alm.EscalationStep{
-				{StepId: genID("step", i*10), StepOrder: 1, DelayMinutes: 15, Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_EMAIL, Endpoint: "noc-team@example.com", MessageTemplate: "[ESC] Major alarm {{alarm.name}} on {{alarm.nodeName}}"},
-				{StepId: genID("step", i*10+1), StepOrder: 2, DelayMinutes: 60, Channel: alm.NotificationChannel_NOTIFICATION_CHANNEL_PAGERDUTY, Endpoint: "l1-oncall@example.com", MessageTemplate: "[ESC] Unresolved major alarm {{alarm.name}} - 1 hour"},
+			policy.MinSeverity = l8events.Severity_SEVERITY_MAJOR
+			policy.Steps = []*l8notify.EscalationStep{
+				{StepId: genID("step", i*10), StepOrder: 1, DelayMinutes: 15, Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_EMAIL, Endpoint: "noc-team@example.com", MessageTemplate: "[ESC] Major alarm {{alarm.name}} on {{alarm.nodeName}}"},
+				{StepId: genID("step", i*10+1), StepOrder: 2, DelayMinutes: 60, Channel: l8notify.NotifyChannel_NOTIFY_CHANNEL_PAGERDUTY, Endpoint: "l1-oncall@example.com", MessageTemplate: "[ESC] Unresolved major alarm {{alarm.name}} - 1 hour"},
 			}
 		}
 
@@ -174,35 +176,35 @@ func generateMaintenanceWindows() []*alm.MaintenanceWindow {
 
 		switch i {
 		case 0: // Weekly network maintenance - scheduled
-			w.Status = alm.MaintenanceWindowStatus_MAINTENANCE_WINDOW_STATUS_SCHEDULED
+			w.Status = l8events.MaintenanceStatus_MAINTENANCE_STATUS_SCHEDULED
 			w.StartTime = randomFutureDate(0, 7)
 			w.EndTime = w.StartTime + 14400
-			w.Recurrence = alm.RecurrenceType_RECURRENCE_TYPE_WEEKLY
+			w.Recurrence = l8events.RecurrenceType_RECURRENCE_TYPE_WEEKLY
 			w.RecurrenceInterval = 1
 			w.SuppressAlarms = false
 			w.SuppressNotifications = true
 		case 1: // Monthly patch - scheduled
-			w.Status = alm.MaintenanceWindowStatus_MAINTENANCE_WINDOW_STATUS_SCHEDULED
+			w.Status = l8events.MaintenanceStatus_MAINTENANCE_STATUS_SCHEDULED
 			w.StartTime = randomFutureDate(1, 15)
 			w.EndTime = w.StartTime + 28800
-			w.Recurrence = alm.RecurrenceType_RECURRENCE_TYPE_MONTHLY
+			w.Recurrence = l8events.RecurrenceType_RECURRENCE_TYPE_MONTHLY
 			w.RecurrenceInterval = 1
 			w.SuppressAlarms = true
 			w.SuppressNotifications = true
 			w.NodeTypes = []string{"SERVER"}
 		case 2: // DC-East UPS - active
-			w.Status = alm.MaintenanceWindowStatus_MAINTENANCE_WINDOW_STATUS_ACTIVE
+			w.Status = l8events.MaintenanceStatus_MAINTENANCE_STATUS_ACTIVE
 			w.StartTime = nowUnix() - 3600
 			w.EndTime = nowUnix() + 7200
-			w.Recurrence = alm.RecurrenceType_RECURRENCE_TYPE_NONE
+			w.Recurrence = l8events.RecurrenceType_RECURRENCE_TYPE_NONE
 			w.SuppressAlarms = true
 			w.SuppressNotifications = true
 			w.Locations = []string{"DC-East"}
 		case 3: // Firewall rule update - completed
-			w.Status = alm.MaintenanceWindowStatus_MAINTENANCE_WINDOW_STATUS_COMPLETED
+			w.Status = l8events.MaintenanceStatus_MAINTENANCE_STATUS_COMPLETED
 			w.StartTime = randomPastDate(0, 7)
 			w.EndTime = w.StartTime + 3600
-			w.Recurrence = alm.RecurrenceType_RECURRENCE_TYPE_NONE
+			w.Recurrence = l8events.RecurrenceType_RECURRENCE_TYPE_NONE
 			w.NodeIds = []string{"node-fw-01", "node-fw-02"}
 			w.SuppressNotifications = true
 		}

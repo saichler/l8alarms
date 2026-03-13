@@ -6,6 +6,9 @@ import (
 	"github.com/saichler/l8alarms/go/alm/escalationpolicies"
 	"github.com/saichler/l8alarms/go/alm/notification"
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
+	"github.com/saichler/l8notify/go/template"
+	l8notify "github.com/saichler/l8notify/go/types/l8notify"
 	"github.com/saichler/l8types/go/ifs"
 	"sort"
 	"sync"
@@ -38,14 +41,14 @@ func NewScheduler() *Scheduler {
 // for matching policies.
 func (s *Scheduler) Schedule(alarm *alm.Alarm, vnic ifs.IVNic) {
 	// Only schedule for active alarms
-	if alarm.State != alm.AlarmState_ALARM_STATE_ACTIVE {
+	if alarm.State != l8events.AlarmState_ALARM_STATE_ACTIVE {
 		return
 	}
 
 	policies, err := common.GetEntities[alm.EscalationPolicy](
 		escalationpolicies.ServiceName, escalationpolicies.ServiceArea,
 		fmt.Sprintf("select * from EscalationPolicy where Status=%d",
-			alm.PolicyStatus_POLICY_STATUS_ACTIVE),
+			alm.AlmPolicyStatus_ALM_POLICY_STATUS_ACTIVE),
 		vnic,
 	)
 	if err != nil || len(policies) == 0 {
@@ -61,7 +64,7 @@ func (s *Scheduler) Schedule(alarm *alm.Alarm, vnic ifs.IVNic) {
 		}
 
 		// Sort steps by order
-		steps := make([]*alm.EscalationStep, len(policy.Steps))
+		steps := make([]*l8notify.EscalationStep, len(policy.Steps))
 		copy(steps, policy.Steps)
 		sort.Slice(steps, func(i, j int) bool {
 			return steps[i].StepOrder < steps[j].StepOrder
@@ -87,14 +90,14 @@ func (s *Scheduler) Cancel(alarmId string) {
 // HandleStateChange cancels escalation when alarm is acknowledged or cleared.
 func (s *Scheduler) HandleStateChange(alarm *alm.Alarm) {
 	switch alarm.State {
-	case alm.AlarmState_ALARM_STATE_ACKNOWLEDGED,
-		alm.AlarmState_ALARM_STATE_CLEARED,
-		alm.AlarmState_ALARM_STATE_SUPPRESSED:
+	case l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED,
+		l8events.AlarmState_ALARM_STATE_CLEARED,
+		l8events.AlarmState_ALARM_STATE_SUPPRESSED:
 		s.Cancel(alarm.AlarmId)
 	}
 }
 
-func (s *Scheduler) startEscalation(alarm *alm.Alarm, policy *alm.EscalationPolicy, steps []*alm.EscalationStep, stepIdx int, vnic ifs.IVNic) {
+func (s *Scheduler) startEscalation(alarm *alm.Alarm, policy *alm.EscalationPolicy, steps []*l8notify.EscalationStep, stepIdx int, vnic ifs.IVNic) {
 	if stepIdx >= len(steps) {
 		return
 	}
@@ -130,15 +133,23 @@ func (s *Scheduler) startEscalation(alarm *alm.Alarm, policy *alm.EscalationPoli
 	}()
 }
 
-func (s *Scheduler) fireStep(alarm *alm.Alarm, policy *alm.EscalationPolicy, steps []*alm.EscalationStep, stepIdx int, vnic ifs.IVNic) {
+func (s *Scheduler) fireStep(alarm *alm.Alarm, policy *alm.EscalationPolicy, steps []*l8notify.EscalationStep, stepIdx int, vnic ifs.IVNic) {
 	step := steps[stepIdx]
 
-	// Render message
-	msg := step.MessageTemplate
-	if msg == "" {
-		msg = fmt.Sprintf("[ESCALATION] Alarm %s (%s) on %s - unacknowledged for %d minutes",
-			alarm.AlarmId, alarm.Name, alarm.NodeName, step.DelayMinutes)
+	// Render message using l8notify template engine
+	vars := map[string]string{
+		"alarm.id":       alarm.AlarmId,
+		"alarm.name":     alarm.Name,
+		"alarm.severity": alarm.Severity.String(),
+		"alarm.state":    alarm.State.String(),
+		"alarm.nodeName": alarm.NodeName,
+		"alarm.nodeId":   alarm.NodeId,
+		"step.order":     fmt.Sprintf("%d", step.StepOrder),
+		"step.delay":     fmt.Sprintf("%d", step.DelayMinutes),
 	}
+	msg := template.RenderWithDefault(step.MessageTemplate, vars,
+		fmt.Sprintf("[ESCALATION] Alarm %s (%s) on %s - unacknowledged for %d minutes",
+			alarm.AlarmId, alarm.Name, alarm.NodeName, step.DelayMinutes))
 
 	// Send notification for this escalation step
 	if err := notification.Send(step.Channel, step.Endpoint, msg); err != nil {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"github.com/saichler/l8types/go/ifs"
 	"time"
 )
@@ -21,7 +22,7 @@ func Check(alarm *alm.Alarm, vnic ifs.IVNic) CheckResult {
 	windows, err := common.GetEntities[alm.MaintenanceWindow](
 		ServiceName, ServiceArea,
 		fmt.Sprintf("select * from MaintenanceWindow where Status=%d",
-			alm.MaintenanceWindowStatus_MAINTENANCE_WINDOW_STATUS_ACTIVE),
+			l8events.MaintenanceStatus_MAINTENANCE_STATUS_ACTIVE),
 		vnic,
 	)
 	if err != nil || len(windows) == 0 {

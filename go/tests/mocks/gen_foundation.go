@@ -4,6 +4,7 @@ package mocks
 
 import (
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"math/rand"
 )
 
@@ -11,20 +12,20 @@ func generateAlarmDefinitions() []*alm.AlarmDefinition {
 	count := len(alarmDefNames)
 	result := make([]*alm.AlarmDefinition, count)
 
-	severities := []alm.AlarmSeverity{
-		alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL,
-		alm.AlarmSeverity_ALARM_SEVERITY_MAJOR,
-		alm.AlarmSeverity_ALARM_SEVERITY_MAJOR,
-		alm.AlarmSeverity_ALARM_SEVERITY_MINOR,
-		alm.AlarmSeverity_ALARM_SEVERITY_WARNING,
-		alm.AlarmSeverity_ALARM_SEVERITY_INFO,
+	severities := []l8events.Severity{
+		l8events.Severity_SEVERITY_CRITICAL,
+		l8events.Severity_SEVERITY_MAJOR,
+		l8events.Severity_SEVERITY_MAJOR,
+		l8events.Severity_SEVERITY_MINOR,
+		l8events.Severity_SEVERITY_WARNING,
+		l8events.Severity_SEVERITY_INFO,
 	}
 
-	eventTypes := []alm.EventType{
-		alm.EventType_EVENT_TYPE_TRAP,
-		alm.EventType_EVENT_TYPE_SYSLOG,
-		alm.EventType_EVENT_TYPE_THRESHOLD,
-		alm.EventType_EVENT_TYPE_STATE_CHANGE,
+	eventTypes := []alm.AlmEventType{
+		alm.AlmEventType_ALM_EVENT_TYPE_TRAP,
+		alm.AlmEventType_ALM_EVENT_TYPE_SYSLOG,
+		alm.AlmEventType_ALM_EVENT_TYPE_THRESHOLD,
+		alm.AlmEventType_ALM_EVENT_TYPE_STATE_CHANGE,
 	}
 
 	for i := 0; i < count; i++ {
@@ -69,11 +70,11 @@ func generateAlarmFilters(store *MockDataStore) []*alm.AlarmFilter {
 		// Vary filters
 		switch i {
 		case 0: // Critical Active
-			f.Severities = []alm.AlarmSeverity{alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL}
-			f.States = []alm.AlarmState{alm.AlarmState_ALARM_STATE_ACTIVE}
+			f.Severities = []l8events.Severity{l8events.Severity_SEVERITY_CRITICAL}
+			f.States = []l8events.AlarmState{l8events.AlarmState_ALARM_STATE_ACTIVE}
 			f.ExcludeSuppressed = true
 		case 1: // All Active
-			f.States = []alm.AlarmState{alm.AlarmState_ALARM_STATE_ACTIVE, alm.AlarmState_ALARM_STATE_ACKNOWLEDGED}
+			f.States = []l8events.AlarmState{l8events.AlarmState_ALARM_STATE_ACTIVE, l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED}
 			f.ExcludeSuppressed = true
 		case 2: // Root Cause Only
 			f.RootCauseOnly = true
@@ -82,7 +83,7 @@ func generateAlarmFilters(store *MockDataStore) []*alm.AlarmFilter {
 			f.Locations = []string{"DC-East"}
 			f.ExcludeSuppressed = true
 		case 4: // Suppressed
-			f.States = []alm.AlarmState{alm.AlarmState_ALARM_STATE_SUPPRESSED}
+			f.States = []l8events.AlarmState{l8events.AlarmState_ALARM_STATE_SUPPRESSED}
 		case 5: // Server Alarms
 			f.NodeTypes = []string{"SERVER"}
 			f.ExcludeSuppressed = true

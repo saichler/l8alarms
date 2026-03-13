@@ -1,19 +1,7 @@
 /*
-Copyright 2024 Sharon Aicler (saichler@gmail.com)
-
-Layer 8 Alarms is licensed under the Apache License, Version 2.0.
-You may obtain a copy of the License at:
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Layer 8 Alarms - Events Enum Definitions
+Uses shared L8EventsEnums for event state, keeps alarm-specific event types local.
 */
-// ALM Events Module - Enum Definitions
-// EventType and EventProcessingState enums
 
 (function() {
     'use strict';
@@ -21,8 +9,9 @@ limitations under the License.
     window.AlmEvents = window.AlmEvents || {};
 
     const factory = Layer8EnumFactory;
+    const { renderEnum } = Layer8DRenderers;
 
-    // EventType: simple enum (no status classes)
+    // AlmEventType: alarm-specific event types (different from l8events.EventCategory)
     const EVENT_TYPE = factory.simple([
         'Unspecified',
         'Fault',
@@ -34,15 +23,8 @@ limitations under the License.
         'Syslog'
     ]);
 
-    // EventProcessingState: status enum with classes
-    const EVENT_PROCESSING_STATE = factory.create([
-        ['Unspecified', null, ''],
-        ['New', 'new', 'layer8d-status-pending'],
-        ['Processing', 'processing', 'layer8d-status-pending'],
-        ['Processed', 'processed', 'layer8d-status-active'],
-        ['Discarded', 'discarded', 'layer8d-status-inactive'],
-        ['Archived', 'archived', 'layer8d-status-inactive']
-    ]);
+    // Use shared event state from l8events
+    const EVENT_PROCESSING_STATE = L8EventsEnums.EVENT_STATE;
 
     // Enum exports
     AlmEvents.enums = {
@@ -52,14 +34,9 @@ limitations under the License.
     };
 
     // Renderers
-    const { renderEnum, createStatusRenderer } = Layer8DRenderers;
-
     AlmEvents.render = {
         eventType: (value) => renderEnum(value, EVENT_TYPE.enum),
-        processingState: createStatusRenderer(
-            EVENT_PROCESSING_STATE.enum,
-            EVENT_PROCESSING_STATE.classes
-        )
+        processingState: L8EventsEnums.render.eventState
     };
 
 })();

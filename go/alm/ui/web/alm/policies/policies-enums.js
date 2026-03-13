@@ -1,19 +1,7 @@
 /*
-Copyright 2024 Sharon Aicler (saichler@gmail.com)
-
-Layer 8 Alarms is licensed under the Apache License, Version 2.0.
-You may obtain a copy of the License at:
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Layer 8 Alarms - Policies Enum Definitions
+Uses shared L8NotifyEnums for notification channel, keeps policy status local.
 */
-// ALM Policies Module - Enum Definitions
-// PolicyStatus and NotificationChannel enums
 
 (function() {
     'use strict';
@@ -21,19 +9,17 @@ limitations under the License.
     window.AlmPolicies = window.AlmPolicies || {};
 
     const factory = Layer8EnumFactory;
-    const { renderEnum, createStatusRenderer } = Layer8DRenderers;
+    const { createStatusRenderer } = Layer8DRenderers;
 
-    // PolicyStatus: status enum with classes
+    // AlmPolicyStatus: alarm-specific policy status
     const POLICY_STATUS = factory.create([
         ['Unspecified', null, ''],
         ['Active', 'active', 'layer8d-status-active'],
         ['Disabled', 'disabled', 'layer8d-status-inactive']
     ]);
 
-    // NotificationChannel: simple enum
-    const NOTIFICATION_CHANNEL = factory.simple([
-        'Unspecified', 'Email', 'Webhook', 'Slack', 'PagerDuty', 'Custom'
-    ]);
+    // Use shared notification channel from l8notify
+    const NOTIFICATION_CHANNEL = L8NotifyEnums.NOTIFY_CHANNEL;
 
     // Enum exports
     AlmPolicies.enums = {
@@ -48,7 +34,7 @@ limitations under the License.
             POLICY_STATUS.enum,
             POLICY_STATUS.classes
         ),
-        notificationChannel: (value) => renderEnum(value, NOTIFICATION_CHANNEL.enum)
+        notificationChannel: L8NotifyEnums.render.channel
     };
 
 })();

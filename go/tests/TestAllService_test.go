@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 func dropAllTables(t *testing.T, vnic ifs.IVNic) {
 	creds := common.DB_CREDS
 	dbname := common.DB_NAME
-	user, pass, port, _, err := vnic.Resources().Security().Credential(creds, dbname, vnic.Resources())
+	_, user, pass, port, err := vnic.Resources().Security().Credential(creds, dbname, vnic.Resources())
 	if err != nil {
 		t.Fatalf("Failed to get credentials: %v", err)
 	}

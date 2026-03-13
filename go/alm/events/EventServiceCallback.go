@@ -19,7 +19,7 @@ func newEventServiceCallback() ifs.IServiceCallback {
 		func(e *alm.Event) { common.GenerateID(&e.EventId) }).
 		BeforeAction(rejectPut).
 		Require(func(e *alm.Event) string { return e.EventId }, "EventId").
-		Enum(func(e *alm.Event) int32 { return int32(e.EventType) }, alm.EventType_name, "EventType").
+		Enum(func(e *alm.Event) int32 { return int32(e.EventType) }, alm.AlmEventType_name, "EventType").
 		Require(func(e *alm.Event) string { return e.NodeId }, "NodeId").
 		Require(func(e *alm.Event) string { return e.Message }, "Message").
 		Build()

@@ -4,6 +4,7 @@ package mocks
 
 import (
 	"fmt"
+	l8events "github.com/saichler/l8events/go/types/l8events"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"math/rand"
 )
@@ -48,11 +49,11 @@ func generateAlarms(store *MockDataStore) []*alm.Alarm {
 
 		// Add notes and state history for some alarms
 		if i%5 == 0 {
-			a.Notes = []*alm.AlarmNote{
+			a.Notes = []*l8events.AlarmNote{
 				{NoteId: genID("note", i*10), Author: "admin", Text: "Investigating this alarm", CreatedAt: firstOccurrence + 60},
 			}
 		}
-		if a.State != alm.AlarmState_ALARM_STATE_ACTIVE {
+		if a.State != l8events.AlarmState_ALARM_STATE_ACTIVE {
 			a.StateHistory = generateStateHistory(a, i)
 		}
 
@@ -65,17 +66,17 @@ func assignAlarmStateAndSeverity(a *alm.Alarm, i, total int) {
 	// State distribution: 50% active, 15% acknowledged, 20% cleared, 15% suppressed
 	switch {
 	case i < total*50/100:
-		a.State = alm.AlarmState_ALARM_STATE_ACTIVE
+		a.State = l8events.AlarmState_ALARM_STATE_ACTIVE
 	case i < total*65/100:
-		a.State = alm.AlarmState_ALARM_STATE_ACKNOWLEDGED
+		a.State = l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED
 		a.AcknowledgedAt = a.FirstOccurrence + int64(rand.Intn(1800))
 		a.AcknowledgedBy = "noc-operator"
 	case i < total*85/100:
-		a.State = alm.AlarmState_ALARM_STATE_CLEARED
+		a.State = l8events.AlarmState_ALARM_STATE_CLEARED
 		a.ClearedAt = a.FirstOccurrence + int64(rand.Intn(7200)+300)
 		a.ClearedBy = "auto-clear"
 	default:
-		a.State = alm.AlarmState_ALARM_STATE_SUPPRESSED
+		a.State = l8events.AlarmState_ALARM_STATE_SUPPRESSED
 		a.IsSuppressed = true
 		a.SuppressedBy = "correlation"
 	}
@@ -83,15 +84,15 @@ func assignAlarmStateAndSeverity(a *alm.Alarm, i, total int) {
 	// Severity distribution: 10% critical, 20% major, 30% minor, 25% warning, 15% info
 	switch {
 	case i < total*10/100:
-		a.Severity = alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL
+		a.Severity = l8events.Severity_SEVERITY_CRITICAL
 	case i < total*30/100:
-		a.Severity = alm.AlarmSeverity_ALARM_SEVERITY_MAJOR
+		a.Severity = l8events.Severity_SEVERITY_MAJOR
 	case i < total*60/100:
-		a.Severity = alm.AlarmSeverity_ALARM_SEVERITY_MINOR
+		a.Severity = l8events.Severity_SEVERITY_MINOR
 	case i < total*85/100:
-		a.Severity = alm.AlarmSeverity_ALARM_SEVERITY_WARNING
+		a.Severity = l8events.Severity_SEVERITY_WARNING
 	default:
-		a.Severity = alm.AlarmSeverity_ALARM_SEVERITY_INFO
+		a.Severity = l8events.Severity_SEVERITY_INFO
 	}
 	a.OriginalSeverity = a.Severity
 }
@@ -127,15 +128,15 @@ func assignCorrelation(a *alm.Alarm, i int, result []*alm.Alarm, store *MockData
 	if entry.parentIdx == -1 {
 		a.IsRootCause = true
 		a.SymptomCount = entry.symptomCount
-		a.Severity = alm.AlarmSeverity_ALARM_SEVERITY_CRITICAL
-		a.State = alm.AlarmState_ALARM_STATE_ACTIVE
+		a.Severity = l8events.Severity_SEVERITY_CRITICAL
+		a.State = l8events.AlarmState_ALARM_STATE_ACTIVE
 		return
 	}
 
 	parentID := genID("alm", entry.parentIdx)
 	a.RootCauseAlarmId = parentID
 	a.CorrelationRuleId = pickRef(store.CorrRuleIDs, entry.parentIdx)
-	a.State = alm.AlarmState_ALARM_STATE_SUPPRESSED
+	a.State = l8events.AlarmState_ALARM_STATE_SUPPRESSED
 	a.IsSuppressed = true
 	a.SuppressedBy = parentID
 	if entry.symptomCount > 0 {
@@ -144,43 +145,39 @@ func assignCorrelation(a *alm.Alarm, i int, result []*alm.Alarm, store *MockData
 	}
 }
 
-func generateStateHistory(a *alm.Alarm, i int) []*alm.AlarmStateChange {
-	var history []*alm.AlarmStateChange
+func generateStateHistory(a *alm.Alarm, i int) []*l8events.AlarmStateChange {
+	var history []*l8events.AlarmStateChange
 
 	// All alarms start as active
-	history = append(history, &alm.AlarmStateChange{
-		ChangeId:  genID("chg", i*10),
-		FromState: alm.AlarmState_ALARM_STATE_UNSPECIFIED,
-		ToState:   alm.AlarmState_ALARM_STATE_ACTIVE,
+	history = append(history, &l8events.AlarmStateChange{
+		FromState: l8events.AlarmState_ALARM_STATE_UNSPECIFIED,
+		ToState:   l8events.AlarmState_ALARM_STATE_ACTIVE,
 		ChangedBy: "system",
 		Reason:    "Alarm raised",
 		ChangedAt: a.FirstOccurrence,
 	})
 
 	switch a.State {
-	case alm.AlarmState_ALARM_STATE_ACKNOWLEDGED:
-		history = append(history, &alm.AlarmStateChange{
-			ChangeId:  genID("chg", i*10+1),
-			FromState: alm.AlarmState_ALARM_STATE_ACTIVE,
-			ToState:   alm.AlarmState_ALARM_STATE_ACKNOWLEDGED,
+	case l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED:
+		history = append(history, &l8events.AlarmStateChange{
+			FromState: l8events.AlarmState_ALARM_STATE_ACTIVE,
+			ToState:   l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED,
 			ChangedBy: a.AcknowledgedBy,
 			Reason:    "Acknowledged by operator",
 			ChangedAt: a.AcknowledgedAt,
 		})
-	case alm.AlarmState_ALARM_STATE_CLEARED:
-		history = append(history, &alm.AlarmStateChange{
-			ChangeId:  genID("chg", i*10+1),
-			FromState: alm.AlarmState_ALARM_STATE_ACTIVE,
-			ToState:   alm.AlarmState_ALARM_STATE_CLEARED,
+	case l8events.AlarmState_ALARM_STATE_CLEARED:
+		history = append(history, &l8events.AlarmStateChange{
+			FromState: l8events.AlarmState_ALARM_STATE_ACTIVE,
+			ToState:   l8events.AlarmState_ALARM_STATE_CLEARED,
 			ChangedBy: a.ClearedBy,
 			Reason:    "Auto-cleared after recovery",
 			ChangedAt: a.ClearedAt,
 		})
-	case alm.AlarmState_ALARM_STATE_SUPPRESSED:
-		history = append(history, &alm.AlarmStateChange{
-			ChangeId:  genID("chg", i*10+1),
-			FromState: alm.AlarmState_ALARM_STATE_ACTIVE,
-			ToState:   alm.AlarmState_ALARM_STATE_SUPPRESSED,
+	case l8events.AlarmState_ALARM_STATE_SUPPRESSED:
+		history = append(history, &l8events.AlarmStateChange{
+			FromState: l8events.AlarmState_ALARM_STATE_ACTIVE,
+			ToState:   l8events.AlarmState_ALARM_STATE_SUPPRESSED,
 			ChangedBy: "correlation-engine",
 			Reason:    "Suppressed as symptom of root cause",
 			ChangedAt: a.FirstOccurrence + 10,
