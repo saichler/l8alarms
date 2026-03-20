@@ -15,6 +15,7 @@ When a network device fails, it typically generates dozens of downstream alarms 
 - **Maintenance windows** - scheduled suppression of alarms within scope
 - **Alarm archiving** - archive resolved alarms and their events for historical analysis
 - **Desktop UI** - real-time alarm dashboard with correlation tree view and topology overlay
+- **Mock data generation** - phased generators for realistic test data across all services
 
 ## Architecture
 
@@ -30,58 +31,117 @@ The alarm service callback is the system's nerve center. Every alarm POST trigge
 
 All services share **ServiceArea 10** with prefix `/alm/`.
 
-| Service | ServiceName | Description |
-|---------|-------------|-------------|
-| Alarm | `Alarm` | Active alarm lifecycle |
-| AlarmDefinition | `AlmDef` | Alarm templates and thresholds |
-| AlarmFilter | `AlmFilter` | Saved alarm filter configurations |
-| Event | `Event` | Raw event ingestion (immutable) |
-| CorrelationRule | `CorrRule` | RCA rule definitions |
-| NotificationPolicy | `NotifPol` | Notification dispatch rules |
-| EscalationPolicy | `EscPolicy` | Time-based escalation chains |
-| MaintenanceWindow | `MaintWin` | Scheduled suppression windows |
-| ArchivedAlarm | `ArcAlarm` | Historical alarms (immutable) |
-| ArchivedEvent | `ArcEvent` | Historical events (immutable) |
+| Service | ServiceName | Primary Key | Description |
+|---------|-------------|-------------|-------------|
+| AlarmDefinition | `AlmDef` | `definitionId` | Alarm templates and thresholds |
+| Alarm | `Alarm` | `alarmId` | Active alarm lifecycle |
+| Event | `Event` | `eventId` | Raw event ingestion (immutable) |
+| CorrelationRule | `CorrRule` | `ruleId` | RCA rule definitions |
+| NotificationPolicy | `NotifPol` | `policyId` | Notification dispatch rules |
+| EscalationPolicy | `EscPolicy` | `policyId` | Time-based escalation chains |
+| MaintenanceWindow | `MaintWin` | `windowId` | Scheduled suppression windows |
+| AlarmFilter | `AlmFilter` | `filterId` | Saved alarm filter configurations |
+| ArchivedAlarm | `ArcAlarm` | `alarmId` | Historical alarms (immutable) |
+| ArchivedEvent | `ArcEvent` | `eventId` | Historical events (immutable) |
+
+## Child Types (embedded, not services)
+
+| Type | Parent | Description |
+|------|--------|-------------|
+| AlarmNote | Alarm | Operator notes on alarms |
+| AlarmStateChange | Alarm | State transition history |
+| CorrelationCondition | CorrelationRule | Rule matching conditions |
+| NotificationTarget | NotificationPolicy | Dispatch targets per policy |
+| EscalationStep | EscalationPolicy | Escalation chain steps |
+| EventAttribute | Event | Key-value event metadata |
 
 ## Engine Components
 
-| Component | Description |
-|-----------|-------------|
-| `correlation/` | RCA engine with topological, temporal, pattern, and composite strategies |
-| `enrichment/` | Topology overlay - projects alarm severity onto topology nodes |
-| `notification/` | Policy matching, throttling, and channel-specific dispatch |
-| `escalation/` | Time-based scheduler with per-alarm timers and step progression |
-| `archiving/` | Recursively archives alarm + events + symptoms, then removes active records |
+| Component | Directory | Description |
+|-----------|-----------|-------------|
+| Correlation | `correlation/` | RCA engine with topological, temporal, pattern, and composite strategies |
+| Enrichment | `enrichment/` | Topology overlay - projects alarm severity onto topology nodes |
+| Notification | `notification/` | Policy matching, throttling, and channel-specific dispatch |
+| Escalation | `escalation/` | Time-based scheduler with per-alarm timers and step progression |
+| Archiving | `archiving/` | Recursively archives alarm + events + symptoms, then removes active records |
+
+## UI
+
+The desktop UI is built with the l8ui shared component library and organized into five submodules:
+
+| Submodule | Services |
+|-----------|----------|
+| Alarms | Alarms, Alarm Definitions, Alarm Filters |
+| Events | Events |
+| Correlation | Correlation Rules |
+| Policies | Notification Policies, Escalation Policies |
+| Maintenance | Maintenance Windows |
+
+Features include a correlation tree view (using `Layer8DTreeGrid` with alarm hierarchy showing ROOT/SYMPTOM badges), severity/state color rendering, and section-based navigation.
 
 ## Project Structure
 
 ```
-proto/                      Protobuf definitions (9 files)
+proto/                          Protobuf definitions (9 files)
+  alm-alarms.proto              Alarm, AlarmNote, AlarmStateChange
+  alm-definitions.proto         AlarmDefinition
+  alm-events.proto              Event, EventAttribute
+  alm-correlation.proto         CorrelationRule, CorrelationCondition
+  alm-policies.proto            NotificationPolicy, EscalationPolicy
+  alm-maintenance.proto         MaintenanceWindow
+  alm-filters.proto             AlarmFilter
+  alm-archive.proto             ArchivedAlarm, ArchivedEvent
+  alm-common.proto              Shared enums (severity, state, etc.)
 go/
   alm/
-    common/                 Shared validation, service factory, defaults
-    services/               Service activation orchestrator
-    alarms/                 Alarm service + post-action runners
-    alarmdefinitions/       Alarm definition service
-    alarmfilters/           Saved filter service
-    events/                 Event service (immutable)
-    correlationrules/       Correlation rule service
-    notificationpolicies/   Notification policy service
-    escalationpolicies/     Escalation policy service
-    maintenancewindows/     Maintenance window service
-    archivedalarms/         Archived alarm service (immutable)
-    archivedevents/         Archived event service (immutable)
-    correlation/            RCA engine (4 strategies)
-    enrichment/             Topology overlay service
-    notification/           Notification engine + senders
-    escalation/             Escalation scheduler
-    archiving/              Archive engine
-    ui/                     Web UI (desktop)
-    vnet/                   Standalone vnet process
-  types/alm/               Generated protobuf Go types
-  tests/                   Integration tests + mock data
-  demo/                    Pre-built demo binaries
-plans/                     Product requirements document
+    common/                     Shared validation, service factory, type registry
+    services/                   Service activation orchestrator
+    alarms/                     Alarm service + post-action runners
+    alarmdefinitions/           Alarm definition service
+    alarmfilters/               Saved filter service
+    events/                     Event service (immutable)
+    correlationrules/           Correlation rule service
+    notificationpolicies/       Notification policy service
+    escalationpolicies/         Escalation policy service
+    maintenancewindows/         Maintenance window service + checker
+    archivedalarms/             Archived alarm service (immutable)
+    archivedevents/             Archived event service (immutable)
+    correlation/                RCA engine (topological, temporal, pattern, composite)
+    enrichment/                 Topology overlay service
+    notification/               Notification engine + senders
+    escalation/                 Escalation scheduler
+    archiving/                  Archive engine
+    ui/
+      web/                      Desktop UI
+        alm/                    Module JS (config, enums, columns, forms, init)
+          alarms/               Alarm views + correlation tree
+          events/               Event views
+          correlation/          Correlation rule views
+          policies/             Policy views
+          maintenance/          Maintenance window views
+          archive/              Archived alarm/event views
+        sections/               Section HTML (dashboard, alarms, system)
+        js/                     App bootstrap, reference registry, sections
+        css/                    Base styles, modals, responsive
+        l8ui/                   Shared UI library
+      main/                     UI server entry point
+    main/                       Backend server entry point
+    vnet/                       Standalone vnet process
+  types/alm/                    Generated protobuf Go types
+  tests/
+    mocks/                      Mock data generators (6 phases)
+      gen_foundation.go         Alarm definitions, correlation rules
+      gen_config.go             Policies, escalation rules, maintenance windows, filters
+      gen_events.go             Events
+      gen_alarms.go             Alarms with state distribution
+      gen_archive.go            Archived alarms and events
+    TestCRUD_test.go            Full CRUD for all services
+    TestValidation_test.go      Field validation
+    TestCorrelation_test.go     Correlation engine
+    TestServiceHandlers_test.go Handler accessibility
+    TestServiceGetters_test.go  Service getter coverage
+    TestAllService_test.go      All-services orchestrator
+plans/                          Product requirements document
 ```
 
 ## Dependencies
@@ -108,18 +168,13 @@ cd go && go test ./tests/ -v -run TestAllServices
 
 Tests exercise full CRUD, validation, correlation, maintenance window suppression, and service handler accessibility through the HTTP API.
 
-## Running the Demo
-
-Pre-built binaries are in `go/demo/`. Start the three processes:
+## Running Locally
 
 ```bash
-cd go/demo
-./vnet_demo &     # VNet relay
-./alm_demo &      # Alarm services
-./ui_demo &       # Web UI (port 2780)
+cd go && ./run-local.sh
 ```
 
-Then open `http://localhost:2780/alm/` in a browser.
+The script builds all binaries, starts PostgreSQL in Docker, launches the vnet/backend/UI processes, and uploads mock data. Open `http://localhost:2780/alm/` in a browser.
 
 ## License
 
