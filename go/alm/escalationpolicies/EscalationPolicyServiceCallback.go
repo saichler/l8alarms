@@ -1,16 +1,15 @@
 package escalationpolicies
 
 import (
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
-func newEscalationPolicyServiceCallback() ifs.IServiceCallback {
-	return common.NewValidation[alm.EscalationPolicy]("EscalationPolicy",
-		func(e *alm.EscalationPolicy) { common.GenerateID(&e.PolicyId) }).
-		Require(func(e *alm.EscalationPolicy) string { return e.PolicyId }, "PolicyId").
-		Require(func(e *alm.EscalationPolicy) string { return e.Name }, "Name").
-		Enum(func(e *alm.EscalationPolicy) int32 { return int32(e.Status) }, alm.AlmPolicyStatus_name, "Status").
+func newEscalationPolicyServiceCallback(vnic ifs.IVNic) ifs.IServiceCallback {
+	return common.NewValidation(&alm.EscalationPolicy{}, vnic).
+		Require(func(e interface{}) string { return e.(*alm.EscalationPolicy).PolicyId }, "PolicyId").
+		Require(func(e interface{}) string { return e.(*alm.EscalationPolicy).Name }, "Name").
+		Enum(func(e interface{}) int32 { return int32(e.(*alm.EscalationPolicy).Status) }, alm.AlmPolicyStatus_name, "Status").
 		Build()
 }

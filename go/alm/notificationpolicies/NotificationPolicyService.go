@@ -1,8 +1,8 @@
 package notificationpolicies
 
 import (
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -12,11 +12,10 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService[alm.NotificationPolicy, alm.NotificationPolicyList](common.ServiceConfig{
+	common.ActivateService(common.ServiceConfig{
 		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "PolicyId", Callback: newNotificationPolicyServiceCallback(),
-		Transactional: true,
-	}, creds, dbname, vnic)
+		PrimaryKey: "PolicyId", Callback: newNotificationPolicyServiceCallback(vnic),
+	}, &alm.NotificationPolicy{}, &alm.NotificationPolicyList{}, creds, dbname, vnic)
 }
 
 func NotificationPolicies(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
@@ -24,5 +23,9 @@ func NotificationPolicies(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
 }
 
 func NotificationPolicy(id string, vnic ifs.IVNic) (*alm.NotificationPolicy, error) {
-	return common.GetEntity(ServiceName, ServiceArea, &alm.NotificationPolicy{PolicyId: id}, vnic)
+	result, err := common.GetEntity(ServiceName, ServiceArea, &alm.NotificationPolicy{PolicyId: id}, vnic)
+	if err != nil || result == nil {
+		return nil, err
+	}
+	return result.(*alm.NotificationPolicy), nil
 }

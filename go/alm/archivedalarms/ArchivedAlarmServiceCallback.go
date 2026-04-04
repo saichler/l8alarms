@@ -2,8 +2,8 @@ package archivedalarms
 
 import (
 	"errors"
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -14,10 +14,9 @@ func rejectPut(_ *alm.ArchivedAlarm, action ifs.Action, _ ifs.IVNic) error {
 	return nil
 }
 
-func newArchivedAlarmServiceCallback() ifs.IServiceCallback {
-	return common.NewValidation[alm.ArchivedAlarm]("ArchivedAlarm",
-		func(e *alm.ArchivedAlarm) {}).
+func newArchivedAlarmServiceCallback(vnic ifs.IVNic) ifs.IServiceCallback {
+	return common.NewValidation(&alm.ArchivedAlarm{}, vnic).
 		BeforeAction(rejectPut).
-		Require(func(e *alm.ArchivedAlarm) string { return e.AlarmId }, "AlarmId").
+		Require(func(e interface{}) string { return e.(*alm.ArchivedAlarm).AlarmId }, "AlarmId").
 		Build()
 }

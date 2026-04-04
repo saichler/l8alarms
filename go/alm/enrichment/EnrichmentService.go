@@ -3,8 +3,8 @@ package enrichment
 import (
 	"fmt"
 	"github.com/saichler/l8alarms/go/alm/alarms"
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	l8events "github.com/saichler/l8events/go/types/l8events"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8topology/go/types/l8topo"
@@ -76,7 +76,7 @@ func (s *EnrichmentService) Get(elements ifs.IElements, vnic ifs.IVNic) ifs.IEle
 	}
 
 	// Fetch active alarms
-	activeAlarms, err := common.GetEntities[alm.Alarm](
+	activeAlarmsRaw, err := common.GetEntitiesByQuery(
 		alarms.ServiceName, alarms.ServiceArea,
 		fmt.Sprintf("select * from Alarm where State=%d",
 			l8events.AlarmState_ALARM_STATE_ACTIVE),
@@ -84,6 +84,10 @@ func (s *EnrichmentService) Get(elements ifs.IElements, vnic ifs.IVNic) ifs.IEle
 	)
 	if err != nil {
 		return object.NewError("failed to fetch active alarms: " + err.Error())
+	}
+	activeAlarms := make([]*alm.Alarm, 0, len(activeAlarmsRaw))
+	for _, raw := range activeAlarmsRaw {
+		activeAlarms = append(activeAlarms, raw.(*alm.Alarm))
 	}
 
 	// Enrich the topology with alarm overlay data

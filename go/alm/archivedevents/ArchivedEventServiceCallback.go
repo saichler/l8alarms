@@ -2,8 +2,8 @@ package archivedevents
 
 import (
 	"errors"
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -14,10 +14,9 @@ func rejectPut(_ *alm.ArchivedEvent, action ifs.Action, _ ifs.IVNic) error {
 	return nil
 }
 
-func newArchivedEventServiceCallback() ifs.IServiceCallback {
-	return common.NewValidation[alm.ArchivedEvent]("ArchivedEvent",
-		func(e *alm.ArchivedEvent) {}).
+func newArchivedEventServiceCallback(vnic ifs.IVNic) ifs.IServiceCallback {
+	return common.NewValidation(&alm.ArchivedEvent{}, vnic).
 		BeforeAction(rejectPut).
-		Require(func(e *alm.ArchivedEvent) string { return e.EventId }, "EventId").
+		Require(func(e interface{}) string { return e.(*alm.ArchivedEvent).EventId }, "EventId").
 		Build()
 }

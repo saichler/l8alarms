@@ -1,8 +1,8 @@
 package maintenancewindows
 
 import (
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -12,11 +12,10 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService[alm.MaintenanceWindow, alm.MaintenanceWindowList](common.ServiceConfig{
+	common.ActivateService(common.ServiceConfig{
 		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "WindowId", Callback: newMaintenanceWindowServiceCallback(),
-		Transactional: true,
-	}, creds, dbname, vnic)
+		PrimaryKey: "WindowId", Callback: newMaintenanceWindowServiceCallback(vnic),
+	}, &alm.MaintenanceWindow{}, &alm.MaintenanceWindowList{}, creds, dbname, vnic)
 }
 
 func MaintenanceWindows(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
@@ -24,5 +23,9 @@ func MaintenanceWindows(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
 }
 
 func MaintenanceWindow(id string, vnic ifs.IVNic) (*alm.MaintenanceWindow, error) {
-	return common.GetEntity(ServiceName, ServiceArea, &alm.MaintenanceWindow{WindowId: id}, vnic)
+	result, err := common.GetEntity(ServiceName, ServiceArea, &alm.MaintenanceWindow{WindowId: id}, vnic)
+	if err != nil || result == nil {
+		return nil, err
+	}
+	return result.(*alm.MaintenanceWindow), nil
 }

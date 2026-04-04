@@ -2,10 +2,10 @@ package alarms
 
 import (
 	"fmt"
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/alm/correlation"
 	"github.com/saichler/l8alarms/go/alm/correlationrules"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	l8events "github.com/saichler/l8events/go/types/l8events"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8topology/go/types/l8topo"
@@ -27,7 +27,7 @@ func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
 	}
 
 	// Fetch active correlation rules
-	rules, err := common.GetEntities[alm.CorrelationRule](
+	rulesRaw, err := common.GetEntitiesByQuery(
 		correlationrules.ServiceName, correlationrules.ServiceArea,
 		fmt.Sprintf("select * from CorrelationRule where Status=%d",
 			alm.CorrelationRuleStatus_CORRELATION_RULE_STATUS_ACTIVE),
@@ -36,12 +36,16 @@ func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
 	if err != nil {
 		return fmt.Errorf("failed to query correlation rules: %w", err)
 	}
-	if len(rules) == 0 {
+	if len(rulesRaw) == 0 {
 		return nil
+	}
+	rules := make([]*alm.CorrelationRule, 0, len(rulesRaw))
+	for _, r := range rulesRaw {
+		rules = append(rules, r.(*alm.CorrelationRule))
 	}
 
 	// Fetch active alarms
-	activeAlarms, err := common.GetEntities[alm.Alarm](
+	activeAlarmsRaw, err := common.GetEntitiesByQuery(
 		ServiceName, ServiceArea,
 		fmt.Sprintf("select * from Alarm where State=%d",
 			l8events.AlarmState_ALARM_STATE_ACTIVE),
@@ -49,6 +53,10 @@ func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
 	)
 	if err != nil {
 		return fmt.Errorf("failed to query active alarms: %w", err)
+	}
+	activeAlarms := make([]*alm.Alarm, 0, len(activeAlarmsRaw))
+	for _, a := range activeAlarmsRaw {
+		activeAlarms = append(activeAlarms, a.(*alm.Alarm))
 	}
 
 	// Build adjacency from topology if any rule needs it

@@ -3,6 +3,7 @@ package mocks
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -26,10 +27,11 @@ func runOp(client *Client, label, endpoint string, list interface{}, ids []strin
 }
 
 // extractIDs extracts a string field from a slice using a getter.
-func extractIDs[T any](items []*T, getter func(*T) string) []string {
-	ids := make([]string, len(items))
-	for i, item := range items {
-		ids[i] = getter(item)
+func extractIDs(items interface{}, getter func(interface{}) string) []string {
+	v := reflect.ValueOf(items)
+	ids := make([]string, v.Len())
+	for i := 0; i < v.Len(); i++ {
+		ids[i] = getter(v.Index(i).Interface())
 	}
 	return ids
 }

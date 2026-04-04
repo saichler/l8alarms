@@ -2,9 +2,9 @@ package notification
 
 import (
 	"fmt"
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/alm/notificationpolicies"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8notify/go/channel"
 	"github.com/saichler/l8notify/go/template"
 	"github.com/saichler/l8notify/go/throttle"
@@ -30,19 +30,20 @@ func (e *Engine) Notify(alarm *alm.Alarm, action ifs.Action, suppressNotificatio
 		return
 	}
 
-	policies, err := common.GetEntities[alm.NotificationPolicy](
+	policiesRaw, err := common.GetEntitiesByQuery(
 		notificationpolicies.ServiceName, notificationpolicies.ServiceArea,
 		fmt.Sprintf("select * from NotificationPolicy where Status=%d",
 			alm.AlmPolicyStatus_ALM_POLICY_STATUS_ACTIVE),
 		vnic,
 	)
-	if err != nil || len(policies) == 0 {
+	if err != nil || len(policiesRaw) == 0 {
 		return
 	}
 
 	isStateChange := action == ifs.PUT || action == ifs.PATCH
 
-	for _, policy := range policies {
+	for _, raw := range policiesRaw {
+		policy := raw.(*alm.NotificationPolicy)
 		if !matchesPolicy(alarm, policy, isStateChange) {
 			continue
 		}

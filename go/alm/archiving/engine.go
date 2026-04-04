@@ -5,9 +5,9 @@ import (
 	"github.com/saichler/l8alarms/go/alm/alarms"
 	"github.com/saichler/l8alarms/go/alm/archivedalarms"
 	"github.com/saichler/l8alarms/go/alm/archivedevents"
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/alm/events"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8types/go/ifs"
 	"time"
@@ -116,12 +116,13 @@ func toArchivedEvent(e *alm.Event, archivedAt int64, archivedBy string) *alm.Arc
 
 func archiveEventsForAlarm(alarmId string, archivedAt int64, archivedBy string, vnic ifs.IVNic) error {
 	query := fmt.Sprintf("select * from Event where AlarmId=%s", alarmId)
-	evts, err := common.GetEntities[alm.Event](events.ServiceName, events.ServiceArea, query, vnic)
+	evtsRaw, err := common.GetEntitiesByQuery(events.ServiceName, events.ServiceArea, query, vnic)
 	if err != nil {
 		return err
 	}
 
-	for _, evt := range evts {
+	for _, raw := range evtsRaw {
+		evt := raw.(*alm.Event)
 		archived := toArchivedEvent(evt, archivedAt, archivedBy)
 		if err := postArchivedEvent(archived, vnic); err != nil {
 			return err
@@ -135,12 +136,13 @@ func archiveEventsForAlarm(alarmId string, archivedAt int64, archivedBy string, 
 
 func archiveSymptoms(rootAlarmId, archivedBy string, vnic ifs.IVNic) error {
 	query := fmt.Sprintf("select * from Alarm where RootCauseAlarmId=%s", rootAlarmId)
-	symptoms, err := common.GetEntities[alm.Alarm](alarms.ServiceName, alarms.ServiceArea, query, vnic)
+	symptomsRaw, err := common.GetEntitiesByQuery(alarms.ServiceName, alarms.ServiceArea, query, vnic)
 	if err != nil {
 		return err
 	}
 
-	for _, symptom := range symptoms {
+	for _, raw := range symptomsRaw {
+		symptom := raw.(*alm.Alarm)
 		if err := ArchiveAlarm(symptom.AlarmId, archivedBy, vnic); err != nil {
 			return err
 		}

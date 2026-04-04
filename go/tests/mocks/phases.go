@@ -30,7 +30,7 @@ func runPhase1(client *Client, store *MockDataStore) error {
 	defs := generateAlarmDefinitions()
 	if err := runOp(client, "Alarm Definitions", almArea+"AlmDef",
 		&alm.AlarmDefinitionList{List: defs},
-		extractIDs(defs, func(e *alm.AlarmDefinition) string { return e.DefinitionId }),
+		extractIDs(defs, func(e interface{}) string { return e.(*alm.AlarmDefinition).DefinitionId }),
 		&store.DefinitionIDs); err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func runPhase2(client *Client, store *MockDataStore) error {
 	filters := generateAlarmFilters(store)
 	if err := runOp(client, "Alarm Filters", almArea+"AlmFilter",
 		&alm.AlarmFilterList{List: filters},
-		extractIDs(filters, func(e *alm.AlarmFilter) string { return e.FilterId }),
+		extractIDs(filters, func(e interface{}) string { return e.(*alm.AlarmFilter).FilterId }),
 		&store.FilterIDs); err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func runPhase2(client *Client, store *MockDataStore) error {
 	rules := generateCorrelationRules(store)
 	if err := runOp(client, "Correlation Rules", almArea+"CorrRule",
 		&alm.CorrelationRuleList{List: rules},
-		extractIDs(rules, func(e *alm.CorrelationRule) string { return e.RuleId }),
+		extractIDs(rules, func(e interface{}) string { return e.(*alm.CorrelationRule).RuleId }),
 		&store.CorrRuleIDs); err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func runPhase2(client *Client, store *MockDataStore) error {
 	notifPols := generateNotificationPolicies()
 	if err := runOp(client, "Notification Policies", almArea+"NotifPol",
 		&alm.NotificationPolicyList{List: notifPols},
-		extractIDs(notifPols, func(e *alm.NotificationPolicy) string { return e.PolicyId }),
+		extractIDs(notifPols, func(e interface{}) string { return e.(*alm.NotificationPolicy).PolicyId }),
 		&store.NotifPolIDs); err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func runPhase2(client *Client, store *MockDataStore) error {
 	escPols := generateEscalationPolicies()
 	if err := runOp(client, "Escalation Policies", almArea+"EscPolicy",
 		&alm.EscalationPolicyList{List: escPols},
-		extractIDs(escPols, func(e *alm.EscalationPolicy) string { return e.PolicyId }),
+		extractIDs(escPols, func(e interface{}) string { return e.(*alm.EscalationPolicy).PolicyId }),
 		&store.EscPolicyIDs); err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func runPhase2(client *Client, store *MockDataStore) error {
 	windows := generateMaintenanceWindows()
 	if err := runOp(client, "Maintenance Windows", almArea+"MaintWin",
 		&alm.MaintenanceWindowList{List: windows},
-		extractIDs(windows, func(e *alm.MaintenanceWindow) string { return e.WindowId }),
+		extractIDs(windows, func(e interface{}) string { return e.(*alm.MaintenanceWindow).WindowId }),
 		&store.MaintWindowIDs); err != nil {
 		return err
 	}
@@ -92,7 +92,7 @@ func runPhase3(client *Client, store *MockDataStore) error {
 	events := generateEvents(store)
 	if err := runOp(client, "Events", almArea+"Event",
 		&alm.EventList{List: events},
-		extractIDs(events, func(e *alm.Event) string { return e.EventId }),
+		extractIDs(events, func(e interface{}) string { return e.(*alm.Event).EventId }),
 		&store.EventIDs); err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func runPhase4(client *Client, store *MockDataStore) error {
 	alarms := generateAlarms(store)
 	if err := runOp(client, "Alarms", almArea+"Alarm",
 		&alm.AlarmList{List: alarms},
-		extractIDs(alarms, func(e *alm.Alarm) string { return e.AlarmId }),
+		extractIDs(alarms, func(e interface{}) string { return e.(*alm.Alarm).AlarmId }),
 		&store.AlarmIDs); err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func runPhase5(client *Client, store *MockDataStore) error {
 	arcAlarms := generateArchivedAlarms(store)
 	if err := runOp(client, "Archived Alarms", almArea+"ArcAlarm",
 		&alm.ArchivedAlarmList{List: arcAlarms},
-		extractIDs(arcAlarms, func(e *alm.ArchivedAlarm) string { return e.AlarmId }),
+		extractIDs(arcAlarms, func(e interface{}) string { return e.(*alm.ArchivedAlarm).AlarmId }),
 		&store.ArchivedAlarmIDs); err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func runPhase5(client *Client, store *MockDataStore) error {
 	arcEvents := generateArchivedEvents(store)
 	if err := runOp(client, "Archived Events", almArea+"ArcEvent",
 		&alm.ArchivedEventList{List: arcEvents},
-		extractIDs(arcEvents, func(e *alm.ArchivedEvent) string { return e.EventId }),
+		extractIDs(arcEvents, func(e interface{}) string { return e.(*alm.ArchivedEvent).EventId }),
 		&store.ArchivedEventIDs); err != nil {
 		return err
 	}

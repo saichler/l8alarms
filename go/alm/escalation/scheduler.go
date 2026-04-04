@@ -2,10 +2,10 @@ package escalation
 
 import (
 	"fmt"
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/alm/escalationpolicies"
 	"github.com/saichler/l8alarms/go/alm/notification"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	l8events "github.com/saichler/l8events/go/types/l8events"
 	"github.com/saichler/l8notify/go/template"
 	l8notify "github.com/saichler/l8notify/go/types/l8notify"
@@ -45,17 +45,18 @@ func (s *Scheduler) Schedule(alarm *alm.Alarm, vnic ifs.IVNic) {
 		return
 	}
 
-	policies, err := common.GetEntities[alm.EscalationPolicy](
+	policiesRaw, err := common.GetEntitiesByQuery(
 		escalationpolicies.ServiceName, escalationpolicies.ServiceArea,
 		fmt.Sprintf("select * from EscalationPolicy where Status=%d",
 			alm.AlmPolicyStatus_ALM_POLICY_STATUS_ACTIVE),
 		vnic,
 	)
-	if err != nil || len(policies) == 0 {
+	if err != nil || len(policiesRaw) == 0 {
 		return
 	}
 
-	for _, policy := range policies {
+	for _, raw := range policiesRaw {
+		policy := raw.(*alm.EscalationPolicy)
 		if !matchesEscalationPolicy(alarm, policy) {
 			continue
 		}

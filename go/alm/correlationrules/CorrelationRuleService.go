@@ -1,8 +1,8 @@
 package correlationrules
 
 import (
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -12,11 +12,10 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService[alm.CorrelationRule, alm.CorrelationRuleList](common.ServiceConfig{
+	common.ActivateService(common.ServiceConfig{
 		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "RuleId", Callback: newCorrelationRuleServiceCallback(),
-		Transactional: true,
-	}, creds, dbname, vnic)
+		PrimaryKey: "RuleId", Callback: newCorrelationRuleServiceCallback(vnic),
+	}, &alm.CorrelationRule{}, &alm.CorrelationRuleList{}, creds, dbname, vnic)
 }
 
 func CorrelationRules(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
@@ -24,5 +23,9 @@ func CorrelationRules(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
 }
 
 func CorrelationRule(id string, vnic ifs.IVNic) (*alm.CorrelationRule, error) {
-	return common.GetEntity(ServiceName, ServiceArea, &alm.CorrelationRule{RuleId: id}, vnic)
+	result, err := common.GetEntity(ServiceName, ServiceArea, &alm.CorrelationRule{RuleId: id}, vnic)
+	if err != nil || result == nil {
+		return nil, err
+	}
+	return result.(*alm.CorrelationRule), nil
 }

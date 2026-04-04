@@ -1,8 +1,8 @@
 package archivedalarms
 
 import (
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -12,11 +12,10 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService[alm.ArchivedAlarm, alm.ArchivedAlarmList](common.ServiceConfig{
+	common.ActivateService(common.ServiceConfig{
 		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "AlarmId", Callback: newArchivedAlarmServiceCallback(),
-		Transactional: true,
-	}, creds, dbname, vnic)
+		PrimaryKey: "AlarmId", Callback: newArchivedAlarmServiceCallback(vnic),
+	}, &alm.ArchivedAlarm{}, &alm.ArchivedAlarmList{}, creds, dbname, vnic)
 }
 
 func ArchivedAlarms(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
@@ -24,5 +23,9 @@ func ArchivedAlarms(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
 }
 
 func GetArchivedAlarm(id string, vnic ifs.IVNic) (*alm.ArchivedAlarm, error) {
-	return common.GetEntity(ServiceName, ServiceArea, &alm.ArchivedAlarm{AlarmId: id}, vnic)
+	result, err := common.GetEntity(ServiceName, ServiceArea, &alm.ArchivedAlarm{AlarmId: id}, vnic)
+	if err != nil || result == nil {
+		return nil, err
+	}
+	return result.(*alm.ArchivedAlarm), nil
 }

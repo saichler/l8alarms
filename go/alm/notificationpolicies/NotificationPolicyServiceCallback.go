@@ -1,16 +1,15 @@
 package notificationpolicies
 
 import (
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
-func newNotificationPolicyServiceCallback() ifs.IServiceCallback {
-	return common.NewValidation[alm.NotificationPolicy]("NotificationPolicy",
-		func(e *alm.NotificationPolicy) { common.GenerateID(&e.PolicyId) }).
-		Require(func(e *alm.NotificationPolicy) string { return e.PolicyId }, "PolicyId").
-		Require(func(e *alm.NotificationPolicy) string { return e.Name }, "Name").
-		Enum(func(e *alm.NotificationPolicy) int32 { return int32(e.Status) }, alm.AlmPolicyStatus_name, "Status").
+func newNotificationPolicyServiceCallback(vnic ifs.IVNic) ifs.IServiceCallback {
+	return common.NewValidation(&alm.NotificationPolicy{}, vnic).
+		Require(func(e interface{}) string { return e.(*alm.NotificationPolicy).PolicyId }, "PolicyId").
+		Require(func(e interface{}) string { return e.(*alm.NotificationPolicy).Name }, "Name").
+		Enum(func(e interface{}) int32 { return int32(e.(*alm.NotificationPolicy).Status) }, alm.AlmPolicyStatus_name, "Status").
 		Build()
 }

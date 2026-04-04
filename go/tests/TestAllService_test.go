@@ -2,11 +2,13 @@ package tests
 
 import (
 	"crypto/tls"
+	"database/sql"
 	"fmt"
 	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/alm/services"
 	"github.com/saichler/l8alarms/go/tests/mocks"
 	"github.com/saichler/l8types/go/ifs"
+	_ "github.com/lib/pq"
 	"net/http"
 	"testing"
 	"time"
@@ -18,6 +20,22 @@ func TestMain(m *testing.M) {
 	tear()
 }
 
+func openDBConnection(dbname, user, pass, port string) *sql.DB {
+	if port == "" {
+		port = "5432"
+	}
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		"127.0.0.1", port, user, pass, dbname)
+	db, err := sql.Open("postgres", psqlInfo)
+	if err != nil {
+		panic(err)
+	}
+	if err = db.Ping(); err != nil {
+		panic(fmt.Errorf("failed to connect to database: %w", err))
+	}
+	return db
+}
+
 func dropAllTables(t *testing.T, vnic ifs.IVNic) {
 	creds := common.DB_CREDS
 	dbname := common.DB_NAME
@@ -25,7 +43,7 @@ func dropAllTables(t *testing.T, vnic ifs.IVNic) {
 	if err != nil {
 		t.Fatalf("Failed to get credentials: %v", err)
 	}
-	db := common.OpenDBConnection(dbname, user, pass, port)
+	db := openDBConnection(dbname, user, pass, port)
 	_, err = db.Exec("DROP SCHEMA public CASCADE")
 	if err != nil {
 		t.Fatalf("Failed to drop schema: %v", err)

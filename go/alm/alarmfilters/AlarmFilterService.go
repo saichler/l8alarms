@@ -1,8 +1,8 @@
 package alarmfilters
 
 import (
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -12,11 +12,10 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService[alm.AlarmFilter, alm.AlarmFilterList](common.ServiceConfig{
+	common.ActivateService(common.ServiceConfig{
 		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "FilterId", Callback: newAlarmFilterServiceCallback(),
-		Transactional: true,
-	}, creds, dbname, vnic)
+		PrimaryKey: "FilterId", Callback: newAlarmFilterServiceCallback(vnic),
+	}, &alm.AlarmFilter{}, &alm.AlarmFilterList{}, creds, dbname, vnic)
 }
 
 func AlarmFilters(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
@@ -24,5 +23,9 @@ func AlarmFilters(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
 }
 
 func GetAlarmFilter(id string, vnic ifs.IVNic) (*alm.AlarmFilter, error) {
-	return common.GetEntity(ServiceName, ServiceArea, &alm.AlarmFilter{FilterId: id}, vnic)
+	result, err := common.GetEntity(ServiceName, ServiceArea, &alm.AlarmFilter{FilterId: id}, vnic)
+	if err != nil || result == nil {
+		return nil, err
+	}
+	return result.(*alm.AlarmFilter), nil
 }

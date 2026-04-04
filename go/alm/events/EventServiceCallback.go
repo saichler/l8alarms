@@ -2,8 +2,8 @@ package events
 
 import (
 	"errors"
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -14,13 +14,12 @@ func rejectPut(_ *alm.Event, action ifs.Action, _ ifs.IVNic) error {
 	return nil
 }
 
-func newEventServiceCallback() ifs.IServiceCallback {
-	return common.NewValidation[alm.Event]("Event",
-		func(e *alm.Event) { common.GenerateID(&e.EventId) }).
+func newEventServiceCallback(vnic ifs.IVNic) ifs.IServiceCallback {
+	return common.NewValidation(&alm.Event{}, vnic).
 		BeforeAction(rejectPut).
-		Require(func(e *alm.Event) string { return e.EventId }, "EventId").
-		Enum(func(e *alm.Event) int32 { return int32(e.EventType) }, alm.AlmEventType_name, "EventType").
-		Require(func(e *alm.Event) string { return e.NodeId }, "NodeId").
-		Require(func(e *alm.Event) string { return e.Message }, "Message").
+		Require(func(e interface{}) string { return e.(*alm.Event).EventId }, "EventId").
+		Enum(func(e interface{}) int32 { return int32(e.(*alm.Event).EventType) }, alm.AlmEventType_name, "EventType").
+		Require(func(e interface{}) string { return e.(*alm.Event).NodeId }, "NodeId").
+		Require(func(e interface{}) string { return e.(*alm.Event).Message }, "Message").
 		Build()
 }

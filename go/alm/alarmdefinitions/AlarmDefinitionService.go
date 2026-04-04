@@ -1,8 +1,8 @@
 package alarmdefinitions
 
 import (
-	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
+	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -12,11 +12,10 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService[alm.AlarmDefinition, alm.AlarmDefinitionList](common.ServiceConfig{
+	common.ActivateService(common.ServiceConfig{
 		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "DefinitionId", Callback: newAlarmDefinitionServiceCallback(),
-		Transactional: true,
-	}, creds, dbname, vnic)
+		PrimaryKey: "DefinitionId", Callback: newAlarmDefinitionServiceCallback(vnic),
+	}, &alm.AlarmDefinition{}, &alm.AlarmDefinitionList{}, creds, dbname, vnic)
 }
 
 func AlarmDefinitions(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
@@ -24,5 +23,9 @@ func AlarmDefinitions(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
 }
 
 func AlarmDefinition(id string, vnic ifs.IVNic) (*alm.AlarmDefinition, error) {
-	return common.GetEntity(ServiceName, ServiceArea, &alm.AlarmDefinition{DefinitionId: id}, vnic)
+	result, err := common.GetEntity(ServiceName, ServiceArea, &alm.AlarmDefinition{DefinitionId: id}, vnic)
+	if err != nil || result == nil {
+		return nil, err
+	}
+	return result.(*alm.AlarmDefinition), nil
 }

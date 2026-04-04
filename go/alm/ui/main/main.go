@@ -5,6 +5,7 @@ import (
 	"github.com/saichler/l8alarms/go/alm/ui"
 	"github.com/saichler/l8bus/go/overlay/health"
 	"github.com/saichler/l8bus/go/overlay/vnic"
+	l8common "github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
 	"github.com/saichler/l8utils/go/utils/ipsegment"
 	"github.com/saichler/l8web/go/web/server"
@@ -27,7 +28,7 @@ func startWebServer(port int, cert string) {
 		panic(err)
 	}
 
-	resources := common.CreateResources("web")
+	resources := l8common.CreateResources("web", "/data/logs/alm", uint32(common.ALM_VNET))
 	ui.RegisterAlmTypes(resources)
 
 	nic := vnic.NewVirtualNetworkInterface(resources, nil)
