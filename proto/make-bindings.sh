@@ -5,9 +5,9 @@ set -e
 # Download / copy proto dependencies
 wget -q https://raw.githubusercontent.com/saichler/l8types/refs/heads/main/proto/api.proto
 
-# Copy l8events and l8notify protos from sibling projects (not yet published to GitHub)
+# Copy l8events and l8notify protos from l8types (moved from separate l8events project)
 PROJ_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-cp "$PROJ_ROOT/l8events/proto/l8events.proto" .
+cp "$PROJ_ROOT/l8types/proto/l8events.proto" .
 cp "$PROJ_ROOT/l8notify/proto/l8notify.proto" .
 
 # Generate bindings for all alarms proto files
@@ -26,5 +26,5 @@ rm -rf *.rs
 # Fix relative import paths in generated Go files
 cd ../go
 find . -name "*.go" -type f -exec sed -i 's|"./types/l8api"|"github.com/saichler/l8types/go/types/l8api"|g' {} +
-find . -name "*.go" -type f -exec sed -i 's|"./types/l8events"|"github.com/saichler/l8events/go/types/l8events"|g' {} +
+find . -name "*.go" -type f -exec sed -i 's|"./types/l8events"|"github.com/saichler/l8types/go/types/l8events"|g' {} +
 find . -name "*.go" -type f -exec sed -i 's|"./types/l8notify"|"github.com/saichler/l8notify/go/types/l8notify"|g' {} +

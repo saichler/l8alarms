@@ -5,7 +5,7 @@ import (
 	"github.com/saichler/l8alarms/go/alm/alarms"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"github.com/saichler/l8common/go/common"
-	l8events "github.com/saichler/l8events/go/types/l8events"
+	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8topology/go/types/l8topo"
 	"github.com/saichler/l8types/go/ifs"

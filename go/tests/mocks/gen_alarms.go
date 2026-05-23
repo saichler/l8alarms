@@ -4,7 +4,7 @@ package mocks
 
 import (
 	"fmt"
-	l8events "github.com/saichler/l8events/go/types/l8events"
+	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"math/rand"
 )

@@ -2,9 +2,9 @@ package alarms
 
 import (
 	"fmt"
+	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
-	"github.com/saichler/l8events/go/state"
-	l8events "github.com/saichler/l8events/go/types/l8events"
+	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -33,7 +33,7 @@ func validateStateTransition(incoming *alm.Alarm, action ifs.Action, vnic ifs.IV
 		return nil
 	}
 
-	if !state.ValidTransition(existing.State, incoming.State) {
+	if !common.ValidTransition(existing.State, incoming.State) {
 		return fmt.Errorf("invalid state transition from %s to %s",
 			existing.State.String(), incoming.State.String())
 	}

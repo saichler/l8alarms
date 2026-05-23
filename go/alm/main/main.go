@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	resources := l8common.CreateResources("alm-"+os.Getenv("HOSTNAME"), "/data/logs/alm", uint32(common.ALM_VNET))
+	resources := l8common.CreateResources("alm-"+os.Getenv("HOSTNAME"), false)
 	ui.RegisterAlmTypes(resources)
 
 	nic := vnic.NewVirtualNetworkInterface(resources, nil)

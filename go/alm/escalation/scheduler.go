@@ -6,7 +6,7 @@ import (
 	"github.com/saichler/l8alarms/go/alm/notification"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"github.com/saichler/l8common/go/common"
-	l8events "github.com/saichler/l8events/go/types/l8events"
+	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8notify/go/template"
 	l8notify "github.com/saichler/l8notify/go/types/l8notify"
 	"github.com/saichler/l8types/go/ifs"

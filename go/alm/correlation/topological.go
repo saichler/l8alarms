@@ -2,7 +2,7 @@ package correlation
 
 import (
 	"github.com/saichler/l8alarms/go/types/alm"
-	l8events "github.com/saichler/l8events/go/types/l8events"
+	l8events "github.com/saichler/l8types/go/types/l8events"
 )
 
 // TopologicalStrategy correlates alarms based on topology adjacency.

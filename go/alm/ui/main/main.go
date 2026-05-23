@@ -15,12 +15,11 @@ func main() {
 	startWebServer(2780, "/data/alm")
 }
 
-func startWebServer(port int, cert string) {
+func startWebServer(port int, _ string) {
 	serverConfig := &server.RestServerConfig{
 		Host:           ipsegment.MachineIP,
 		Port:           port,
 		Authentication: true,
-		CertName:       cert,
 		Prefix:         common.PREFIX,
 	}
 	svr, err := server.NewRestServer(serverConfig)
@@ -28,7 +27,7 @@ func startWebServer(port int, cert string) {
 		panic(err)
 	}
 
-	resources := l8common.CreateResources("web", "/data/logs/alm", uint32(common.ALM_VNET))
+	resources := l8common.CreateResources("web", false)
 	ui.RegisterAlmTypes(resources)
 
 	nic := vnic.NewVirtualNetworkInterface(resources, nil)

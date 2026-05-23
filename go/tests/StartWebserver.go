@@ -17,7 +17,6 @@ func startWebServer(port int, nic ifs.IVNic, servicesNic ...ifs.IVNic) ifs.IWebS
 		Port:           port,
 		Authentication: true,
 		Prefix:         common.PREFIX,
-		CertName:       "/data/l8alarms",
 	}
 	svr, err := server.NewRestServer(serverConfig)
 	if err != nil {
