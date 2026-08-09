@@ -10,7 +10,6 @@ import (
 	"github.com/saichler/l8alarms/go/alm/enrichment"
 	"github.com/saichler/l8alarms/go/alm/escalationpolicies"
 	"github.com/saichler/l8alarms/go/alm/events"
-	"github.com/saichler/l8alarms/go/alm/maintenancewindows"
 	"github.com/saichler/l8alarms/go/alm/notificationpolicies"
 	"github.com/saichler/l8types/go/ifs"
 )
@@ -29,7 +28,6 @@ func ActivateAlmServices(creds, dbname string, vnic ifs.IVNic) {
 	escalationpolicies.Activate(creds, dbname, vnic)
 
 	// Operations
-	maintenancewindows.Activate(creds, dbname, vnic)
 	alarmfilters.Activate(creds, dbname, vnic)
 
 	// Archive

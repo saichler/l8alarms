@@ -6,10 +6,9 @@ import (
 	"github.com/saichler/l8alarms/go/alm/notification"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"github.com/saichler/l8common/go/common"
-	l8events "github.com/saichler/l8types/go/types/l8events"
-	"github.com/saichler/l8notify/go/template"
-	l8notify "github.com/saichler/l8notify/go/types/l8notify"
 	"github.com/saichler/l8types/go/ifs"
+	l8events "github.com/saichler/l8types/go/types/l8events"
+	l8notify "github.com/saichler/l8types/go/types/l8notify"
 	"sort"
 	"sync"
 	"time"
@@ -137,7 +136,8 @@ func (s *Scheduler) startEscalation(alarm *alm.Alarm, policy *alm.EscalationPoli
 func (s *Scheduler) fireStep(alarm *alm.Alarm, policy *alm.EscalationPolicy, steps []*l8notify.EscalationStep, stepIdx int, vnic ifs.IVNic) {
 	step := steps[stepIdx]
 
-	// Render message using l8notify template engine
+	// Render the escalation message locally, then dispatch through the
+	// Notify service.
 	vars := map[string]string{
 		"alarm.id":       alarm.AlarmId,
 		"alarm.name":     alarm.Name,
@@ -148,12 +148,17 @@ func (s *Scheduler) fireStep(alarm *alm.Alarm, policy *alm.EscalationPolicy, ste
 		"step.order":     fmt.Sprintf("%d", step.StepOrder),
 		"step.delay":     fmt.Sprintf("%d", step.DelayMinutes),
 	}
-	msg := template.RenderWithDefault(step.MessageTemplate, vars,
+	msg := notification.RenderTemplate(step.MessageTemplate, vars,
 		fmt.Sprintf("[ESCALATION] Alarm %s (%s) on %s - unacknowledged for %d minutes",
 			alarm.AlarmId, alarm.Name, alarm.NodeName, step.DelayMinutes))
+	subject := fmt.Sprintf("[ESCALATION step %d] %s", step.StepOrder, alarm.Name)
+	attrs := map[string]string{
+		"alarmId": alarm.AlarmId, "policyId": policy.PolicyId,
+		"step": fmt.Sprintf("%d", step.StepOrder),
+	}
 
 	// Send notification for this escalation step
-	if err := notification.Send(step.Channel, step.Endpoint, msg); err != nil {
+	if err := notification.Send(vnic, step.Channel, step.Endpoint, subject, msg, attrs); err != nil {
 		fmt.Printf("[escalation] step %d failed for alarm %s: %v\n",
 			step.StepOrder, alarm.AlarmId, err)
 	}

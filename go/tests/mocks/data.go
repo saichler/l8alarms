@@ -133,12 +133,6 @@ var escPolicyNames = []string{
 	"Critical Escalation Path", "Major Alarm Escalation",
 }
 
-// Maintenance window names
-var maintWindowNames = []string{
-	"Weekly Network Maintenance", "Monthly Patch Window",
-	"DC-East UPS Maintenance", "Firewall Rule Update",
-}
-
 // Filter names
 var filterNames = []string{
 	"Critical Active Alarms", "All Active Alarms",

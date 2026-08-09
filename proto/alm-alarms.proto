@@ -14,7 +14,7 @@ message Alarm {
   string description = 4;
 
   // State and severity (from l8events)
-  l8events.AlarmState state = 5;
+  AlarmState state = 5;
   l8events.Severity severity = 6;
   l8events.Severity original_severity = 7;
 
@@ -52,11 +52,37 @@ message Alarm {
   map<string, string> attributes = 28;
 
   // Embedded children (from l8events)
-  repeated l8events.AlarmNote notes = 29;
-  repeated l8events.AlarmStateChange state_history = 30;
+  repeated AlarmNote notes = 29;
+  repeated AlarmStateChange state_history = 30;
 }
 
 message AlarmList {
   repeated Alarm list = 1;
   l8api.L8MetaData metadata = 2;
+}
+
+// A note/comment attached to an alarm.
+message AlarmNote {
+  string note_id = 1;
+  string author = 2;
+  string text = 3;
+  int64 created_at = 4;
+}
+
+// Generic alarm lifecycle states.
+enum AlarmState {
+  ALARM_STATE_UNSPECIFIED = 0;
+  ALARM_STATE_ACTIVE = 1;
+  ALARM_STATE_ACKNOWLEDGED = 2;
+  ALARM_STATE_CLEARED = 3;
+  ALARM_STATE_SUPPRESSED = 4;
+}
+
+// A state transition record for alarm audit trail.
+message AlarmStateChange {
+  AlarmState from_state = 1;
+  AlarmState to_state = 2;
+  string changed_by = 3;
+  string reason = 4;
+  int64 changed_at = 5;
 }

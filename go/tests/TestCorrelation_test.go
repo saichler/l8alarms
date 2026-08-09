@@ -11,7 +11,6 @@ import (
 
 func testCorrelation(t *testing.T, client *mocks.Client) {
 	testPatternCorrelation(t, client)
-	testMaintenanceWindowSuppression(t, client)
 	testNoCorrelationWhenAlreadyCleared(t, client)
 }
 
@@ -125,61 +124,6 @@ func testPatternCorrelation(t *testing.T, client *mocks.Client) {
 	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", symptomId))
 	client.Delete("/alm/10/Alarm", delQ)
 	delQ = mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", rootId))
-	client.Delete("/alm/10/Alarm", delQ)
-}
-
-// testMaintenanceWindowSuppression verifies that alarms on nodes within
-// an active maintenance window get suppressed automatically.
-// Mock data creates an ACTIVE window (case 2) with Locations: ["DC-East"]
-// and SuppressAlarms: true.
-func testMaintenanceWindowSuppression(t *testing.T, client *mocks.Client) {
-	alarmId := ifs.NewUuid()
-	alarm := map[string]interface{}{
-		"alarm_id":      alarmId,
-		"definition_id": testStore.DefinitionIDs[0],
-		"node_id":       "node-maint-test-01",
-		"name":          "testMaintenanceAlarm",
-		"location":      "DC-East", // Matches the active maintenance window scope
-		"state":         1,         // ACTIVE
-		"severity":      2,         // WARNING
-	}
-	_, err := client.Post("/alm/10/Alarm", alarm)
-	if err != nil {
-		t.Fatalf("POST alarm in maintenance window failed: %v", err)
-	}
-
-	time.Sleep(1 * time.Second)
-
-	// GET the alarm and verify it was suppressed by the maintenance window
-	q := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarmId))
-	getResp, err := client.Get("/alm/10/Alarm", q)
-	if err != nil {
-		t.Fatalf("GET maintenance alarm failed: %v", err)
-	}
-
-	result, err := extractFirstFromList(getResp)
-	if err != nil {
-		t.Fatalf("Failed to parse maintenance alarm response: %v", err)
-	}
-
-	// State should be SUPPRESSED (value 4)
-	state, _ := result["state"].(float64)
-	if int(state) != 4 {
-		t.Fatalf("Expected alarm state=4 (SUPPRESSED), got=%v", state)
-	}
-
-	isSuppressed, _ := result["isSuppressed"].(bool)
-	if !isSuppressed {
-		t.Fatal("Expected alarm isSuppressed=true")
-	}
-
-	suppressedBy, _ := result["suppressedBy"].(string)
-	if suppressedBy == "" {
-		t.Fatal("Expected alarm suppressedBy to be set (maintenance:windowId)")
-	}
-
-	// Cleanup
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarmId))
 	client.Delete("/alm/10/Alarm", delQ)
 }
 

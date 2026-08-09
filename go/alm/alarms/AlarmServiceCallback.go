@@ -16,7 +16,6 @@ func newAlarmServiceCallback(vnic ifs.IVNic) ifs.IServiceCallback {
 		Enum(func(e interface{}) int32 { return int32(e.(*alm.Alarm).Severity) }, l8events.Severity_name, "Severity").
 		BeforeAction(protectSystemFields).
 		BeforeAction(validateStateTransition).
-		BeforeAction(checkMaintenanceWindow).
 		After(runCorrelation).
 		After(runNotification).
 		After(runEscalation).

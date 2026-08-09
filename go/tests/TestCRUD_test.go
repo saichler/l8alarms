@@ -16,7 +16,6 @@ func testCRUD(t *testing.T, client *mocks.Client) {
 	testCRUDCorrelationRule(t, client)
 	testCRUDNotificationPolicy(t, client)
 	testCRUDEscalationPolicy(t, client)
-	testCRUDMaintenanceWindow(t, client)
 	testCRUDAlarmFilter(t, client)
 	testCRUDArchivedAlarm(t, client)
 	testCRUDArchivedEvent(t, client)
@@ -230,42 +229,6 @@ func testCRUDEscalationPolicy(t *testing.T, client *mocks.Client) {
 	}
 }
 
-func testCRUDMaintenanceWindow(t *testing.T, client *mocks.Client) {
-	windowId := ifs.NewUuid()
-	now := time.Now().Unix()
-	window := map[string]interface{}{
-		"window_id":  windowId,
-		"name":       "CRUD Test Maintenance Window",
-		"status":     2,
-		"start_time": now,
-		"end_time":   now + 3600,
-	}
-	_, err := client.Post("/alm/10/MaintWin", window)
-	if err != nil {
-		t.Fatalf("POST MaintenanceWindow failed: %v", err)
-	}
-
-	q := mocks.L8QueryText(fmt.Sprintf("select * from MaintenanceWindow where WindowId=%s", windowId))
-	getResp, err := client.Get("/alm/10/MaintWin", q)
-	if err != nil {
-		t.Fatalf("GET MaintenanceWindow failed: %v", err)
-	}
-	if !strings.Contains(getResp, "CRUD Test Maintenance Window") {
-		t.Fatalf("GET MaintenanceWindow did not return expected name, got: %s", getResp)
-	}
-
-	window["name"] = "Updated CRUD Test Maintenance Window"
-	_, err = client.Put("/alm/10/MaintWin", window)
-	if err != nil {
-		t.Fatalf("PUT MaintenanceWindow failed: %v", err)
-	}
-
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from MaintenanceWindow where WindowId=%s", windowId))
-	_, err = client.Delete("/alm/10/MaintWin", delQ)
-	if err != nil {
-		t.Fatalf("DELETE MaintenanceWindow failed: %v", err)
-	}
-}
 
 func testCRUDAlarmFilter(t *testing.T, client *mocks.Client) {
 	filterId := ifs.NewUuid()

@@ -5,22 +5,19 @@ import (
 	"github.com/saichler/l8alarms/go/alm/notificationpolicies"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"github.com/saichler/l8common/go/common"
-	"github.com/saichler/l8notify/go/channel"
-	"github.com/saichler/l8notify/go/template"
-	"github.com/saichler/l8notify/go/throttle"
 	"github.com/saichler/l8types/go/ifs"
 )
 
-// Engine evaluates notification policies and dispatches notifications.
-// Uses l8notify for throttling, template rendering, and channel dispatch.
+// Engine evaluates notification policies and dispatches notifications
+// through the Notify service (vnic.Resources().Notify()).
 type Engine struct {
-	throttler *throttle.Throttler
+	throttler *throttler
 }
 
 // NewEngine creates a new notification engine.
 func NewEngine() *Engine {
 	return &Engine{
-		throttler: throttle.New(),
+		throttler: newThrottler(),
 	}
 }
 
@@ -49,11 +46,11 @@ func (e *Engine) Notify(alarm *alm.Alarm, action ifs.Action, suppressNotificatio
 		}
 		key := alarm.AlarmId + ":" + policy.PolicyId
 		groupKey := policy.PolicyId
-		if e.throttler.IsThrottled(key, groupKey, policy.CooldownSeconds, policy.MaxNotificationsPerHour) {
+		if e.throttler.isThrottled(key, groupKey, policy.CooldownSeconds, policy.MaxNotificationsPerHour) {
 			continue
 		}
-		e.throttler.Record(key, groupKey)
-		dispatch(alarm, policy)
+		e.throttler.record(key, groupKey)
+		dispatch(alarm, policy, vnic)
 	}
 }
 
@@ -96,15 +93,18 @@ func matchesPolicy(alarm *alm.Alarm, policy *alm.NotificationPolicy, isStateChan
 	return true
 }
 
-// dispatch sends notifications to all targets of a policy using l8notify.
-func dispatch(alarm *alm.Alarm, policy *alm.NotificationPolicy) {
+// dispatch sends notifications to all targets of a policy through the
+// Notify service.
+func dispatch(alarm *alm.Alarm, policy *alm.NotificationPolicy, vnic ifs.IVNic) {
 	vars := alarmTemplateVars(alarm)
+	subject := fmt.Sprintf("[%s] %s", alarm.Severity.String(), alarm.Name)
+	attrs := map[string]string{"alarmId": alarm.AlarmId, "policyId": policy.PolicyId}
 	for _, target := range policy.Targets {
-		msg := template.RenderWithDefault(target.Template, vars,
+		msg := RenderTemplate(target.Template, vars,
 			fmt.Sprintf("Alarm %s: %s on %s (severity: %s, state: %s)",
 				alarm.AlarmId, alarm.Name, alarm.NodeName,
 				alarm.Severity.String(), alarm.State.String()))
-		result := channel.Dispatch(target, msg, nil, nil)
+		result := vnic.Resources().Notify().Send(target.Channel, target.Endpoint, subject, msg, attrs)
 		if result != nil && result.ErrorMessage != "" {
 			fmt.Printf("[notification] failed to send %s to %s: %s\n",
 				target.Channel.String(), target.Endpoint, result.ErrorMessage)

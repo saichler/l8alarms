@@ -4,14 +4,28 @@ set -e
 
 # Download / copy proto dependencies
 wget -q https://raw.githubusercontent.com/saichler/l8types/refs/heads/main/proto/api.proto
+wget -q https://raw.githubusercontent.com/saichler/l8types/refs/heads/main/proto/l8events.proto
+wget -q https://raw.githubusercontent.com/saichler/l8types/refs/heads/main/proto/l8notify.proto
 
-# Copy l8events and l8notify protos from l8types (moved from separate l8events project)
-PROJ_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-cp "$PROJ_ROOT/l8types/proto/l8events.proto" .
-cp "$PROJ_ROOT/l8notify/proto/l8notify.proto" .
+PROTOS=(
+    alm-common.proto
+    alm-definitions.proto
+    alm-alarms.proto
+    alm-events.proto
+    alm-correlation.proto
+    alm-policies.proto
+    alm-filters.proto
+    alm-archive.proto
+)
 
-# Generate bindings for all alarms proto files
-docker run --user "$(id -u):$(id -g)" -e PROTO="alm-common.proto alm-definitions.proto alm-alarms.proto alm-events.proto alm-correlation.proto alm-policies.proto alm-maintenance.proto alm-filters.proto alm-archive.proto" --mount type=bind,source="$PWD",target=/home/proto/ -i saichler/protoc:latest
+# Use the protoc image to run protoc.sh and generate Go + Rust bindings.
+for p in "${PROTOS[@]}"; do
+    docker run --user "$(id -u):$(id -g)" -e PROTO="$p" --mount type=bind,source="$PWD",target=/home/proto/ -i saichler/protoc:latest
+done
+
+rm -rf api.proto
+rm -rf l8events.proto
+rm -rf l8notify.proto
 
 # Move generated bindings to the types directory and clean up
 rm -rf ../go/types
@@ -27,4 +41,4 @@ rm -rf *.rs
 cd ../go
 find . -name "*.go" -type f -exec sed -i 's|"./types/l8api"|"github.com/saichler/l8types/go/types/l8api"|g' {} +
 find . -name "*.go" -type f -exec sed -i 's|"./types/l8events"|"github.com/saichler/l8types/go/types/l8events"|g' {} +
-find . -name "*.go" -type f -exec sed -i 's|"./types/l8notify"|"github.com/saichler/l8notify/go/types/l8notify"|g' {} +
+find . -name "*.go" -type f -exec sed -i 's|"./types/l8notify"|"github.com/saichler/l8types/go/types/l8notify"|g' {} +

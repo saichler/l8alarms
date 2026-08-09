@@ -1,7 +1,6 @@
 package alarms
 
 import (
-	"github.com/saichler/l8alarms/go/alm/maintenancewindows"
 	"github.com/saichler/l8alarms/go/alm/notification"
 	"github.com/saichler/l8alarms/go/types/alm"
 	l8events "github.com/saichler/l8types/go/types/l8events"
@@ -22,13 +21,6 @@ func runNotification(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error 
 		return nil
 	}
 
-	// Check if notifications are suppressed by maintenance window
-	suppressNotif := false
-	result := maintenancewindows.Check(alarm, vnic)
-	if result.InWindow && result.SuppressNotifications {
-		suppressNotif = true
-	}
-
-	notifEngine.Notify(alarm, action, suppressNotif, vnic)
+	notifEngine.Notify(alarm, action, false, vnic)
 	return nil
 }

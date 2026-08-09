@@ -75,15 +75,6 @@ func runPhase2(client *Client, store *MockDataStore) error {
 		return err
 	}
 
-	// Maintenance Windows
-	windows := generateMaintenanceWindows()
-	if err := runOp(client, "Maintenance Windows", almArea+"MaintWin",
-		&alm.MaintenanceWindowList{List: windows},
-		extractIDs(windows, func(e interface{}) string { return e.(*alm.MaintenanceWindow).WindowId }),
-		&store.MaintWindowIDs); err != nil {
-		return err
-	}
-
 	return nil
 }
 

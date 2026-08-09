@@ -15,7 +15,6 @@ func testValidation(t *testing.T, client *mocks.Client) {
 	testValidationCorrelationRule(t, client)
 	testValidationNotificationPolicy(t, client)
 	testValidationEscalationPolicy(t, client)
-	testValidationMaintenanceWindow(t, client)
 	testValidationAlarmFilter(t, client)
 	testValidationAutoID(t, client)
 	testValidationEventImmutability(t, client)
@@ -126,43 +125,6 @@ func testValidationEscalationPolicy(t *testing.T, client *mocks.Client) {
 	}
 }
 
-func testValidationMaintenanceWindow(t *testing.T, client *mocks.Client) {
-	// Missing name — should fail
-	winNoName := map[string]interface{}{
-		"status":     2,
-		"start_time": 1700000000,
-		"end_time":   1700086400,
-	}
-	_, err := client.Post("/alm/10/MaintWin", winNoName)
-	if err == nil {
-		t.Fatal("POST MaintenanceWindow without name should have failed")
-	}
-	if !strings.Contains(err.Error(), "Name is required") {
-		t.Fatalf("Expected 'Name is required' error, got: %v", err)
-	}
-
-	// Missing start_time — should fail
-	winNoStart := map[string]interface{}{
-		"name":     "Test Window",
-		"status":   2,
-		"end_time": 1700086400,
-	}
-	_, err = client.Post("/alm/10/MaintWin", winNoStart)
-	if err == nil {
-		t.Fatal("POST MaintenanceWindow without start_time should have failed")
-	}
-
-	// Missing end_time — should fail
-	winNoEnd := map[string]interface{}{
-		"name":       "Test Window",
-		"status":     2,
-		"start_time": 1700000000,
-	}
-	_, err = client.Post("/alm/10/MaintWin", winNoEnd)
-	if err == nil {
-		t.Fatal("POST MaintenanceWindow without end_time should have failed")
-	}
-}
 
 func testValidationAlarmFilter(t *testing.T, client *mocks.Client) {
 	// Missing name — should fail

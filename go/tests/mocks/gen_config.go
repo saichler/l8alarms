@@ -1,12 +1,11 @@
 package mocks
 
-// Generates: CorrelationRule, NotificationPolicy, EscalationPolicy, MaintenanceWindow
+// Generates: CorrelationRule, NotificationPolicy, EscalationPolicy
 
 import (
-	"fmt"
 	"github.com/saichler/l8alarms/go/types/alm"
 	l8events "github.com/saichler/l8types/go/types/l8events"
-	l8notify "github.com/saichler/l8notify/go/types/l8notify"
+	l8notify "github.com/saichler/l8types/go/types/l8notify"
 	"math/rand"
 )
 
@@ -156,60 +155,6 @@ func generateEscalationPolicies() []*alm.EscalationPolicy {
 		}
 
 		result[i] = policy
-	}
-	return result
-}
-
-func generateMaintenanceWindows() []*alm.MaintenanceWindow {
-	count := len(maintWindowNames)
-	result := make([]*alm.MaintenanceWindow, count)
-
-	for i := 0; i < count; i++ {
-		w := &alm.MaintenanceWindow{
-			WindowId:    genID("mwin", i),
-			Name:        maintWindowNames[i],
-			Description: fmt.Sprintf("Scheduled: %s", maintWindowNames[i]),
-			CreatedBy:   "admin",
-			CreatedAt:   randomPastDate(3, 15),
-			UpdatedAt:   nowUnix(),
-		}
-
-		switch i {
-		case 0: // Weekly network maintenance - scheduled
-			w.Status = l8events.MaintenanceStatus_MAINTENANCE_STATUS_SCHEDULED
-			w.StartTime = randomFutureDate(0, 7)
-			w.EndTime = w.StartTime + 14400
-			w.Recurrence = l8events.RecurrenceType_RECURRENCE_TYPE_WEEKLY
-			w.RecurrenceInterval = 1
-			w.SuppressAlarms = false
-			w.SuppressNotifications = true
-		case 1: // Monthly patch - scheduled
-			w.Status = l8events.MaintenanceStatus_MAINTENANCE_STATUS_SCHEDULED
-			w.StartTime = randomFutureDate(1, 15)
-			w.EndTime = w.StartTime + 28800
-			w.Recurrence = l8events.RecurrenceType_RECURRENCE_TYPE_MONTHLY
-			w.RecurrenceInterval = 1
-			w.SuppressAlarms = true
-			w.SuppressNotifications = true
-			w.NodeTypes = []string{"SERVER"}
-		case 2: // DC-East UPS - active
-			w.Status = l8events.MaintenanceStatus_MAINTENANCE_STATUS_ACTIVE
-			w.StartTime = nowUnix() - 3600
-			w.EndTime = nowUnix() + 7200
-			w.Recurrence = l8events.RecurrenceType_RECURRENCE_TYPE_NONE
-			w.SuppressAlarms = true
-			w.SuppressNotifications = true
-			w.Locations = []string{"DC-East"}
-		case 3: // Firewall rule update - completed
-			w.Status = l8events.MaintenanceStatus_MAINTENANCE_STATUS_COMPLETED
-			w.StartTime = randomPastDate(0, 7)
-			w.EndTime = w.StartTime + 3600
-			w.Recurrence = l8events.RecurrenceType_RECURRENCE_TYPE_NONE
-			w.NodeIds = []string{"node-fw-01", "node-fw-02"}
-			w.SuppressNotifications = true
-		}
-
-		result[i] = w
 	}
 	return result
 }

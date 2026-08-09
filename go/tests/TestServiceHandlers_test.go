@@ -7,7 +7,6 @@ import (
 	"github.com/saichler/l8alarms/go/alm/correlationrules"
 	"github.com/saichler/l8alarms/go/alm/escalationpolicies"
 	"github.com/saichler/l8alarms/go/alm/events"
-	"github.com/saichler/l8alarms/go/alm/maintenancewindows"
 	"github.com/saichler/l8alarms/go/alm/notificationpolicies"
 	"github.com/saichler/l8types/go/ifs"
 	"testing"
@@ -33,9 +32,6 @@ func testServiceHandlers(t *testing.T, vnic ifs.IVNic) {
 	}
 	if h, ok := escalationpolicies.EscalationPolicies(vnic); !ok || h == nil {
 		log.Fail(t, "EscalationPolicy service handler not found")
-	}
-	if h, ok := maintenancewindows.MaintenanceWindows(vnic); !ok || h == nil {
-		log.Fail(t, "MaintenanceWindow service handler not found")
 	}
 	if h, ok := alarmfilters.AlarmFilters(vnic); !ok || h == nil {
 		log.Fail(t, "AlarmFilter service handler not found")

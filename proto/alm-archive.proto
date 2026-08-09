@@ -4,6 +4,7 @@ option go_package = "./types/alm";
 
 import "alm-common.proto";
 import "alm-events.proto";
+import "alm-alarms.proto";
 import "l8events.proto";
 import "api.proto";
 
@@ -15,7 +16,7 @@ message ArchivedAlarm {
   string description = 4;
 
   // State and severity (from l8events)
-  l8events.AlarmState state = 5;
+  alm.AlarmState state = 5;
   l8events.Severity severity = 6;
   l8events.Severity original_severity = 7;
 
@@ -53,8 +54,8 @@ message ArchivedAlarm {
   map<string, string> attributes = 28;
 
   // Embedded children (from l8events)
-  repeated l8events.AlarmNote notes = 29;
-  repeated l8events.AlarmStateChange state_history = 30;
+  repeated alm.AlarmNote notes = 29;
+  repeated alm.AlarmStateChange state_history = 30;
 
   // Archive metadata
   int64 archived_at = 31;

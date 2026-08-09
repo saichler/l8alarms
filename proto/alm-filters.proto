@@ -4,6 +4,7 @@ option go_package = "./types/alm";
 
 import "l8events.proto";
 import "api.proto";
+import "alm-alarms.proto";
 
 // AlarmFilter: Saved filter/view for alarm queries.
 message AlarmFilter {
@@ -16,7 +17,7 @@ message AlarmFilter {
 
   // Filter criteria
   repeated l8events.Severity severities = 7;
-  repeated l8events.AlarmState states = 8;
+  repeated alm.AlarmState states = 8;
   repeated string node_ids = 9;
   repeated string node_types = 10;
   repeated string locations = 11;

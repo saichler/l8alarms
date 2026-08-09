@@ -21,7 +21,6 @@ func RegisterAlmTypes(resources ifs.IResources) {
 	common.RegisterType(resources, &alm.EscalationPolicy{}, &alm.EscalationPolicyList{}, "PolicyId")
 
 	// Operations
-	common.RegisterType(resources, &alm.MaintenanceWindow{}, &alm.MaintenanceWindowList{}, "WindowId")
 	common.RegisterType(resources, &alm.AlarmFilter{}, &alm.AlarmFilterList{}, "FilterId")
 
 	// Archive

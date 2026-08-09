@@ -6,11 +6,10 @@ type MockDataStore struct {
 	DefinitionIDs []string // AlarmDefinition IDs
 
 	// Phase 2: Configuration
-	FilterIDs      []string // AlarmFilter IDs
-	CorrRuleIDs    []string // CorrelationRule IDs
-	NotifPolIDs    []string // NotificationPolicy IDs
-	EscPolicyIDs   []string // EscalationPolicy IDs
-	MaintWindowIDs []string // MaintenanceWindow IDs
+	FilterIDs    []string // AlarmFilter IDs
+	CorrRuleIDs  []string // CorrelationRule IDs
+	NotifPolIDs  []string // NotificationPolicy IDs
+	EscPolicyIDs []string // EscalationPolicy IDs
 
 	// Phase 3: Events
 	EventIDs []string // Event IDs
