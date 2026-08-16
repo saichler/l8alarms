@@ -12,13 +12,11 @@ import (
 func testCRUD(t *testing.T, client *mocks.Client) {
 	testCRUDAlarmDefinition(t, client)
 	testCRUDAlarm(t, client)
-	testCRUDEvent(t, client)
 	testCRUDCorrelationRule(t, client)
 	testCRUDNotificationPolicy(t, client)
 	testCRUDEscalationPolicy(t, client)
 	testCRUDAlarmFilter(t, client)
 	testCRUDArchivedAlarm(t, client)
-	testCRUDArchivedEvent(t, client)
 }
 
 func testCRUDAlarmDefinition(t *testing.T, client *mocks.Client) {
@@ -92,37 +90,6 @@ func testCRUDAlarm(t *testing.T, client *mocks.Client) {
 	_, err = client.Delete("/alm/10/Alarm", delQ)
 	if err != nil {
 		t.Fatalf("DELETE Alarm failed: %v", err)
-	}
-}
-
-func testCRUDEvent(t *testing.T, client *mocks.Client) {
-	eventId := ifs.NewUuid()
-	event := map[string]interface{}{
-		"event_id":   eventId,
-		"event_type": 1,
-		"node_id":    "test-node-001",
-		"message":    "CRUD Test Event",
-	}
-	_, err := client.Post("/alm/10/Event", event)
-	if err != nil {
-		t.Fatalf("POST Event failed: %v", err)
-	}
-
-	q := mocks.L8QueryText(fmt.Sprintf("select * from Event where EventId=%s", eventId))
-	getResp, err := client.Get("/alm/10/Event", q)
-	if err != nil {
-		t.Fatalf("GET Event failed: %v", err)
-	}
-	if !strings.Contains(getResp, "CRUD Test Event") {
-		t.Fatalf("GET Event did not return expected message, got: %s", getResp)
-	}
-
-	// Events are immutable — no PUT test (see testValidationEventImmutability)
-
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Event where EventId=%s", eventId))
-	_, err = client.Delete("/alm/10/Event", delQ)
-	if err != nil {
-		t.Fatalf("DELETE Event failed: %v", err)
 	}
 }
 
@@ -229,7 +196,6 @@ func testCRUDEscalationPolicy(t *testing.T, client *mocks.Client) {
 	}
 }
 
-
 func testCRUDAlarmFilter(t *testing.T, client *mocks.Client) {
 	filterId := ifs.NewUuid()
 	filter := map[string]interface{}{
@@ -304,47 +270,5 @@ func testCRUDArchivedAlarm(t *testing.T, client *mocks.Client) {
 	_, err = client.Delete("/alm/10/ArcAlarm", delQ)
 	if err != nil {
 		t.Fatalf("DELETE ArchivedAlarm failed: %v", err)
-	}
-}
-
-func testCRUDArchivedEvent(t *testing.T, client *mocks.Client) {
-	eventId := ifs.NewUuid()
-	now := time.Now().Unix()
-	arcEvent := map[string]interface{}{
-		"event_id":    eventId,
-		"event_type":  1,
-		"node_id":     "test-node-001",
-		"message":     "CRUD Test Archived Event",
-		"archived_at": now,
-		"archived_by": "test-user",
-	}
-	_, err := client.Post("/alm/10/ArcEvent", arcEvent)
-	if err != nil {
-		t.Fatalf("POST ArchivedEvent failed: %v", err)
-	}
-
-	q := mocks.L8QueryText(fmt.Sprintf("select * from ArchivedEvent where EventId=%s", eventId))
-	getResp, err := client.Get("/alm/10/ArcEvent", q)
-	if err != nil {
-		t.Fatalf("GET ArchivedEvent failed: %v", err)
-	}
-	if !strings.Contains(getResp, "CRUD Test Archived Event") {
-		t.Fatalf("GET ArchivedEvent did not return expected message, got: %s", getResp)
-	}
-
-	// PUT should be rejected — archived events are immutable
-	arcEvent["message"] = "Should Not Update"
-	_, err = client.Put("/alm/10/ArcEvent", arcEvent)
-	if err == nil {
-		t.Fatal("PUT ArchivedEvent should have been rejected (immutable)")
-	}
-	if !strings.Contains(err.Error(), "immutable") {
-		t.Fatalf("Expected immutability error, got: %v", err)
-	}
-
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from ArchivedEvent where EventId=%s", eventId))
-	_, err = client.Delete("/alm/10/ArcEvent", delQ)
-	if err != nil {
-		t.Fatalf("DELETE ArchivedEvent failed: %v", err)
 	}
 }

@@ -2,6 +2,7 @@ syntax = "proto3";
 package alm;
 option go_package = "./types/alm";
 
+import "alm-common.proto";
 import "l8events.proto";
 import "api.proto";
 
@@ -54,6 +55,9 @@ message Alarm {
   // Embedded children (from l8events)
   repeated AlarmNote notes = 29;
   repeated AlarmStateChange state_history = 30;
+
+  // Correlation/threshold provisional state — see AlmCorrelationThresholdState
+  AlmCorrelationThresholdState correlation_threshold_state = 31;
 }
 
 message AlarmList {

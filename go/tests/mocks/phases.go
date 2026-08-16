@@ -14,14 +14,11 @@ func RunAllPhases(client *Client, store *MockDataStore) {
 	runPhase("Phase 2: Configuration", func() error {
 		return runPhase2(client, store)
 	})
-	runPhase("Phase 3: Events", func() error {
+	runPhase("Phase 3: Alarms", func() error {
 		return runPhase3(client, store)
 	})
-	runPhase("Phase 4: Alarms", func() error {
+	runPhase("Phase 4: Archive", func() error {
 		return runPhase4(client, store)
-	})
-	runPhase("Phase 5: Archive", func() error {
-		return runPhase5(client, store)
 	})
 }
 
@@ -78,20 +75,8 @@ func runPhase2(client *Client, store *MockDataStore) error {
 	return nil
 }
 
-// Phase 3: Events (depends on DefinitionIDs)
+// Phase 3: Alarms (depends on DefinitionIDs, CorrRuleIDs)
 func runPhase3(client *Client, store *MockDataStore) error {
-	events := generateEvents(store)
-	if err := runOp(client, "Events", almArea+"Event",
-		&alm.EventList{List: events},
-		extractIDs(events, func(e interface{}) string { return e.(*alm.Event).EventId }),
-		&store.EventIDs); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Phase 4: Alarms (depends on DefinitionIDs, EventIDs, CorrRuleIDs)
-func runPhase4(client *Client, store *MockDataStore) error {
 	alarms := generateAlarms(store)
 	if err := runOp(client, "Alarms", almArea+"Alarm",
 		&alm.AlarmList{List: alarms},
@@ -102,21 +87,13 @@ func runPhase4(client *Client, store *MockDataStore) error {
 	return nil
 }
 
-// Phase 5: Archive (depends on AlarmIDs, EventIDs, DefinitionIDs)
-func runPhase5(client *Client, store *MockDataStore) error {
+// Phase 4: Archive (depends on AlarmIDs, DefinitionIDs)
+func runPhase4(client *Client, store *MockDataStore) error {
 	arcAlarms := generateArchivedAlarms(store)
 	if err := runOp(client, "Archived Alarms", almArea+"ArcAlarm",
 		&alm.ArchivedAlarmList{List: arcAlarms},
 		extractIDs(arcAlarms, func(e interface{}) string { return e.(*alm.ArchivedAlarm).AlarmId }),
 		&store.ArchivedAlarmIDs); err != nil {
-		return err
-	}
-
-	arcEvents := generateArchivedEvents(store)
-	if err := runOp(client, "Archived Events", almArea+"ArcEvent",
-		&alm.ArchivedEventList{List: arcEvents},
-		extractIDs(arcEvents, func(e interface{}) string { return e.(*alm.ArchivedEvent).EventId }),
-		&store.ArchivedEventIDs); err != nil {
 		return err
 	}
 

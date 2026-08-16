@@ -4,8 +4,8 @@ package mocks
 
 import (
 	"fmt"
-	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8alarms/go/types/alm"
+	l8events "github.com/saichler/l8types/go/types/l8events"
 	"math/rand"
 )
 
@@ -33,7 +33,6 @@ func generateAlarms(store *MockDataStore) []*alm.Alarm {
 			LastOccurrence:   lastOccurrence,
 			OccurrenceCount:  int32(rand.Intn(50) + 1),
 			DedupKey:         fmt.Sprintf("%s:%s", nodeIDs[nodeIdx], pickRef(store.DefinitionIDs, defIdx)),
-			EventId:          pickRef(store.EventIDs, i),
 			Attributes: map[string]string{
 				"nodeType": nodeTypes[nodeIdx],
 				"location": locations[nodeIdx],

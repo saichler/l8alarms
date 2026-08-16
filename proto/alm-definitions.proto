@@ -16,12 +16,13 @@ message AlarmDefinition {
 
   // Event matching criteria
   string event_pattern = 6;
-  AlmEventType event_type_filter = 7;
+  l8events.EventCategory event_category_filter = 7;
   string node_type_filter = 8;
 
   // Threshold-based alarm generation
   int32 threshold_count = 9;
   int32 threshold_window_seconds = 10;
+  int32 correlation_window_seconds = 22;
 
   // Auto-clear configuration
   bool auto_clear_enabled = 11;

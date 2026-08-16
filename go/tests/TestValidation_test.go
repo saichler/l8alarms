@@ -11,13 +11,11 @@ import (
 func testValidation(t *testing.T, client *mocks.Client) {
 	testValidationAlarmDefinition(t, client)
 	testValidationAlarm(t, client)
-	testValidationEvent(t, client)
 	testValidationCorrelationRule(t, client)
 	testValidationNotificationPolicy(t, client)
 	testValidationEscalationPolicy(t, client)
 	testValidationAlarmFilter(t, client)
 	testValidationAutoID(t, client)
-	testValidationEventImmutability(t, client)
 	testValidationAlarmFieldProtection(t, client)
 }
 
@@ -57,28 +55,6 @@ func testValidationAlarm(t *testing.T, client *mocks.Client) {
 	_, err = client.Post("/alm/10/Alarm", alarmNoNode)
 	if err == nil {
 		t.Fatal("POST Alarm without node_id should have failed")
-	}
-}
-
-func testValidationEvent(t *testing.T, client *mocks.Client) {
-	// Missing node_id — should fail
-	eventNoNode := map[string]interface{}{
-		"event_type": 1,
-		"message":    "Test",
-	}
-	_, err := client.Post("/alm/10/Event", eventNoNode)
-	if err == nil {
-		t.Fatal("POST Event without node_id should have failed")
-	}
-
-	// Missing message — should fail
-	eventNoMsg := map[string]interface{}{
-		"event_type": 1,
-		"node_id":    "test-node",
-	}
-	_, err = client.Post("/alm/10/Event", eventNoMsg)
-	if err == nil {
-		t.Fatal("POST Event without message should have failed")
 	}
 }
 
@@ -124,7 +100,6 @@ func testValidationEscalationPolicy(t *testing.T, client *mocks.Client) {
 		t.Fatalf("Expected 'Name is required' error, got: %v", err)
 	}
 }
-
 
 func testValidationAlarmFilter(t *testing.T, client *mocks.Client) {
 	// Missing name — should fail
@@ -174,35 +149,6 @@ func testValidationAutoID(t *testing.T, client *mocks.Client) {
 	if !strings.Contains(getResp, "Auto ID Test") {
 		t.Fatalf("Auto-ID alarm definition not found in GET response: %s", getResp)
 	}
-}
-
-func testValidationEventImmutability(t *testing.T, client *mocks.Client) {
-	// POST a valid event
-	eventId := ifs.NewUuid()
-	event := map[string]interface{}{
-		"event_id":   eventId,
-		"event_type": 1,
-		"node_id":    "test-node-001",
-		"message":    "Immutability Test Event",
-	}
-	_, err := client.Post("/alm/10/Event", event)
-	if err != nil {
-		t.Fatalf("POST Event for immutability test failed: %v", err)
-	}
-
-	// PUT should be rejected
-	event["message"] = "Should Not Update"
-	_, err = client.Put("/alm/10/Event", event)
-	if err == nil {
-		t.Fatal("PUT Event should have been rejected (events are immutable)")
-	}
-	if !strings.Contains(err.Error(), "immutable") {
-		t.Fatalf("Expected immutability error, got: %v", err)
-	}
-
-	// Cleanup
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Event where EventId=%s", eventId))
-	_, _ = client.Delete("/alm/10/Event", delQ)
 }
 
 func testValidationAlarmFieldProtection(t *testing.T, client *mocks.Client) {

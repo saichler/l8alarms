@@ -8,13 +8,12 @@ Reuses AlmAlarms renderers for severity/state display
 
     window.AlmArchive = window.AlmArchive || {};
 
-    // Archive entities reuse alarm/event renderers — no new enums needed
+    // Archive entities reuse alarm renderers — no new enums needed
     AlmArchive.enums = {};
 
     AlmArchive.render = {
         severity: AlmAlarms.render.severity,
-        state: AlmAlarms.render.state,
-        eventType: AlmAlarms.render.eventType
+        state: AlmAlarms.render.state
     };
 
 })();

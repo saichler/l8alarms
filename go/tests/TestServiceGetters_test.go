@@ -6,7 +6,6 @@ import (
 	"github.com/saichler/l8alarms/go/alm/alarms"
 	"github.com/saichler/l8alarms/go/alm/correlationrules"
 	"github.com/saichler/l8alarms/go/alm/escalationpolicies"
-	"github.com/saichler/l8alarms/go/alm/events"
 	"github.com/saichler/l8alarms/go/alm/notificationpolicies"
 	"github.com/saichler/l8types/go/ifs"
 	"testing"
@@ -20,9 +19,6 @@ func testServiceGetters(t *testing.T, vnic ifs.IVNic) {
 	}
 	if _, err := alarms.GetAlarm("test-id", vnic); err != nil {
 		log.Fail(t, "Alarm getter failed: ", err.Error())
-	}
-	if _, err := events.GetEvent("test-id", vnic); err != nil {
-		log.Fail(t, "Event getter failed: ", err.Error())
 	}
 	if _, err := correlationrules.CorrelationRule("test-id", vnic); err != nil {
 		log.Fail(t, "CorrelationRule getter failed: ", err.Error())

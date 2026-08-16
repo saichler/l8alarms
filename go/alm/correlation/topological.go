@@ -2,7 +2,6 @@ package correlation
 
 import (
 	"github.com/saichler/l8alarms/go/types/alm"
-	l8events "github.com/saichler/l8types/go/types/l8events"
 )
 
 // TopologicalStrategy correlates alarms based on topology adjacency.
@@ -68,7 +67,7 @@ func findAlarmOnNode(nodeId string, activeAlarms []*alm.Alarm) *alm.Alarm {
 		if a.NodeId != nodeId {
 			continue
 		}
-		if a.State == l8events.AlarmState_ALARM_STATE_CLEARED || a.State == l8events.AlarmState_ALARM_STATE_SUPPRESSED {
+		if a.State == alm.AlarmState_ALARM_STATE_CLEARED || a.State == alm.AlarmState_ALARM_STATE_SUPPRESSED {
 			continue
 		}
 		if best == nil || a.Severity > best.Severity {

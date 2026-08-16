@@ -4,11 +4,11 @@ import (
 	"crypto/tls"
 	"database/sql"
 	"fmt"
+	_ "github.com/lib/pq"
 	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/alm/services"
 	"github.com/saichler/l8alarms/go/tests/mocks"
 	"github.com/saichler/l8types/go/ifs"
-	_ "github.com/lib/pq"
 	"net/http"
 	"testing"
 	"time"
@@ -95,9 +95,6 @@ func TestAllServices(t *testing.T) {
 	}
 	if len(testStore.AlarmIDs) == 0 {
 		log.Fail(t, "No alarms generated")
-	}
-	if len(testStore.EventIDs) == 0 {
-		log.Fail(t, "No events generated")
 	}
 
 	mocks.PrintSummary(testStore)

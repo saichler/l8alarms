@@ -23,16 +23,6 @@ Layer8DReferenceRegistry.register({
     ...refAlm.simple('AlarmFilter', 'filterId', 'name', 'Filter'),
 
     // ========================================
-    // ALM - Events
-    // ========================================
-    Event: {
-        idColumn: 'eventId',
-        displayColumn: 'message',
-        selectColumns: ['eventId', 'message', 'eventType'],
-        displayLabel: 'Event'
-    },
-
-    // ========================================
     // ALM - Correlation
     // ========================================
     ...refAlm.simple('CorrelationRule', 'ruleId', 'name', 'Rule'),

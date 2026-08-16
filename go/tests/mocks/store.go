@@ -11,13 +11,9 @@ type MockDataStore struct {
 	NotifPolIDs  []string // NotificationPolicy IDs
 	EscPolicyIDs []string // EscalationPolicy IDs
 
-	// Phase 3: Events
-	EventIDs []string // Event IDs
-
-	// Phase 4: Alarms
+	// Phase 3: Alarms
 	AlarmIDs []string // Alarm IDs
 
-	// Phase 5: Archive
+	// Phase 4: Archive
 	ArchivedAlarmIDs []string // ArchivedAlarm IDs
-	ArchivedEventIDs []string // ArchivedEvent IDs
 }

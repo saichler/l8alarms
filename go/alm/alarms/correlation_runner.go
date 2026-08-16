@@ -6,7 +6,6 @@ import (
 	"github.com/saichler/l8alarms/go/alm/correlationrules"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"github.com/saichler/l8common/go/common"
-	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8topology/go/types/l8topo"
 	"github.com/saichler/l8types/go/ifs"
@@ -14,19 +13,124 @@ import (
 
 var engine = correlation.NewEngine()
 
-// runCorrelation is called after an alarm is persisted (POST).
-// It queries active correlation rules and alarms, then runs the engine.
+// runCorrelation is called after an alarm is persisted (POST or PUT — PUT
+// because the MERGE branch in lifecycle.go calls common.PutEntity, which
+// goes through the same Before/After pipeline as any other caller).
+//
+// Two directional passes, per the plan's "Correlation & Threshold State"
+// section, resolved against Phase 5's concrete test scenarios (the
+// section's own summary prose was ambiguous about which alarm ends up root
+// vs. symptom in each pass; the test descriptions are unambiguous and were
+// used as the authoritative source):
+//
+//  1. Does this alarm become a SYMPTOM of an existing OPEN_FOR_CORRELATION
+//     alarm? Root-cause candidates are sourced from the correlation-eligible
+//     cache only (OPEN_FOR_CORRELATION — only those alarms can still
+//     "consume more events/alarms to be correlated to it").
+//  2. Does this alarm become the ROOT CAUSE for some other existing alarm
+//     (OPEN_FOR_CORRELATION or STABLE — STABLE alarms can still become a
+//     symptom of a later alarm, just can't gain symptoms on their own)? This
+//     pass queries Alarm directly, not the cache, since the cache excludes
+//     STABLE by design.
+//
+// PENDING_THRESHOLD alarms are excluded from both directions — matches the
+// pre-existing skip-if-cleared behavior this function already had.
 func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
-	if action != ifs.POST {
+	if action != ifs.POST && action != ifs.PUT {
 		return nil
 	}
 
-	// Skip if alarm is already correlated or cleared
-	if alarm.RootCauseAlarmId != "" || alarm.State == l8events.AlarmState_ALARM_STATE_CLEARED {
+	if alarm.State == alm.AlarmState_ALARM_STATE_CLEARED {
+		return nil
+	}
+	if alarm.CorrelationThresholdState == alm.AlmCorrelationThresholdState_ALM_CORRELATION_THRESHOLD_STATE_PENDING_THRESHOLD {
 		return nil
 	}
 
-	// Fetch active correlation rules
+	rules, err := fetchActiveCorrelationRules(vnic)
+	if err != nil {
+		return fmt.Errorf("failed to query correlation rules: %w", err)
+	}
+	if len(rules) == 0 {
+		return nil
+	}
+
+	adjacency := make(map[string][]string)
+	if needsTopology(rules) {
+		adjacency = fetchAdjacency(vnic)
+	}
+
+	if alarm.RootCauseAlarmId == "" {
+		if err := correlateAsSymptom(alarm, rules, adjacency, vnic); err != nil {
+			return err
+		}
+	}
+	if err := correlateAsRootCause(alarm, rules, adjacency, vnic); err != nil {
+		return err
+	}
+	return nil
+}
+
+// correlateAsSymptom: pass 1 — does alarm gain a root cause from the
+// correlation-eligible (OPEN_FOR_CORRELATION) cache?
+func correlateAsSymptom(alarm *alm.Alarm, rules []*alm.CorrelationRule, adjacency map[string][]string, vnic ifs.IVNic) error {
+	candidates := correlationEligibleSnapshot()
+	if len(candidates) == 0 {
+		return nil
+	}
+	ctx := &correlation.CorrelationContext{Vnic: vnic, ActiveAlarms: candidates, Adjacency: adjacency}
+
+	rootCause := engine.Correlate(alarm, rules, ctx)
+	if rootCause == nil {
+		return nil
+	}
+	if err := common.PutEntity(ServiceName, ServiceArea, alarm, vnic); err != nil {
+		return fmt.Errorf("failed to update symptom alarm: %w", err)
+	}
+	if err := common.PutEntity(ServiceName, ServiceArea, rootCause, vnic); err != nil {
+		return fmt.Errorf("failed to update root cause alarm: %w", err)
+	}
+	return nil
+}
+
+// correlateAsRootCause: pass 2 — does alarm turn out to be the root cause
+// for some other existing OPEN_FOR_CORRELATION/STABLE alarm that doesn't yet
+// have one? Queried directly (not the cache), since STABLE alarms are
+// deliberately excluded from the cache but remain eligible here.
+func correlateAsRootCause(alarm *alm.Alarm, rules []*alm.CorrelationRule, adjacency map[string][]string, vnic ifs.IVNic) error {
+	query := fmt.Sprintf(
+		"select * from Alarm where AlarmId!=%s and RootCauseAlarmId='' and (CorrelationThresholdState=%d or CorrelationThresholdState=%d)",
+		alarm.AlarmId,
+		alm.AlmCorrelationThresholdState_ALM_CORRELATION_THRESHOLD_STATE_OPEN_FOR_CORRELATION,
+		alm.AlmCorrelationThresholdState_ALM_CORRELATION_THRESHOLD_STATE_STABLE,
+	)
+	raw, err := common.GetEntitiesByQuery(ServiceName, ServiceArea, query, vnic)
+	if err != nil {
+		return fmt.Errorf("failed to query root-cause candidates: %w", err)
+	}
+
+	ctx := &correlation.CorrelationContext{Vnic: vnic, ActiveAlarms: []*alm.Alarm{alarm}, Adjacency: adjacency}
+	for _, r := range raw {
+		candidate := r.(*alm.Alarm)
+		if candidate.State == alm.AlarmState_ALARM_STATE_CLEARED {
+			continue
+		}
+		rootCause := engine.Correlate(candidate, rules, ctx)
+		if rootCause == nil {
+			continue
+		}
+		if err := common.PutEntity(ServiceName, ServiceArea, candidate, vnic); err != nil {
+			return fmt.Errorf("failed to update symptom alarm %s: %w", candidate.AlarmId, err)
+		}
+		if err := common.PutEntity(ServiceName, ServiceArea, rootCause, vnic); err != nil {
+			return fmt.Errorf("failed to update root cause alarm: %w", err)
+		}
+	}
+	return nil
+}
+
+// fetchActiveCorrelationRules loads all active CorrelationRule records.
+func fetchActiveCorrelationRules(vnic ifs.IVNic) ([]*alm.CorrelationRule, error) {
 	rulesRaw, err := common.GetEntitiesByQuery(
 		correlationrules.ServiceName, correlationrules.ServiceArea,
 		fmt.Sprintf("select * from CorrelationRule where Status=%d",
@@ -34,61 +138,13 @@ func runCorrelation(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error {
 		vnic,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to query correlation rules: %w", err)
-	}
-	if len(rulesRaw) == 0 {
-		return nil
+		return nil, err
 	}
 	rules := make([]*alm.CorrelationRule, 0, len(rulesRaw))
 	for _, r := range rulesRaw {
 		rules = append(rules, r.(*alm.CorrelationRule))
 	}
-
-	// Fetch active alarms
-	activeAlarmsRaw, err := common.GetEntitiesByQuery(
-		ServiceName, ServiceArea,
-		fmt.Sprintf("select * from Alarm where State=%d",
-			l8events.AlarmState_ALARM_STATE_ACTIVE),
-		vnic,
-	)
-	if err != nil {
-		return fmt.Errorf("failed to query active alarms: %w", err)
-	}
-	activeAlarms := make([]*alm.Alarm, 0, len(activeAlarmsRaw))
-	for _, a := range activeAlarmsRaw {
-		activeAlarms = append(activeAlarms, a.(*alm.Alarm))
-	}
-
-	// Build adjacency from topology if any rule needs it
-	adjacency := make(map[string][]string)
-	if needsTopology(rules) {
-		adjacency = fetchAdjacency(vnic)
-	}
-
-	// Build context
-	ctx := &correlation.CorrelationContext{
-		Vnic:         vnic,
-		ActiveAlarms: activeAlarms,
-		Adjacency:    adjacency,
-	}
-
-	// Run correlation
-	rootCause := engine.Correlate(alarm, rules, ctx)
-	if rootCause == nil {
-		return nil
-	}
-
-	// Persist the updated symptom alarm (this alarm)
-	if err := common.PutEntity(ServiceName, ServiceArea, alarm, vnic); err != nil {
-		return fmt.Errorf("failed to update symptom alarm: %w", err)
-	}
-
-	// Persist the updated root cause alarm
-	if err := common.PutEntity(ServiceName, ServiceArea, rootCause, vnic); err != nil {
-		return fmt.Errorf("failed to update root cause alarm: %w", err)
-	}
-
-	return nil
+	return rules, nil
 }
 
 // needsTopology returns true if any rule uses topological or composite correlation.

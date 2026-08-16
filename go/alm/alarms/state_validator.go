@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/types/alm"
-	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -16,7 +15,7 @@ func validateStateTransition(incoming *alm.Alarm, action ifs.Action, vnic ifs.IV
 	}
 
 	// UNSPECIFIED state means the caller isn't changing state
-	if incoming.State == l8events.AlarmState_ALARM_STATE_UNSPECIFIED {
+	if incoming.State == alm.AlarmState_ALARM_STATE_UNSPECIFIED {
 		return nil
 	}
 

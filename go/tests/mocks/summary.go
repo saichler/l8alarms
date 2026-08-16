@@ -13,13 +13,12 @@ func PrintSummary(store *MockDataStore) {
 	fmt.Printf("  Notification Policies:  %d\n", len(store.NotifPolIDs))
 	fmt.Printf("  Escalation Policies:    %d\n", len(store.EscPolicyIDs))
 	fmt.Printf("  Maintenance Windows:    %d\n", len(store.MaintWindowIDs))
-	fmt.Printf("  Events:                 %d\n", len(store.EventIDs))
 	fmt.Printf("  Alarms:                 %d\n", len(store.AlarmIDs))
 	fmt.Printf("========================================\n")
 
 	total := len(store.DefinitionIDs) + len(store.FilterIDs) + len(store.CorrRuleIDs) +
 		len(store.NotifPolIDs) + len(store.EscPolicyIDs) + len(store.MaintWindowIDs) +
-		len(store.EventIDs) + len(store.AlarmIDs)
+		len(store.AlarmIDs)
 	fmt.Printf("  Total entities:         %d\n", total)
 	fmt.Printf("========================================\n")
 }

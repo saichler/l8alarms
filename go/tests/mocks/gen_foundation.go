@@ -21,31 +21,31 @@ func generateAlarmDefinitions() []*alm.AlarmDefinition {
 		l8events.Severity_SEVERITY_INFO,
 	}
 
-	eventTypes := []alm.AlmEventType{
-		alm.AlmEventType_ALM_EVENT_TYPE_TRAP,
-		alm.AlmEventType_ALM_EVENT_TYPE_SYSLOG,
-		alm.AlmEventType_ALM_EVENT_TYPE_THRESHOLD,
-		alm.AlmEventType_ALM_EVENT_TYPE_STATE_CHANGE,
+	eventCategories := []l8events.EventCategory{
+		l8events.EventCategory_EVENT_CATEGORY_TRAP,
+		l8events.EventCategory_EVENT_CATEGORY_SYSLOG,
+		l8events.EventCategory_EVENT_CATEGORY_PERFORMANCE,
+		l8events.EventCategory_EVENT_CATEGORY_NETWORK,
 	}
 
 	for i := 0; i < count; i++ {
 		result[i] = &alm.AlarmDefinition{
-			DefinitionId:         genID("def", i),
-			Name:                 alarmDefNames[i],
-			Description:          alarmDefDescriptions[i],
-			Status:               alm.AlarmDefinitionStatus_ALARM_DEFINITION_STATUS_ACTIVE,
-			DefaultSeverity:      severities[i%len(severities)],
-			EventPattern:         eventPatterns[i],
-			EventTypeFilter:      eventTypes[i%len(eventTypes)],
-			ThresholdCount:       int32(rand.Intn(3) + 1),
+			DefinitionId:           genID("def", i),
+			Name:                   alarmDefNames[i],
+			Description:            alarmDefDescriptions[i],
+			Status:                 alm.AlarmDefinitionStatus_ALARM_DEFINITION_STATUS_ACTIVE,
+			DefaultSeverity:        severities[i%len(severities)],
+			EventPattern:           eventPatterns[i],
+			EventCategoryFilter:    eventCategories[i%len(eventCategories)],
+			ThresholdCount:         int32(rand.Intn(3) + 1),
 			ThresholdWindowSeconds: int32(rand.Intn(300) + 60),
-			AutoClearEnabled:     i%3 != 0,
-			AutoClearSeconds:     int32(rand.Intn(3600) + 300),
-			ClearEventPattern:    clearPatterns[i],
-			DedupEnabled:         true,
-			DedupKeyExpression:   "nodeId+definitionId",
-			CreatedAt:            randomPastDate(6, 30),
-			UpdatedAt:            nowUnix(),
+			AutoClearEnabled:       i%3 != 0,
+			AutoClearSeconds:       int32(rand.Intn(3600) + 300),
+			ClearEventPattern:      clearPatterns[i],
+			DedupEnabled:           true,
+			DedupKeyExpression:     "nodeId+definitionId",
+			CreatedAt:              randomPastDate(6, 30),
+			UpdatedAt:              nowUnix(),
 		}
 	}
 	return result

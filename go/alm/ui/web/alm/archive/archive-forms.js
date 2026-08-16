@@ -33,33 +33,11 @@ All fields are display-only (immutable archived records)
                 ...f.datetime('archivedAt', 'Archived At'),
                 ...f.text('archivedBy', 'Archived By')
             ])
-        ]),
-
-        ArchivedEvent: f.form('Archived Event', [
-            f.section('Event Details', [
-                ...f.select('eventType', 'Event Type', AlmEvents.enums.EVENT_TYPE),
-                ...f.select('severity', 'Severity', enums.ALARM_SEVERITY),
-                ...f.text('nodeId', 'Node ID'),
-                ...f.text('nodeName', 'Node Name'),
-                ...f.textarea('message', 'Message'),
-                ...f.text('category', 'Category'),
-                ...f.text('subcategory', 'Subcategory')
-            ]),
-            f.section('Timing', [
-                ...f.datetime('occurredAt', 'Occurred At'),
-                ...f.datetime('receivedAt', 'Received At'),
-                ...f.datetime('processedAt', 'Processed At')
-            ]),
-            f.section('Archive Info', [
-                ...f.datetime('archivedAt', 'Archived At'),
-                ...f.text('archivedBy', 'Archived By')
-            ])
         ])
     };
 
     AlmArchive.primaryKeys = {
-        ArchivedAlarm: 'alarmId',
-        ArchivedEvent: 'eventId'
+        ArchivedAlarm: 'alarmId'
     };
 
 })();

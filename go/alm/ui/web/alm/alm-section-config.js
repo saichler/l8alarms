@@ -24,12 +24,6 @@ Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
                 ]
             },
             {
-                key: 'events', label: 'Events', icon: '\u26A1',
-                services: [
-                    { key: 'events', label: 'Events', icon: '\u26A1', isDefault: true }
-                ]
-            },
-            {
                 key: 'correlation', label: 'Correlation', icon: '\uD83D\uDD17',
                 services: [
                     { key: 'correlation-rules', label: 'Rules', icon: '\uD83D\uDD17', isDefault: true }
@@ -51,8 +45,7 @@ Layer 8 Ecosystem is licensed under the Apache License, Version 2.0.
             {
                 key: 'archive', label: 'Archive', icon: '\uD83D\uDDC4\uFE0F',
                 services: [
-                    { key: 'archived-alarms', label: 'Archived Alarms', icon: '\uD83D\uDD14', isDefault: true },
-                    { key: 'archived-events', label: 'Archived Events', icon: '\u26A1' }
+                    { key: 'archived-alarms', label: 'Archived Alarms', icon: '\uD83D\uDD14', isDefault: true }
                 ]
             }
         ]

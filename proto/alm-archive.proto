@@ -3,7 +3,6 @@ package alm;
 option go_package = "./types/alm";
 
 import "alm-common.proto";
-import "alm-events.proto";
 import "alm-alarms.proto";
 import "l8events.proto";
 import "api.proto";
@@ -62,49 +61,7 @@ message ArchivedAlarm {
   string archived_by = 32;
 }
 
-// ArchivedEvent: Immutable copy of a processed event.
-message ArchivedEvent {
-  string event_id = 1;
-  AlmEventType event_type = 2;
-  l8events.EventState processing_state = 3;
-
-  // Source (topology references by ID)
-  string node_id = 4;
-  string node_name = 5;
-  string source_identifier = 6;
-
-  // Event content
-  l8events.Severity severity = 7;
-  string message = 8;
-  string raw_data = 9;
-
-  // Classification
-  string category = 10;
-  string subcategory = 11;
-
-  // Processing results
-  string alarm_id = 12;
-  string definition_id = 13;
-
-  // Timing
-  int64 occurred_at = 14;
-  int64 received_at = 15;
-  int64 processed_at = 16;
-
-  // Extensible attributes
-  repeated EventAttribute attributes = 17;
-
-  // Archive metadata
-  int64 archived_at = 18;
-  string archived_by = 19;
-}
-
 message ArchivedAlarmList {
   repeated ArchivedAlarm list = 1;
-  l8api.L8MetaData metadata = 2;
-}
-
-message ArchivedEventList {
-  repeated ArchivedEvent list = 1;
   l8api.L8MetaData metadata = 2;
 }

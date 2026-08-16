@@ -5,11 +5,9 @@ import (
 	"github.com/saichler/l8alarms/go/alm/alarmfilters"
 	"github.com/saichler/l8alarms/go/alm/alarms"
 	"github.com/saichler/l8alarms/go/alm/archivedalarms"
-	"github.com/saichler/l8alarms/go/alm/archivedevents"
 	"github.com/saichler/l8alarms/go/alm/correlationrules"
 	"github.com/saichler/l8alarms/go/alm/enrichment"
 	"github.com/saichler/l8alarms/go/alm/escalationpolicies"
-	"github.com/saichler/l8alarms/go/alm/events"
 	"github.com/saichler/l8alarms/go/alm/notificationpolicies"
 	"github.com/saichler/l8types/go/ifs"
 )
@@ -18,7 +16,6 @@ func ActivateAlmServices(creds, dbname string, vnic ifs.IVNic) {
 	// Core alarm management
 	alarmdefinitions.Activate(creds, dbname, vnic)
 	alarms.Activate(creds, dbname, vnic)
-	events.Activate(creds, dbname, vnic)
 
 	// Correlation
 	correlationrules.Activate(creds, dbname, vnic)
@@ -32,7 +29,6 @@ func ActivateAlmServices(creds, dbname string, vnic ifs.IVNic) {
 
 	// Archive
 	archivedalarms.Activate(creds, dbname, vnic)
-	archivedevents.Activate(creds, dbname, vnic)
 
 	// Topology enrichment (read-only, no DB)
 	enrichment.Activate(vnic)

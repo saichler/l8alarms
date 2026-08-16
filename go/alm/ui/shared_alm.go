@@ -11,7 +11,6 @@ func RegisterAlmTypes(resources ifs.IResources) {
 	// Core alarm management
 	common.RegisterType(resources, &alm.AlarmDefinition{}, &alm.AlarmDefinitionList{}, "DefinitionId")
 	common.RegisterType(resources, &alm.Alarm{}, &alm.AlarmList{}, "AlarmId")
-	common.RegisterType(resources, &alm.Event{}, &alm.EventList{}, "EventId")
 
 	// Correlation
 	common.RegisterType(resources, &alm.CorrelationRule{}, &alm.CorrelationRuleList{}, "RuleId")
@@ -25,7 +24,6 @@ func RegisterAlmTypes(resources ifs.IResources) {
 
 	// Archive
 	common.RegisterType(resources, &alm.ArchivedAlarm{}, &alm.ArchivedAlarmList{}, "AlarmId")
-	common.RegisterType(resources, &alm.ArchivedEvent{}, &alm.ArchivedEventList{}, "EventId")
 
 	// External types used by EnrichmentService
 	resources.Registry().Register(&l8topo.L8Topology{})

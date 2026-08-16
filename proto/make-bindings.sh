@@ -11,7 +11,6 @@ PROTOS=(
     alm-common.proto
     alm-definitions.proto
     alm-alarms.proto
-    alm-events.proto
     alm-correlation.proto
     alm-policies.proto
     alm-filters.proto

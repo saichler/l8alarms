@@ -7,32 +7,21 @@ import (
 	"github.com/saichler/l8alarms/go/types/alm"
 	"github.com/saichler/l8common/go/common"
 	"github.com/saichler/l8types/go/ifs"
-	l8events "github.com/saichler/l8types/go/types/l8events"
 	l8notify "github.com/saichler/l8types/go/types/l8notify"
+	"github.com/saichler/l8utils/go/utils/timer"
 	"sort"
-	"sync"
 	"time"
 )
 
 // Scheduler manages escalation timers for unacknowledged alarms.
 type Scheduler struct {
-	// active tracks running escalation timers by alarm ID
-	active map[string]*escalationState
-	mtx    sync.Mutex
-}
-
-type escalationState struct {
-	alarmId   string
-	policyId  string
-	stepIndex int
-	timer     *time.Timer
-	cancel    chan struct{}
+	timers *timer.TimerManager
 }
 
 // NewScheduler creates a new escalation scheduler.
 func NewScheduler() *Scheduler {
 	return &Scheduler{
-		active: make(map[string]*escalationState),
+		timers: timer.NewTimerManager(),
 	}
 }
 
@@ -40,7 +29,7 @@ func NewScheduler() *Scheduler {
 // for matching policies.
 func (s *Scheduler) Schedule(alarm *alm.Alarm, vnic ifs.IVNic) {
 	// Only schedule for active alarms
-	if alarm.State != l8events.AlarmState_ALARM_STATE_ACTIVE {
+	if alarm.State != alm.AlarmState_ALARM_STATE_ACTIVE {
 		return
 	}
 
@@ -77,22 +66,15 @@ func (s *Scheduler) Schedule(alarm *alm.Alarm, vnic ifs.IVNic) {
 
 // Cancel stops any running escalation for the given alarm.
 func (s *Scheduler) Cancel(alarmId string) {
-	s.mtx.Lock()
-	defer s.mtx.Unlock()
-
-	if state, ok := s.active[alarmId]; ok {
-		close(state.cancel)
-		state.timer.Stop()
-		delete(s.active, alarmId)
-	}
+	s.timers.Cancel(alarmId)
 }
 
 // HandleStateChange cancels escalation when alarm is acknowledged or cleared.
 func (s *Scheduler) HandleStateChange(alarm *alm.Alarm) {
 	switch alarm.State {
-	case l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED,
-		l8events.AlarmState_ALARM_STATE_CLEARED,
-		l8events.AlarmState_ALARM_STATE_SUPPRESSED:
+	case alm.AlarmState_ALARM_STATE_ACKNOWLEDGED,
+		alm.AlarmState_ALARM_STATE_CLEARED,
+		alm.AlarmState_ALARM_STATE_SUPPRESSED:
 		s.Cancel(alarm.AlarmId)
 	}
 }
@@ -105,32 +87,9 @@ func (s *Scheduler) startEscalation(alarm *alm.Alarm, policy *alm.EscalationPoli
 	step := steps[stepIdx]
 	delay := time.Duration(step.DelayMinutes) * time.Minute
 
-	cancel := make(chan struct{})
-	timer := time.NewTimer(delay)
-
-	s.mtx.Lock()
-	// Cancel any existing escalation for this alarm
-	if existing, ok := s.active[alarm.AlarmId]; ok {
-		close(existing.cancel)
-		existing.timer.Stop()
-	}
-	s.active[alarm.AlarmId] = &escalationState{
-		alarmId:   alarm.AlarmId,
-		policyId:  policy.PolicyId,
-		stepIndex: stepIdx,
-		timer:     timer,
-		cancel:    cancel,
-	}
-	s.mtx.Unlock()
-
-	go func() {
-		select {
-		case <-timer.C:
-			s.fireStep(alarm, policy, steps, stepIdx, vnic)
-		case <-cancel:
-			timer.Stop()
-		}
-	}()
+	s.timers.Start(alarm.AlarmId, delay, func() {
+		s.fireStep(alarm, policy, steps, stepIdx, vnic)
+	})
 }
 
 func (s *Scheduler) fireStep(alarm *alm.Alarm, policy *alm.EscalationPolicy, steps []*l8notify.EscalationStep, stepIdx int, vnic ifs.IVNic) {
@@ -162,11 +121,6 @@ func (s *Scheduler) fireStep(alarm *alm.Alarm, policy *alm.EscalationPolicy, ste
 		fmt.Printf("[escalation] step %d failed for alarm %s: %v\n",
 			step.StepOrder, alarm.AlarmId, err)
 	}
-
-	// Clean up current state
-	s.mtx.Lock()
-	delete(s.active, alarm.AlarmId)
-	s.mtx.Unlock()
 
 	// Schedule next step if available
 	if stepIdx+1 < len(steps) {

@@ -15,12 +15,6 @@ Layer8ModuleConfigFactory.create({
                 { key: 'alarm-filters', label: 'Saved Filters', endpoint: '/10/AlmFilter', model: 'AlarmFilter' }
             ]
         },
-        'events': {
-            label: 'Events',
-            services: [
-                { key: 'events', label: 'Events', endpoint: '/10/Event', model: 'Event', readOnly: true }
-            ]
-        },
         'correlation': {
             label: 'Correlation',
             services: [
@@ -43,10 +37,9 @@ Layer8ModuleConfigFactory.create({
         'archive': {
             label: 'Archive',
             services: [
-                { key: 'archived-alarms', label: 'Archived Alarms', endpoint: '/10/ArcAlarm', model: 'ArchivedAlarm', readOnly: true },
-                { key: 'archived-events', label: 'Archived Events', endpoint: '/10/ArcEvent', model: 'ArchivedEvent', readOnly: true }
+                { key: 'archived-alarms', label: 'Archived Alarms', endpoint: '/10/ArcAlarm', model: 'ArchivedAlarm', readOnly: true }
             ]
         }
     },
-    submodules: ['AlmAlarms', 'AlmEvents', 'AlmCorrelation', 'AlmPolicies', 'AlmMaintenance', 'AlmArchive']
+    submodules: ['AlmAlarms', 'AlmCorrelation', 'AlmPolicies', 'AlmMaintenance', 'AlmArchive']
 });

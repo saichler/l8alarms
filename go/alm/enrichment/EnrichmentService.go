@@ -5,7 +5,6 @@ import (
 	"github.com/saichler/l8alarms/go/alm/alarms"
 	"github.com/saichler/l8alarms/go/types/alm"
 	"github.com/saichler/l8common/go/common"
-	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8srlz/go/serialize/object"
 	"github.com/saichler/l8topology/go/types/l8topo"
 	"github.com/saichler/l8types/go/ifs"
@@ -79,7 +78,7 @@ func (s *EnrichmentService) Get(elements ifs.IElements, vnic ifs.IVNic) ifs.IEle
 	activeAlarmsRaw, err := common.GetEntitiesByQuery(
 		alarms.ServiceName, alarms.ServiceArea,
 		fmt.Sprintf("select * from Alarm where State=%d",
-			l8events.AlarmState_ALARM_STATE_ACTIVE),
+			alm.AlarmState_ALARM_STATE_ACTIVE),
 		vnic,
 	)
 	if err != nil {

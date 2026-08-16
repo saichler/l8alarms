@@ -3,7 +3,6 @@ package alarms
 import (
 	"github.com/saichler/l8alarms/go/alm/notification"
 	"github.com/saichler/l8alarms/go/types/alm"
-	l8events "github.com/saichler/l8types/go/types/l8events"
 	"github.com/saichler/l8types/go/ifs"
 )
 
@@ -17,7 +16,7 @@ func runNotification(alarm *alm.Alarm, action ifs.Action, vnic ifs.IVNic) error 
 	}
 
 	// Skip suppressed alarms
-	if alarm.State == l8events.AlarmState_ALARM_STATE_SUPPRESSED {
+	if alarm.State == alm.AlarmState_ALARM_STATE_SUPPRESSED {
 		return nil
 	}
 

@@ -7,7 +7,7 @@ Uses shared L8EventsEnums for severity/state, keeps alarm-specific enums local.
     'use strict';
 
     const factory = window.Layer8EnumFactory;
-    const { createStatusRenderer, renderEnum } = Layer8DRenderers;
+    const { createStatusRenderer } = Layer8DRenderers;
 
     window.AlmAlarms = window.AlmAlarms || {};
 
@@ -30,13 +30,6 @@ Uses shared L8EventsEnums for severity/state, keeps alarm-specific enums local.
         ['Disabled', 'disabled', 'layer8d-status-inactive']
     ]);
 
-    // AlmEventType: 0=Unspecified, 1=Trap, 2=Syslog, 3=Threshold, 4=StateChange,
-    //               5=Heartbeat, 6=Configuration, 7=Custom
-    const EVENT_TYPE = factory.simple([
-        'Unspecified', 'Trap', 'Syslog', 'Threshold', 'State Change',
-        'Heartbeat', 'Configuration', 'Custom'
-    ]);
-
     // ============================================================================
     // EXPORT ENUMS
     // ============================================================================
@@ -47,8 +40,7 @@ Uses shared L8EventsEnums for severity/state, keeps alarm-specific enums local.
         ALARM_STATE: ALARM_STATE.enum,
         ALARM_STATE_CLASSES: ALARM_STATE.classes,
         ALARM_DEFINITION_STATUS: ALARM_DEFINITION_STATUS.enum,
-        ALARM_DEFINITION_STATUS_CLASSES: ALARM_DEFINITION_STATUS.classes,
-        EVENT_TYPE: EVENT_TYPE.enum
+        ALARM_DEFINITION_STATUS_CLASSES: ALARM_DEFINITION_STATUS.classes
     };
 
     // ============================================================================
@@ -58,8 +50,7 @@ Uses shared L8EventsEnums for severity/state, keeps alarm-specific enums local.
     AlmAlarms.render = {
         severity: L8EventsEnums.render.severity,
         state: L8EventsEnums.render.alarmState,
-        definitionStatus: createStatusRenderer(ALARM_DEFINITION_STATUS.enum, ALARM_DEFINITION_STATUS.classes),
-        eventType: (v) => renderEnum(v, EVENT_TYPE.enum)
+        definitionStatus: createStatusRenderer(ALARM_DEFINITION_STATUS.enum, ALARM_DEFINITION_STATUS.classes)
     };
 
 })();
