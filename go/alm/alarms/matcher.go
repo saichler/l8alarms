@@ -38,7 +38,9 @@ func fetchActiveDefinitions(vnic ifs.IVNic) ([]*alm.AlarmDefinition, error) {
 	}
 	defs := make([]*alm.AlarmDefinition, 0, len(raw))
 	for _, r := range raw {
-		defs = append(defs, r.(*alm.AlarmDefinition))
+		if def, ok := r.(*alm.AlarmDefinition); ok {
+			defs = append(defs, def)
+		}
 	}
 	return defs, nil
 }
@@ -97,7 +99,10 @@ func findActiveAlarmByDedupKey(dedupKey string, vnic ifs.IVNic) (*alm.Alarm, err
 		return nil, err
 	}
 	for _, r := range raw {
-		a := r.(*alm.Alarm)
+		a, ok := r.(*alm.Alarm)
+		if !ok {
+			continue
+		}
 		if a.State != alm.AlarmState_ALARM_STATE_CLEARED {
 			return a, nil
 		}

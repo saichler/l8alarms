@@ -9,9 +9,10 @@ import (
 	"time"
 )
 
-func testCRUD(t *testing.T, client *mocks.Client) {
+func testCRUD(t *testing.T, client *mocks.Client, vnic ifs.IVNic) {
 	testCRUDAlarmDefinition(t, client)
-	testCRUDAlarm(t, client)
+	testCRUDAlarm(t, client, vnic)
+	testAlarmHasNoHttpCreateRoute(t, client)
 	testCRUDCorrelationRule(t, client)
 	testCRUDNotificationPolicy(t, client)
 	testCRUDEscalationPolicy(t, client)
@@ -55,41 +56,59 @@ func testCRUDAlarmDefinition(t *testing.T, client *mocks.Client) {
 	}
 }
 
-func testCRUDAlarm(t *testing.T, client *mocks.Client) {
-	alarmId := ifs.NewUuid()
-	alarm := map[string]interface{}{
-		"alarm_id":      alarmId,
-		"definition_id": testStore.DefinitionIDs[0],
-		"node_id":       "test-node-001",
-		"state":         1,
-		"severity":      1,
-		"name":          "CRUD Test Alarm",
-	}
-	_, err := client.Post("/alm/10/Alarm", alarm)
-	if err != nil {
-		t.Fatalf("POST Alarm failed: %v", err)
-	}
+// testCRUDAlarm exercises Alarm's actual lifecycle post-Phase-3: create via
+// an EventRecord posted through the vnic (Alarm's POST has no HTTP route —
+// see AlarmService.go), read via HTTP GET, transition via HTTP PATCH
+// (Acknowledge — Alarm has no PUT endpoint at all), then HTTP DELETE.
+func testCRUDAlarm(t *testing.T, client *mocks.Client, vnic ifs.IVNic) {
+	defId := createAlarmDefFixture(t, client, vnic, alarmDefFixture{
+		Name:           "flow5-crud",
+		EventPattern:   "flow5CrudTrigger",
+		ThresholdCount: 1,
+		DedupEnabled:   true,
+	})
+	defer deleteAlarmDefFixture(client, defId)
 
-	q := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarmId))
+	sourceId := "flow5-crud-node"
+	if err := postAlarmEvent(vnic, "flow5CrudTrigger", sourceId, "CRUD Node"); err != nil {
+		t.Fatalf("POST event (create alarm) failed: %v", err)
+	}
+	alarm := mustFindOneAlarm(t, vnic, defId, sourceId)
+
+	q := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarm.AlarmId))
 	getResp, err := client.Get("/alm/10/Alarm", q)
 	if err != nil {
 		t.Fatalf("GET Alarm failed: %v", err)
 	}
-	if !strings.Contains(getResp, "CRUD Test Alarm") {
+	if !strings.Contains(getResp, "flow5-crud") {
 		t.Fatalf("GET Alarm did not return expected name, got: %s", getResp)
 	}
 
-	// PUT: only change user-editable fields (state, severity); system fields must stay the same
-	alarm["state"] = 2
-	_, err = client.Put("/alm/10/Alarm", alarm)
-	if err != nil {
-		t.Fatalf("PUT Alarm failed: %v", err)
+	patch := map[string]interface{}{
+		"alarm_id":        alarm.AlarmId,
+		"state":           2, // ACKNOWLEDGED
+		"acknowledged_by": "crud-test",
+	}
+	if _, err := client.Patch("/alm/10/Alarm", patch); err != nil {
+		t.Fatalf("PATCH Alarm (acknowledge) failed: %v", err)
 	}
 
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarmId))
-	_, err = client.Delete("/alm/10/Alarm", delQ)
-	if err != nil {
+	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarm.AlarmId))
+	if _, err := client.Delete("/alm/10/Alarm", delQ); err != nil {
 		t.Fatalf("DELETE Alarm failed: %v", err)
+	}
+}
+
+// testAlarmHasNoHttpCreateRoute covers Phase 5 bullet 14: Alarm's POST and
+// PUT are reachable only via a direct vnic call (see AlarmService.go's
+// hand-built WebService) — neither has an HTTP route.
+func testAlarmHasNoHttpCreateRoute(t *testing.T, client *mocks.Client) {
+	body := map[string]interface{}{"alarm_id": ifs.NewUuid(), "name": "should not route"}
+	if _, err := client.Post("/alm/10/Alarm", body); err == nil {
+		t.Fatal("expected POST /alm/10/Alarm to fail to route, but it succeeded")
+	}
+	if _, err := client.Put("/alm/10/Alarm", body); err == nil {
+		t.Fatal("expected PUT /alm/10/Alarm to fail to route, but it succeeded")
 	}
 }
 

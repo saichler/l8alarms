@@ -13,24 +13,48 @@ import (
 // decideAlarmForEvent implements the Target Flow: match the event against
 // active AlarmDefinitions, then DROP / CLEAR / MERGE / CREATE.
 //
-// Interpretation note: "matches a definition whose clear_event_pattern this
-// event satisfies, AND an ACTIVE alarm exists for that definition's
-// DedupKey" is resolved as: the definition consulted for clear_event_pattern
-// is the SAME definition matchDefinition already selected via
-// event_pattern/event_category_filter/node_type_filter (the plan's "matched"
-// definition) — not a second, independently-searched definition. This keeps
-// the dedup-key computation and the clear-pattern check anchored to one
-// definition per event, which is the only self-consistent reading given
-// AlarmDefinition.dedup_key_expression is defined per-definition.
+// CLEAR is checked independently of event_pattern matching, across every
+// active definition, before falling through to the event_pattern-based
+// match/merge/create flow: clear_event_pattern (e.g. "linkUp") is normally a
+// disjoint regex from event_pattern (e.g. "linkDown|ifOperStatus.*down"), so
+// requiring the clearing event to ALSO satisfy event_pattern first — the
+// original reading of this function — would make clear_event_pattern
+// practically unreachable for any realistic pair of patterns. Each candidate
+// definition's own dedup key is used for its own existing-alarm lookup, so
+// this stays self-consistent even though the definition that ends up
+// clearing an alarm isn't "the" matched definition in the event_pattern
+// sense.
 //
-// CLEAR is checked before the dedup_enabled gate: dedup_enabled=false only
-// disables the MERGE branch ("no merge lookup performed" per the plan) — it
-// does not prevent an explicit clear_event_pattern match from clearing an
-// existing alarm.
+// CLEAR taking priority over event_pattern matching also means
+// dedup_enabled=false has no bearing here: that flag only disables the MERGE
+// branch below ("no merge lookup performed" per the plan) — it never
+// prevented an explicit clear_event_pattern match from clearing an existing
+// alarm.
 func decideAlarmForEvent(event *l8events.EventRecord, vnic ifs.IVNic) (*alm.Alarm, bool, error) {
 	defs, err := fetchActiveDefinitions(vnic)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to query alarm definitions: %w", err)
+	}
+
+	for _, cdef := range defs {
+		if !matchesClearPattern(event, cdef) {
+			continue
+		}
+		dedupKey := computeDedupKey(cdef, event)
+		existing, err := findActiveAlarmByDedupKey(dedupKey, vnic)
+		if err != nil {
+			return nil, false, fmt.Errorf("failed to query existing alarm: %w", err)
+		}
+		if existing == nil {
+			continue
+		}
+		if err := clearAlarm(existing, "system:event", vnic); err != nil {
+			return nil, false, fmt.Errorf("failed to clear alarm: %w", err)
+		}
+		if err := markEventProcessed(event.EventId, existing.AlarmId, vnic); err != nil {
+			fmt.Printf("[alarms] mark event processed failed for %s: %v\n", event.EventId, err)
+		}
+		return nil, false, nil
 	}
 
 	def := matchDefinition(event, defs)
@@ -42,16 +66,6 @@ func decideAlarmForEvent(event *l8events.EventRecord, vnic ifs.IVNic) (*alm.Alar
 	existing, err := findActiveAlarmByDedupKey(dedupKey, vnic)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to query existing alarm: %w", err)
-	}
-
-	if existing != nil && matchesClearPattern(event, def) {
-		if err := clearAlarm(existing, "system:event", vnic); err != nil {
-			return nil, false, fmt.Errorf("failed to clear alarm: %w", err)
-		}
-		if err := markEventProcessed(event.EventId, existing.AlarmId, vnic); err != nil {
-			fmt.Printf("[alarms] mark event processed failed for %s: %v\n", event.EventId, err)
-		}
-		return nil, false, nil
 	}
 
 	if existing != nil && def.DedupEnabled {

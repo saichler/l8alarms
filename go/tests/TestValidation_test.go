@@ -1,22 +1,22 @@
 package tests
 
 import (
-	"fmt"
 	"github.com/saichler/l8alarms/go/tests/mocks"
 	"github.com/saichler/l8types/go/ifs"
 	"strings"
 	"testing"
+	"time"
 )
 
-func testValidation(t *testing.T, client *mocks.Client) {
+func testValidation(t *testing.T, client *mocks.Client, vnic ifs.IVNic) {
 	testValidationAlarmDefinition(t, client)
-	testValidationAlarm(t, client)
+	testValidationAlarm(t, client, vnic)
 	testValidationCorrelationRule(t, client)
 	testValidationNotificationPolicy(t, client)
 	testValidationEscalationPolicy(t, client)
 	testValidationAlarmFilter(t, client)
 	testValidationAutoID(t, client)
-	testValidationAlarmFieldProtection(t, client)
+	testValidationAlarmFieldProtection(t, client, vnic)
 }
 
 func testValidationAlarmDefinition(t *testing.T, client *mocks.Client) {
@@ -34,27 +34,26 @@ func testValidationAlarmDefinition(t *testing.T, client *mocks.Client) {
 	}
 }
 
-func testValidationAlarm(t *testing.T, client *mocks.Client) {
-	// Missing definition_id — should fail
-	alarmNoDef := map[string]interface{}{
-		"node_id":  "test-node",
-		"state":    1,
-		"severity": 1,
-	}
-	_, err := client.Post("/alm/10/Alarm", alarmNoDef)
-	if err == nil {
-		t.Fatal("POST Alarm without definition_id should have failed")
-	}
+// testValidationAlarm covers Phase 5 bullet 3 from the "validation" angle:
+// since Alarm's POST body is now an l8events.EventRecord decided by
+// matching against active AlarmDefinitions (not a caller-supplied *alm.Alarm
+// with required-field checks), "invalid input" no longer means a rejected
+// POST — a non-matching event is simply dropped (no error, no alarm).
+func testValidationAlarm(t *testing.T, client *mocks.Client, vnic ifs.IVNic) {
+	defId := createAlarmDefFixture(t, client, vnic, alarmDefFixture{
+		Name:           "flow5-validation-nomatch",
+		EventPattern:   "flow5ValidationTrigger",
+		ThresholdCount: 1,
+		DedupEnabled:   true,
+	})
+	defer deleteAlarmDefFixture(client, defId)
 
-	// Missing node_id — should fail
-	alarmNoNode := map[string]interface{}{
-		"definition_id": testStore.DefinitionIDs[0],
-		"state":         1,
-		"severity":      1,
+	sourceId := "flow5-validation-node"
+	if err := postAlarmEvent(vnic, "flow5SomethingElseEntirely", sourceId, "Node"); err != nil {
+		t.Fatalf("POST non-matching event failed: %v", err)
 	}
-	_, err = client.Post("/alm/10/Alarm", alarmNoNode)
-	if err == nil {
-		t.Fatal("POST Alarm without node_id should have failed")
+	if got := findAlarmsByDedupKey(t, vnic, defId, sourceId); len(got) != 0 {
+		t.Fatalf("expected no alarm for a non-matching event, got %d", len(got))
 	}
 }
 
@@ -151,41 +150,78 @@ func testValidationAutoID(t *testing.T, client *mocks.Client) {
 	}
 }
 
-func testValidationAlarmFieldProtection(t *testing.T, client *mocks.Client) {
-	// POST a valid alarm
-	alarmId := ifs.NewUuid()
-	alarm := map[string]interface{}{
-		"alarm_id":      alarmId,
-		"definition_id": testStore.DefinitionIDs[0],
-		"node_id":       "test-node-001",
-		"state":         1,
-		"severity":      1,
-		"name":          "Field Protection Test",
+// testValidationAlarmFieldProtection covers Phase 5 bullet 13:
+// protectPatchFields' restricted PATCH scope now that Alarm has no PUT
+// endpoint at all. PATCH may only transition State to ACKNOWLEDGED or
+// CLEARED (never SUPPRESSED, never ACTIVE/"Reactivate"), plus notes —
+// everything else is rejected as system-managed.
+func testValidationAlarmFieldProtection(t *testing.T, client *mocks.Client, vnic ifs.IVNic) {
+	defId := createAlarmDefFixture(t, client, vnic, alarmDefFixture{
+		Name:           "flow5-patch-scope",
+		EventPattern:   "flow5PatchScopeTrigger",
+		ThresholdCount: 1,
+		DedupEnabled:   true,
+	})
+	defer deleteAlarmDefFixture(client, defId)
+
+	sourceId := "flow5-patch-scope-node"
+	if err := postAlarmEvent(vnic, "flow5PatchScopeTrigger", sourceId, "Node"); err != nil {
+		t.Fatalf("POST event failed: %v", err)
 	}
-	_, err := client.Post("/alm/10/Alarm", alarm)
-	if err != nil {
-		t.Fatalf("POST Alarm for field protection test failed: %v", err)
+	alarm := mustFindOneAlarm(t, vnic, defId, sourceId)
+
+	// Out-of-scope fields — rejected as system-managed.
+	badSeverity := map[string]interface{}{"alarm_id": alarm.AlarmId, "severity": 1}
+	if _, err := client.Patch("/alm/10/Alarm", badSeverity); err == nil {
+		t.Fatal("PATCH changing severity should have been rejected")
+	} else if !strings.Contains(err.Error(), "system-managed") {
+		t.Fatalf("expected system-managed field error, got: %v", err)
 	}
 
-	// PUT changing a system-managed field (name) — should be rejected
-	alarm["name"] = "Changed Name"
-	_, err = client.Put("/alm/10/Alarm", alarm)
-	if err == nil {
-		t.Fatal("PUT Alarm with changed system field should have been rejected")
-	}
-	if !strings.Contains(err.Error(), "system-managed") {
-		t.Fatalf("Expected system-managed field error, got: %v", err)
+	badDef := map[string]interface{}{"alarm_id": alarm.AlarmId, "definition_id": ifs.NewUuid()}
+	if _, err := client.Patch("/alm/10/Alarm", badDef); err == nil {
+		t.Fatal("PATCH changing definitionId should have been rejected")
+	} else if !strings.Contains(err.Error(), "system-managed") {
+		t.Fatalf("expected system-managed field error, got: %v", err)
 	}
 
-	// PUT changing only user-editable field (state) — should succeed
-	alarm["name"] = "Field Protection Test" // restore original
-	alarm["state"] = 2
-	_, err = client.Put("/alm/10/Alarm", alarm)
-	if err != nil {
-		t.Fatalf("PUT Alarm with only user-editable field change should succeed: %v", err)
+	badThresholdState := map[string]interface{}{"alarm_id": alarm.AlarmId, "correlation_threshold_state": 3}
+	if _, err := client.Patch("/alm/10/Alarm", badThresholdState); err == nil {
+		t.Fatal("PATCH changing correlationThresholdState should have been rejected")
+	} else if !strings.Contains(err.Error(), "system-managed") {
+		t.Fatalf("expected system-managed field error, got: %v", err)
 	}
 
-	// Cleanup
-	delQ := mocks.L8QueryText(fmt.Sprintf("select * from Alarm where AlarmId=%s", alarmId))
-	_, _ = client.Delete("/alm/10/Alarm", delQ)
+	// Allowed: Acknowledge.
+	ack := map[string]interface{}{"alarm_id": alarm.AlarmId, "state": 2, "acknowledged_by": "field-protection-test"}
+	if _, err := client.Patch("/alm/10/Alarm", ack); err != nil {
+		t.Fatalf("PATCH Acknowledge should have succeeded: %v", err)
+	}
+
+	// Disallowed state transitions from ACKNOWLEDGED — rejected.
+	suppress := map[string]interface{}{"alarm_id": alarm.AlarmId, "state": 4} // SUPPRESSED
+	if _, err := client.Patch("/alm/10/Alarm", suppress); err == nil {
+		t.Fatal("PATCH State=SUPPRESSED should have been rejected")
+	}
+	reactivate := map[string]interface{}{"alarm_id": alarm.AlarmId, "state": 1} // ACTIVE ("Reactivate")
+	if _, err := client.Patch("/alm/10/Alarm", reactivate); err == nil {
+		t.Fatal("PATCH State=ACTIVE (reactivate) should have been rejected")
+	}
+
+	// Allowed: notes.
+	notePatch := map[string]interface{}{
+		"alarm_id": alarm.AlarmId,
+		"notes": []map[string]interface{}{
+			{"note_id": ifs.NewUuid(), "author": "field-protection-test", "text": "note", "created_at": time.Now().Unix()},
+		},
+	}
+	if _, err := client.Patch("/alm/10/Alarm", notePatch); err != nil {
+		t.Fatalf("PATCH adding a note should have succeeded: %v", err)
+	}
+
+	// Allowed: Clear.
+	clear := map[string]interface{}{"alarm_id": alarm.AlarmId, "state": 3} // CLEARED
+	if _, err := client.Patch("/alm/10/Alarm", clear); err != nil {
+		t.Fatalf("PATCH Clear should have succeeded: %v", err)
+	}
 }

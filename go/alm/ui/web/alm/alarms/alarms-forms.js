@@ -16,28 +16,48 @@ Uses Layer8FormFactory for reduced boilerplate
         return fields.map(function(field) { field.readOnly = true; return field; });
     }
 
+    // Alarm's form definition. Kept field-complete here (data-completeness-
+    // pipeline.md) even though the detail popup itself now renders via
+    // L8EventsAlarmDetail (alarms-state-actions.js), not this definition —
+    // every field still needs a form/column home. Every field is read-only:
+    // Alarm has no PUT endpoint at all (see AlarmService.go), so there is no
+    // generic-edit path left; state transitions happen via PATCH through the
+    // state-action buttons, notes display-only here (adding a note is a
+    // PATCH, not part of a whole-record save).
+    //
+    // Mirrors L8EventsAlarmTable.getFormDefinition()'s base sections, minus
+    // its 'Source' section (sourceId/sourceName/sourceType have no
+    // equivalent on l8alarms's Alarm — see alarms-columns.js's comment on
+    // the same mismatch), plus an alarm-specific 'Topology & Correlation'
+    // section for the fields l8ui's base form has no equivalent for.
     AlmAlarms.forms = {
         Alarm: f.form('Alarm', [
-            f.section('Alarm Details', [
-                // System-managed identity fields (read-only)
+            f.section('Alarm Information', [
                 ...ro(f.text('name', 'Name')),
                 ...ro(f.textarea('description', 'Description')),
-                ...ro(f.reference('definitionId', 'Definition', 'AlarmDefinition')),
-                // Operator-editable fields
-                ...f.select('severity', 'Severity', enums.ALARM_SEVERITY),
-                ...f.select('state', 'State', enums.ALARM_STATE),
-                // System-managed source fields (read-only)
+                ...ro(f.select('severity', 'Severity', enums.ALARM_SEVERITY)),
+                ...ro(f.select('state', 'State', enums.ALARM_STATE)),
+                ...ro(f.reference('definitionId', 'Definition', 'AlarmDefinition'))
+            ]),
+            f.section('Timing', [
+                ...ro(f.datetime('firstOccurrence', 'First Occurrence')),
+                ...ro(f.datetime('lastOccurrence', 'Last Occurrence')),
+                ...ro(f.number('occurrenceCount', 'Occurrence Count')),
+                ...ro(f.text('acknowledgedBy', 'Acknowledged By')),
+                ...ro(f.datetime('acknowledgedAt', 'Acknowledged At')),
+                ...ro(f.text('clearedBy', 'Cleared By')),
+                ...ro(f.datetime('clearedAt', 'Cleared At'))
+            ]),
+            f.section('Topology & Correlation', [
                 ...ro(f.text('nodeId', 'Node ID')),
                 ...ro(f.text('nodeName', 'Node Name')),
                 ...ro(f.text('linkId', 'Link ID')),
                 ...ro(f.text('location', 'Location')),
-                ...ro(f.text('sourceIdentifier', 'Source Identifier'))
-            ]),
-            f.section('Timing', [
-                ...f.datetime('firstOccurrence', 'First Occurrence'),
-                ...f.datetime('lastOccurrence', 'Last Occurrence'),
-                ...f.datetime('acknowledgedAt', 'Acknowledged At'),
-                ...f.datetime('clearedAt', 'Cleared At')
+                ...ro(f.text('sourceIdentifier', 'Source Identifier')),
+                ...ro(f.reference('rootCauseAlarmId', 'Root Cause Alarm', 'Alarm')),
+                ...ro(f.reference('correlationRuleId', 'Correlation Rule', 'CorrelationRule')),
+                ...ro(f.checkbox('isRootCause', 'Is Root Cause')),
+                ...ro(f.number('symptomCount', 'Symptom Count'))
             ]),
             f.section('Notes', [
                 ...f.inlineTable('notes', 'Notes', [

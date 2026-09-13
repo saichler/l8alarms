@@ -29,7 +29,7 @@ func generateArchivedAlarms(store *MockDataStore) []*alm.ArchivedAlarm {
 			DefinitionId:     pickRef(store.DefinitionIDs, i),
 			Name:             archiveAlarmNames[i%len(archiveAlarmNames)],
 			Description:      "Archived alarm from cleared state",
-			State:            l8events.AlarmState_ALARM_STATE_CLEARED,
+			State:            alm.AlarmState_ALARM_STATE_CLEARED,
 			Severity:         l8events.Severity(int32(i%5) + 1),
 			OriginalSeverity: l8events.Severity(int32(i%5) + 1),
 			NodeId:           nodeIDs[i%len(nodeIDs)],

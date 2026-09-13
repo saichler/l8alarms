@@ -115,6 +115,30 @@ var eventMessages = []string{
 	"Round-trip latency to 10.0.0.5 at 250ms (threshold: 100ms)",
 }
 
+// triggerEventTypes are literal EventType strings that satisfy the
+// corresponding eventPatterns[i] regex — used to construct EventRecords
+// that will actually match their AlarmDefinition via the Phase 3 matcher.
+var triggerEventTypes = []string{
+	"linkDown", "highCPU", "highMemory", "ifInErrors", "bgpPeerDown",
+	"ospfNbrStateChange down", "powerSupply fail", "coolingFail",
+	"tempAboveThreshold", "diskSpace critical", "authFailure", "configChanged",
+	"portSecurityViolation", "dhcpPoolExhausted", "dnsResolutionFail",
+	"sslCertExpiring", "backupFailed", "reachabilityLost",
+	"packetLoss threshold", "latency threshold",
+}
+
+// clearEventTypes are literal EventType strings that satisfy the
+// corresponding clearPatterns[i] regex. Empty string where clearPatterns[i]
+// is empty (no clear pattern defined for that definition).
+var clearEventTypes = []string{
+	"linkUp", "cpuUtil normal", "memUtil normal", "ifErrors cleared", "bgpPeerUp",
+	"ospfNbrStateChange full", "powerSupply ok", "fan ok",
+	"tempNormal", "diskSpace normal", "", "configRestored",
+	"", "dhcpPoolAvailable", "dnsResolutionOk",
+	"sslCertRenewed", "backupSucceeded", "reachabilityRestored",
+	"packetLoss normal", "latency normal",
+}
+
 // Correlation rule names
 var corrRuleNames = []string{
 	"Upstream Router Failure", "Switch Cascade Failure",

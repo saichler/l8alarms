@@ -71,10 +71,10 @@ func generateAlarmFilters(store *MockDataStore) []*alm.AlarmFilter {
 		switch i {
 		case 0: // Critical Active
 			f.Severities = []l8events.Severity{l8events.Severity_SEVERITY_CRITICAL}
-			f.States = []l8events.AlarmState{l8events.AlarmState_ALARM_STATE_ACTIVE}
+			f.States = []alm.AlarmState{alm.AlarmState_ALARM_STATE_ACTIVE}
 			f.ExcludeSuppressed = true
 		case 1: // All Active
-			f.States = []l8events.AlarmState{l8events.AlarmState_ALARM_STATE_ACTIVE, l8events.AlarmState_ALARM_STATE_ACKNOWLEDGED}
+			f.States = []alm.AlarmState{alm.AlarmState_ALARM_STATE_ACTIVE, alm.AlarmState_ALARM_STATE_ACKNOWLEDGED}
 			f.ExcludeSuppressed = true
 		case 2: // Root Cause Only
 			f.RootCauseOnly = true
@@ -83,7 +83,7 @@ func generateAlarmFilters(store *MockDataStore) []*alm.AlarmFilter {
 			f.Locations = []string{"DC-East"}
 			f.ExcludeSuppressed = true
 		case 4: // Suppressed
-			f.States = []l8events.AlarmState{l8events.AlarmState_ALARM_STATE_SUPPRESSED}
+			f.States = []alm.AlarmState{alm.AlarmState_ALARM_STATE_SUPPRESSED}
 		case 5: // Server Alarms
 			f.NodeTypes = []string{"SERVER"}
 			f.ExcludeSuppressed = true

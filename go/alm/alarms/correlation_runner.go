@@ -111,7 +111,10 @@ func correlateAsRootCause(alarm *alm.Alarm, rules []*alm.CorrelationRule, adjace
 
 	ctx := &correlation.CorrelationContext{Vnic: vnic, ActiveAlarms: []*alm.Alarm{alarm}, Adjacency: adjacency}
 	for _, r := range raw {
-		candidate := r.(*alm.Alarm)
+		candidate, ok := r.(*alm.Alarm)
+		if !ok {
+			continue
+		}
 		if candidate.State == alm.AlarmState_ALARM_STATE_CLEARED {
 			continue
 		}
@@ -142,7 +145,9 @@ func fetchActiveCorrelationRules(vnic ifs.IVNic) ([]*alm.CorrelationRule, error)
 	}
 	rules := make([]*alm.CorrelationRule, 0, len(rulesRaw))
 	for _, r := range rulesRaw {
-		rules = append(rules, r.(*alm.CorrelationRule))
+		if rule, ok := r.(*alm.CorrelationRule); ok {
+			rules = append(rules, rule)
+		}
 	}
 	return rules, nil
 }

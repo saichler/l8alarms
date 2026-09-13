@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/saichler/l8alarms/go/alm/common"
 	"github.com/saichler/l8alarms/go/alm/services"
+	"github.com/saichler/l8alarms/go/alm/ui"
 	"github.com/saichler/l8alarms/go/tests/mocks"
 	"github.com/saichler/l8types/go/ifs"
 	"net/http"
@@ -63,6 +64,18 @@ func TestAllServices(t *testing.T) {
 	// 0. Drop all existing tables for a clean slate
 	dropAllTables(t, erpServicesVnic)
 
+	// Register types (incl. primary-key decorators) on erpServicesVnic's own
+	// resources BEFORE activating services, matching alm/main/main.go's
+	// order (ui.RegisterAlmTypes then services.ActivateAlmServices, same
+	// resources throughout). Without this, common.NewValidation's setID
+	// auto-ID lookup (in each VB-based ServiceCallback's constructor, which
+	// runs as part of Activate()'s own argument evaluation) finds no
+	// primary-key decorator yet and permanently falls back to a no-op —
+	// startWebServer's own ui.RegisterAlmTypes call happens too late (after
+	// ActivateAlmServices) and on the wrong vnic (webServiceVnic, not
+	// erpServicesVnic) to fix this for the services vnic.
+	ui.RegisterAlmTypes(erpServicesVnic.Resources())
+
 	// 1. Activate all L8Alarms services on the services vNic
 	services.ActivateAlmServices(common.DB_CREDS, common.DB_NAME, erpServicesVnic)
 
@@ -87,7 +100,7 @@ func TestAllServices(t *testing.T) {
 
 	// 4. Run all mock data phases
 	testStore = &mocks.MockDataStore{}
-	mocks.RunAllPhases(client, testStore)
+	mocks.RunAllPhases(client, testStore, erpServicesVnic)
 
 	// 5. Verify key entity counts
 	if len(testStore.DefinitionIDs) == 0 {
@@ -106,11 +119,15 @@ func TestAllServices(t *testing.T) {
 	testServiceGetters(t, erpServicesVnic)
 
 	// 8. Test CRUD lifecycle
-	testCRUD(t, client)
+	testCRUD(t, client, erpServicesVnic)
 
 	// 9. Test validation
-	testValidation(t, client)
+	testValidation(t, client, erpServicesVnic)
 
-	// 10. Test correlation engine, maintenance windows
-	testCorrelation(t, client)
+	// 10. Test the EventRecord -> Alarm decision flow (create/merge/drop,
+	// threshold state, dedup, clear) end to end
+	testAlarmFlow(t, client, erpServicesVnic)
+
+	// 11. Test correlation engine
+	testCorrelation(t, client, erpServicesVnic)
 }

@@ -11,18 +11,22 @@ Table column definitions for Alarm, AlarmDefinition, AlarmFilter
     const col = window.Layer8ColumnFactory;
     const render = AlmAlarms.render;
 
-    AlmAlarms.columns = {
-        Alarm: [
-            ...col.id('alarmId'),
-            ...col.col('name', 'Name'),
-            ...col.status('severity', 'Severity', null, render.severity),
-            ...col.status('state', 'State', null, render.state),
+    // L8EventsAlarmTable.getColumns() covers severity/name/state/firstOccurrence/
+    // lastOccurrence/occurrenceCount/acknowledgedBy, but its 'sourceName' column
+    // has no equivalent on l8alarms's Alarm (which has nodeId/nodeName/linkId/
+    // location/sourceIdentifier instead — see js-protobuf-field-names.md) — drop
+    // it rather than alias a mismatched field. Append the alarm-specific columns
+    // (nodeName, isRootCause, symptomCount) that l8ui has no equivalent for.
+    const alarmColumns = L8EventsAlarmTable.getColumns()
+        .filter((c) => c.key !== 'sourceName')
+        .concat([
             ...col.col('nodeName', 'Node'),
-            ...col.datetime('firstOccurrence', 'First Occurrence'),
-            ...col.col('occurrenceCount', 'Count'),
             ...col.boolean('isRootCause', 'Root Cause'),
             ...col.col('symptomCount', 'Symptoms')
-        ],
+        ]);
+
+    AlmAlarms.columns = {
+        Alarm: alarmColumns,
 
         AlarmDefinition: [
             ...col.id('definitionId'),

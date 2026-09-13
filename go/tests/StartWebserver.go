@@ -12,11 +12,15 @@ func startWebServer(port int, nic ifs.IVNic, servicesNic ...ifs.IVNic) ifs.IWebS
 	// Register UI types on the vNic's resources
 	ui.RegisterAlmTypes(nic.Resources())
 
+	domain, private, _ := nic.Resources().Certificate()
+
 	serverConfig := &server.RestServerConfig{
 		Host:           "localhost",
 		Port:           port,
 		Authentication: true,
 		Prefix:         common.PREFIX,
+		CertDomain:     domain,
+		CertPrivate:    private,
 	}
 	svr, err := server.NewRestServer(serverConfig)
 	if err != nil {

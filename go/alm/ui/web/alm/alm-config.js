@@ -10,7 +10,13 @@ Layer8ModuleConfigFactory.create({
         'alarms': {
             label: 'Alarms',
             services: [
-                { key: 'alarms', label: 'Active Alarms', endpoint: '/10/Alarm', model: 'Alarm', supportedViews: ['table', 'kanban', 'chart'] },
+                // readOnly: true — Alarm's POST/PUT have no HTTP route at all (see
+                // AlarmService.go's hand-built WebService — POST only accepts an
+                // l8events.EventRecord via a direct vnic call, and there is no PUT).
+                // Row click still opens the detail popup (onRowClick is unconditional);
+                // state transitions happen via PATCH through the state-action buttons
+                // wired in alarms-state-actions.js, not through a generic Add/Edit modal.
+                { key: 'alarms', label: 'Active Alarms', endpoint: '/10/Alarm', model: 'Alarm', supportedViews: ['table', 'kanban', 'chart'], readOnly: true },
                 { key: 'alarm-definitions', label: 'Definitions', endpoint: '/10/AlmDef', model: 'AlarmDefinition' },
                 { key: 'alarm-filters', label: 'Saved Filters', endpoint: '/10/AlmFilter', model: 'AlarmFilter' }
             ]
