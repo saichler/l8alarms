@@ -1,0 +1,205 @@
+# KIND cluster version — uses KIND's built-in standard StorageClass
+# KIND ships with rancher/local-path-provisioner pre-installed as StorageClass "standard"
+# No custom StorageClass definition needed.
+#
+# NOTE: this covers only the KIND mode, built for a one-off verification run
+# (see plans/remove-local-event-duplication-and-gate-alarm-creation.md's
+# Phase 7). l8alarms has no local/baremetal/gke manifests yet, and no
+# log-vnet/log-agent services (l8alarms has no such binaries at all —
+# see log-services-required.md, a separate pre-existing gap).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: l8alarms
+  labels:
+    name: l8alarms
+
+---
+
+# alm-postgres is only in this KIND-only manifest: l8erp's own k8s YAMLs have
+# no Postgres pod at all, implying they expect an externally-managed
+# instance (cloud-managed in GKE, a pre-existing host instance in
+# local/bare-metal — matching how run-local.sh starts postgres separately
+# via `docker run saichler/unsecure-postgres`). This KIND cluster needs its
+# own, so we run one using the alm-postgres base image directly — its
+# ENTRYPOINT is commented out in l8secure/postgres/Dockerfile (the same bug
+# already found and reported in l8utils's own postgres-unsecure image), so
+# command/args invoke start-postgres.sh explicitly.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: l8alarms
+  name: alm-postgres
+  labels:
+    app: alm-postgres
+spec:
+  serviceName: alm-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alm-postgres
+  template:
+    metadata:
+      labels:
+        app: alm-postgres
+    spec:
+      hostNetwork: true
+      containers:
+        - name: alm-postgres
+          image: saichler/alm-postgres:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh"]
+          args: ["-c", "/start-postgres.sh admin admin admin 5432 && sleep infinity"]
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: hdata
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: hdata
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 5Gi
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: l8alarms
+  name: alm-vnet
+  labels:
+    app: alm-vnet
+spec:
+  serviceName: alm-vnet
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alm-vnet
+  template:
+    metadata:
+      labels:
+        app: alm-vnet
+    spec:
+      hostNetwork: true
+      containers:
+        - name: alm-vnet
+          image: saichler/alm-vnet:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: hdata
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: hdata
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 2Gi
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: l8alarms
+  name: alm
+  labels:
+    app: alm
+spec:
+  serviceName: alm
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alm
+  template:
+    metadata:
+      labels:
+        app: alm
+    spec:
+      # hostNetwork (deviating from l8erp's own erp StatefulSet, which
+      # doesn't set this): alm-vnet uses hostNetwork:true, and KIND's default
+      # CNI (kindnet) doesn't forward the vnic's multicast-based discovery
+      # across the pod-overlay/host-network boundary — confirmed by alm
+      # otherwise trying to dial its own pod IP for the vnet and getting
+      # connection refused. Putting alm on the same network layer as
+      # alm-vnet fixes discovery for this KIND-only verification manifest.
+      hostNetwork: true
+      containers:
+        - name: alm
+          image: saichler/alm:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: hdata
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: hdata
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 5Gi
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: l8alarms
+  name: alm-web
+  labels:
+    app: alm-web
+spec:
+  serviceName: alm-web
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alm-web
+  template:
+    metadata:
+      labels:
+        app: alm-web
+    spec:
+      hostNetwork: true
+      containers:
+        - name: alm-web
+          image: saichler/alm-web:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          volumeMounts:
+            - name: hdata
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: hdata
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: standard
+        resources:
+          requests:
+            storage: 2Gi
