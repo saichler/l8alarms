@@ -6,26 +6,42 @@ When a network device fails, it typically generates dozens of downstream alarms 
 
 ## Key Capabilities
 
-- **Alarm lifecycle management** - raise, acknowledge, clear, suppress
-- **Event ingestion** - raw event normalization and processing
+- **Alarm lifecycle management** - acknowledge, clear, suppress, with state-transition history
+- **Event-driven alarm creation** - events arrive as shared `l8events.EventRecord`s; the `Alarm` service matches
+  them against `AlarmDefinition`s and decides DROP / CLEAR / MERGE / CREATE
+- **Threshold & correlation windows** - per-alarm threshold, correlation, and auto-clear timers
+  (`AlmCorrelationThresholdState`: PENDING_THRESHOLD → OPEN_FOR_CORRELATION → STABLE)
 - **Topology-aware root cause analysis (RCA)** - integrates with [l8topology](https://github.com/saichler/l8topology) to correlate alarms using network topology relationships
 - **Correlation engine** - four strategies: topological, temporal, pattern-based, and composite
-- **Notification policies** - dispatch to email, webhook, Slack, PagerDuty, or custom channels with throttling
-- **Escalation policies** - time-based step progression for unacknowledged alarms
-- **Maintenance windows** - scheduled suppression of alarms within scope
-- **Alarm archiving** - archive resolved alarms and their events for historical analysis
-- **Desktop UI** - real-time alarm dashboard with correlation tree view and topology overlay
+- **Notification policies** - match alarms to `l8notify.NotifyTarget`s, with throttling; delivery goes through the
+  shared l8notify `Notify` service (`Resources().Notify().Send`)
+- **Escalation policies** - time-based `l8notify.EscalationStep` progression for unacknowledged alarms
+- **Alarm archiving** - archive resolved alarms (and their symptoms) for historical analysis
+- **Desktop UI** - alarm dashboard with correlation tree view and topology overlay
 - **Mock data generation** - phased generators for realistic test data across all services
 
 ## Architecture
 
-The alarm service callback is the system's nerve center. Every alarm POST triggers:
+l8alarms does **not** own events or notification delivery — both are shared, required system services:
 
-1. **Maintenance check** - suppresses the alarm if within an active maintenance window
-2. **Persist** - stores to PostgreSQL via l8orm
-3. **Correlation** - queries active rules and alarms, runs the correlation engine to identify root cause vs. symptom relationships
-4. **Notification** - evaluates notification policies, dispatches to configured targets
-5. **Escalation** - schedules time-based escalation timers for unacknowledged alarms
+- **Events** come from `l8events` (`Events` service, area 76). The event source pushes each `EventRecord` to the
+  `Alarm` service via vnic (`POST` with an `EventRecord` body — there is no HTTP "create alarm" endpoint). After
+  deciding, l8alarms PATCHes the source `EventRecord` to `PROCESSED` with `GeneratedAlarmId` set.
+- **Notifications** go to `l8notify` (`Notify` service, area 78) through `Resources().Notify().Send(...)`.
+
+Both are required system services activated by `l8common` — l8alarms does not activate them itself.
+
+Alarm `POST` (an incoming `EventRecord`):
+
+1. **Match** - find the active `AlarmDefinition` whose pattern matches the event; no match → DROP
+2. **Decide** - CLEAR (clear pattern matched), MERGE (same dedup key → bump occurrence count, reset auto-clear),
+   or CREATE (new alarm, starts threshold/correlation/auto-clear timers)
+3. **Persist** - stores to PostgreSQL via l8orm
+4. **Correlation** - runs the correlation engine to identify root cause vs. symptom relationships
+5. **Notification** - evaluates notification policies, sends via the l8notify `Notify` service
+6. **Escalation** - schedules time-based escalation timers for unacknowledged alarms
+
+`PUT`/`PATCH` (acknowledge, clear, notes) run steps 4-6 as well.
 
 ## Services
 
@@ -33,16 +49,17 @@ All services share **ServiceArea 10** with prefix `/alm/`.
 
 | Service | ServiceName | Primary Key | Description |
 |---------|-------------|-------------|-------------|
-| AlarmDefinition | `AlmDef` | `definitionId` | Alarm templates and thresholds |
-| Alarm | `Alarm` | `alarmId` | Active alarm lifecycle |
-| Event | `Event` | `eventId` | Raw event ingestion (immutable) |
+| AlarmDefinition | `AlmDef` | `definitionId` | Alarm templates, event patterns, thresholds |
+| Alarm | `Alarm` | `alarmId` | Active alarm lifecycle. HTTP: GET/PATCH/DELETE only; POST (an `EventRecord`) is vnic-only |
 | CorrelationRule | `CorrRule` | `ruleId` | RCA rule definitions |
 | NotificationPolicy | `NotifPol` | `policyId` | Notification dispatch rules |
 | EscalationPolicy | `EscPolicy` | `policyId` | Time-based escalation chains |
-| MaintenanceWindow | `MaintWin` | `windowId` | Scheduled suppression windows |
 | AlarmFilter | `AlmFilter` | `filterId` | Saved alarm filter configurations |
 | ArchivedAlarm | `ArcAlarm` | `alarmId` | Historical alarms (immutable) |
-| ArchivedEvent | `ArcEvent` | `eventId` | Historical events (immutable) |
+| TopologyOverlay | `AlmOverlay` | — | Read-only topology enrichment (no DB) |
+
+Events (`EventRecord`) and notification records (`NotifyRecord`) are **not** l8alarms services — they are owned by
+`l8events` and `l8notify`.
 
 ## Child Types (embedded, not services)
 
@@ -51,9 +68,8 @@ All services share **ServiceArea 10** with prefix `/alm/`.
 | AlarmNote | Alarm | Operator notes on alarms |
 | AlarmStateChange | Alarm | State transition history |
 | CorrelationCondition | CorrelationRule | Rule matching conditions |
-| NotificationTarget | NotificationPolicy | Dispatch targets per policy |
-| EscalationStep | EscalationPolicy | Escalation chain steps |
-| EventAttribute | Event | Key-value event metadata |
+| `l8notify.NotifyTarget` | NotificationPolicy | Dispatch targets per policy (shared l8notify type) |
+| `l8notify.EscalationStep` | EscalationPolicy | Escalation chain steps (shared l8notify type) |
 
 ## Engine Components
 
@@ -61,87 +77,82 @@ All services share **ServiceArea 10** with prefix `/alm/`.
 |-----------|-----------|-------------|
 | Correlation | `correlation/` | RCA engine with topological, temporal, pattern, and composite strategies |
 | Enrichment | `enrichment/` | Topology overlay - projects alarm severity onto topology nodes |
-| Notification | `notification/` | Policy matching, throttling, and channel-specific dispatch |
-| Escalation | `escalation/` | Time-based scheduler with per-alarm timers and step progression |
-| Archiving | `archiving/` | Recursively archives alarm + events + symptoms, then removes active records |
+| Notification | `notification/` | Policy matching, throttling, template rendering; sends via `Resources().Notify().Send` |
+| Escalation | `escalation/` | Time-based scheduler with per-alarm timers and step progression (sends via l8notify) |
+| Archiving | `archiving/` | Archives an alarm and its symptom alarms to `ArchivedAlarm`, then removes the active records |
 
 ## UI
 
-The desktop UI is built with the l8ui shared component library and organized into five submodules:
+The desktop UI is built with the l8ui shared component library (a git submodule at `go/alm/ui/web/l8ui`) and
+organized into submodules:
 
 | Submodule | Services |
 |-----------|----------|
-| Alarms | Alarms, Alarm Definitions, Alarm Filters |
-| Events | Events |
+| Alarms | Active Alarms, Alarm Definitions, Saved Filters |
 | Correlation | Correlation Rules |
 | Policies | Notification Policies, Escalation Policies |
-| Maintenance | Maintenance Windows |
+| Archive | Archived Alarms |
 
-Features include a correlation tree view (using `Layer8DTreeGrid` with alarm hierarchy showing ROOT/SYMPTOM badges), severity/state color rendering, and section-based navigation.
+Alarm views reuse the shared `L8Events*` components from `l8ui/events/`; notification targets use `l8ui/notify/`.
+Features include a correlation tree view (using `Layer8DTreeGrid` with alarm hierarchy showing ROOT/SYMPTOM badges),
+severity/state color rendering, and section-based navigation.
 
 ## Project Structure
 
 ```
-proto/                          Protobuf definitions (9 files)
-  alm-alarms.proto              Alarm, AlarmNote, AlarmStateChange
+proto/                          Protobuf definitions (7 files)
+  alm-alarms.proto              Alarm, AlarmNote, AlarmStateChange, AlarmState
   alm-definitions.proto         AlarmDefinition
-  alm-events.proto              Event, EventAttribute
   alm-correlation.proto         CorrelationRule, CorrelationCondition
-  alm-policies.proto            NotificationPolicy, EscalationPolicy
-  alm-maintenance.proto         MaintenanceWindow
+  alm-policies.proto            NotificationPolicy, EscalationPolicy (use l8notify types)
   alm-filters.proto             AlarmFilter
-  alm-archive.proto             ArchivedAlarm, ArchivedEvent
-  alm-common.proto              Shared enums (severity, state, etc.)
+  alm-archive.proto             ArchivedAlarm
+  alm-common.proto              Shared enums
 go/
   alm/
-    common/                     Shared validation, service factory, type registry
-    services/                   Service activation orchestrator
-    alarms/                     Alarm service + post-action runners
+    common/                     Alarm state-transition helpers, defaults
+    services/                   Service activation orchestrator (ActivateAlmServices)
+    alarms/                     Alarm service, event matching/lifecycle, timers, post-action runners
     alarmdefinitions/           Alarm definition service
     alarmfilters/               Saved filter service
-    events/                     Event service (immutable)
     correlationrules/           Correlation rule service
     notificationpolicies/       Notification policy service
     escalationpolicies/         Escalation policy service
-    maintenancewindows/         Maintenance window service + checker
     archivedalarms/             Archived alarm service (immutable)
-    archivedevents/             Archived event service (immutable)
     correlation/                RCA engine (topological, temporal, pattern, composite)
     enrichment/                 Topology overlay service
-    notification/               Notification engine + senders
+    notification/               Notification policy engine; sends via l8notify
     escalation/                 Escalation scheduler
     archiving/                  Archive engine
     ui/
+      shared_alm.go             UI type registration
       web/                      Desktop UI
         alm/                    Module JS (config, enums, columns, forms, init)
           alarms/               Alarm views + correlation tree
-          events/               Event views
           correlation/          Correlation rule views
           policies/             Policy views
-          maintenance/          Maintenance window views
-          archive/              Archived alarm/event views
+          archive/              Archived alarm views
         sections/               Section HTML (dashboard, alarms, system)
         js/                     App bootstrap, reference registry, sections
-        css/                    Base styles, modals, responsive
-        l8ui/                   Shared UI library
+        l8ui/                   Shared UI library (git submodule)
       main/                     UI server entry point
     main/                       Backend server entry point
     vnet/                       Standalone vnet process
   types/alm/                    Generated protobuf Go types
   tests/
-    mocks/                      Mock data generators (6 phases)
+    mocks/                      Mock data generators (phased)
       gen_foundation.go         Alarm definitions, correlation rules
-      gen_config.go             Policies, escalation rules, maintenance windows, filters
-      gen_events.go             Events
+      gen_config.go             Policies, escalation rules, filters
       gen_alarms.go             Alarms with state distribution
-      gen_archive.go            Archived alarms and events
+      gen_archive.go            Archived alarms
     TestCRUD_test.go            Full CRUD for all services
     TestValidation_test.go      Field validation
     TestCorrelation_test.go     Correlation engine
+    TestAlarmFlow_test.go       Event → alarm decision flow
     TestServiceHandlers_test.go Handler accessibility
     TestServiceGetters_test.go  Service getter coverage
     TestAllService_test.go      All-services orchestrator
-plans/                          Product requirements document
+plans/                          PRD and implementation plans
 ```
 
 ## Dependencies
@@ -150,15 +161,15 @@ Built on the Layer 8 service framework:
 
 | Package | Role |
 |---------|------|
+| [l8common](https://github.com/saichler/l8common) | Service activation, CRUD helpers, bootstrapping |
 | [l8bus](https://github.com/saichler/l8bus) | Virtual network overlay (VNet, vNic) |
 | [l8orm](https://github.com/saichler/l8orm) | ORM + PostgreSQL persistence |
-| [l8services](https://github.com/saichler/l8services) | Service manager framework |
 | [l8topology](https://github.com/saichler/l8topology) | Topology types for enrichment + RCA |
 | [l8web](https://github.com/saichler/l8web) | REST web server |
-| [l8reflect](https://github.com/saichler/l8reflect) | Runtime type introspection |
-| [l8types](https://github.com/saichler/l8types) | Core interfaces |
-| [l8utils](https://github.com/saichler/l8utils) | Logging, web, registry utilities |
+| [l8types](https://github.com/saichler/l8types) | Core interfaces + shared `l8events`/`l8notify` types |
+| [l8utils](https://github.com/saichler/l8utils) | Logging, timers, registry, default `Events()`/`Notify()` impls |
 | [l8srlz](https://github.com/saichler/l8srlz) | Serialization |
+| [l8test](https://github.com/saichler/l8test) | Test topology |
 
 ## Running Tests
 
@@ -166,7 +177,7 @@ Built on the Layer 8 service framework:
 cd go && go test ./tests/ -v -run TestAllServices
 ```
 
-Tests exercise full CRUD, validation, correlation, maintenance window suppression, and service handler accessibility through the HTTP API.
+Tests exercise full CRUD, validation, correlation, the event → alarm flow, and service handler accessibility through the HTTP API.
 
 ## Running Locally
 

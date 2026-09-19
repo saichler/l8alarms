@@ -16,23 +16,27 @@ func main() {
 }
 
 func startWebServer(port int, _ string) {
-	serverConfig := &server.RestServerConfig{
-		Host:           ipsegment.MachineIP,
-		Port:           port,
-		Authentication: true,
-		Prefix:         common.PREFIX,
-	}
-	svr, err := server.NewRestServer(serverConfig)
-	if err != nil {
-		panic(err)
-	}
-
 	resources := l8common.CreateResources("web", false)
 	ui.RegisterAlmTypes(resources)
 
 	nic := vnic.NewVirtualNetworkInterface(resources, nil)
 	nic.Start()
 	nic.WaitForConnection()
+
+	domain, private, _ := nic.Resources().Certificate()
+
+	serverConfig := &server.RestServerConfig{
+		Host:           ipsegment.MachineIP,
+		Port:           port,
+		Authentication: true,
+		Prefix:         common.PREFIX,
+		CertDomain:     domain,
+		CertPrivate:    private,
+	}
+	svr, err := server.NewRestServer(serverConfig)
+	if err != nil {
+		panic(err)
+	}
 
 	hs, ok := nic.Resources().Services().ServiceHandler(health.ServiceName, 0)
 	if ok {

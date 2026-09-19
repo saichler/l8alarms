@@ -23,9 +23,11 @@ limitations under the License.
     <title>Layer 8 Alarms</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <!-- Shared Theme (load first) -->
+    <link rel="stylesheet" href="l8ui/shared/layer8d-theme-tokens.css">
     <link rel="stylesheet" href="l8ui/shared/layer8d-theme.css">
     <link rel="stylesheet" href="l8ui/shared/layer8d-animations.css">
     <link rel="stylesheet" href="l8ui/shared/layer8d-scrollbar.css">
+    <link rel="stylesheet" href="l8ui/shared/layer8-print.css">
     <!-- Generic Section Layout (shared by all modules) -->
     <link rel="stylesheet" href="l8ui/shared/layer8-section-layout.css">
     <link rel="stylesheet" href="l8ui/shared/layer8-section-responsive.css">
@@ -47,17 +49,24 @@ limitations under the License.
     <link rel="stylesheet" href="l8ui/wizard/layer8d-wizard.css">
     <link rel="stylesheet" href="l8ui/dashboard/layer8d-widget.css">
     <link rel="stylesheet" href="l8ui/shared/layer8-view-switcher.css">
+    <!-- Markdown & AI Agent Styles -->
+    <link rel="stylesheet" href="l8ui/shared/layer8-markdown.css">
+    <link rel="stylesheet" href="l8ui/l8agent/l8agent-chat.css">
+    <link rel="stylesheet" href="l8ui/l8agent/l8agent-bubble.css">
     <!-- SYS Module Styles -->
     <link rel="stylesheet" href="l8ui/sys/l8sys.css">
+    <link rel="stylesheet" href="l8ui/sys/security/l8security-password-strength.css">
     <link rel="stylesheet" href="l8ui/sys/health/l8health.css">
     <link rel="stylesheet" href="l8ui/sys/modules/l8sys-modules.css">
     <link rel="stylesheet" href="l8ui/sys/logs/l8logs.css">
+    <link rel="stylesheet" href="l8ui/sys/dataimport/l8dataimport.css">
     <!-- Toggle Tree Component -->
     <link rel="stylesheet" href="l8ui/shared/layer8d-toggle-tree.css">
     <!-- Popup Component -->
     <link rel="stylesheet" href="l8ui/popup/layer8d-popup.css">
     <link rel="stylesheet" href="l8ui/popup/layer8d-popup-forms.css">
     <link rel="stylesheet" href="l8ui/shared/layer8d-form-fields.css">
+    <link rel="stylesheet" href="l8ui/shared/layer8-file-upload.css">
     <link rel="stylesheet" href="l8ui/popup/layer8d-popup-inline-table.css">
     <link rel="stylesheet" href="l8ui/popup/layer8d-popup-content.css">
     <!-- Date Picker Component -->
@@ -70,7 +79,7 @@ limitations under the License.
     <link rel="stylesheet" href="l8ui/notification/layer8d-notification.css">
     <!-- Shared L8Events & L8Notify Component Styles -->
     <link rel="stylesheet" href="l8ui/events/l8events.css">
-    <link rel="stylesheet" href="l8ui/notification/l8notify-notification.css">
+    <link rel="stylesheet" href="l8ui/notify/l8notify-notification.css">
 </head>
 <body>
     <div class="app-container">
@@ -152,14 +161,19 @@ limitations under the License.
     <!-- Popup Root -->
     <div id="layer8d-popup-root"></div>
 
+    <script src="l8ui/shared/layer8d-router.js"></script>
     <script src="js/sections.js"></script>
     <script src="js/app.js"></script>
     <!-- Shared Scripts (load first, in order) -->
+    <script src="l8ui/shared/layer8d-theme-switcher.js"></script>
     <script src="l8ui/shared/layer8d-config.js"></script>
+    <script src="l8ui/shared/layer8d-websocket.js"></script>
     <script src="l8ui/shared/layer8d-utils.js"></script>
     <script src="l8ui/shared/layer8d-renderers.js"></script>
     <script src="l8ui/shared/layer8d-reference-registry.js"></script>
+    <script src="l8ui/shared/layer8d-portal-switcher.js"></script>
     <!-- Factory Components (load before module scripts) -->
+    <script src="l8ui/shared/layer8-query-builder.js"></script>
     <script src="l8ui/shared/layer8-enum-factory.js"></script>
     <script src="l8ui/shared/layer8-ref-factory.js"></script>
     <script src="l8ui/shared/layer8-column-factory.js"></script>
@@ -174,12 +188,13 @@ limitations under the License.
     <script src="l8ui/events/l8events-state-actions.js"></script>
     <script src="l8ui/events/l8events-alarm-table.js"></script>
     <script src="l8ui/events/l8events-alarm-detail.js"></script>
-    <script src="l8ui/notification/l8notify-enums.js"></script>
+    <script src="l8ui/notify/l8notify-enums.js"></script>
     <!-- ALM Reference Registry -->
     <script src="js/reference-registry-alm.js"></script>
     <!-- Notification Component (load before forms) -->
     <script src="l8ui/notification/layer8d-notification.js"></script>
     <!-- Input Formatter Component (load in order, before forms) -->
+    <script src="l8ui/shared/layer8-field-parsers.js"></script>
     <script src="l8ui/input_formatters/layer8d-input-formatter-utils.js"></script>
     <script src="l8ui/input_formatters/layer8d-input-formatter-masks.js"></script>
     <script src="l8ui/input_formatters/layer8d-input-formatter-types-validators.js"></script>
@@ -187,6 +202,11 @@ limitations under the License.
     <script src="l8ui/input_formatters/layer8d-input-formatter-core.js"></script>
     <script src="l8ui/input_formatters/layer8d-input-formatter.js"></script>
     <!-- Forms Component (load in order) -->
+    <script src="l8ui/shared/layer8-format-display.js"></script>
+    <script src="l8ui/shared/layer8-form-chips.js"></script>
+    <script src="l8ui/shared/layer8-inline-table-state.js"></script>
+    <script src="l8ui/shared/layer8-period-selector.js"></script>
+    <script src="l8ui/shared/layer8-reference-config-resolver.js"></script>
     <script src="l8ui/shared/layer8d-forms-fields.js"></script>
     <script src="l8ui/shared/layer8d-forms-fields-ext.js"></script>
     <script src="l8ui/shared/layer8d-forms-data.js"></script>
@@ -196,6 +216,7 @@ limitations under the License.
     <!-- Popup Component -->
     <script src="l8ui/popup/layer8d-popup.js"></script>
     <!-- Date Picker Component (load in order) -->
+    <script src="l8ui/shared/layer8-datepicker-grid.js"></script>
     <script src="l8ui/datepicker/layer8d-datepicker-utils.js"></script>
     <script src="l8ui/datepicker/layer8d-datepicker-calendar.js"></script>
     <script src="l8ui/datepicker/layer8d-datepicker-core.js"></script>
@@ -214,6 +235,12 @@ limitations under the License.
     <script src="l8ui/edit_table/layer8d-table-events.js"></script>
     <script src="l8ui/edit_table/layer8d-table-filter.js"></script>
     <script src="l8ui/edit_table/layer8d-table.js"></script>
+    <!-- Export & File Upload Components -->
+    <script src="l8ui/shared/layer8-csv-export.js"></script>
+    <script src="l8ui/shared/layer8-excel-export.js"></script>
+    <script src="l8ui/shared/layer8-pdf-export.js"></script>
+    <script src="l8ui/shared/layer8-export-helper.js"></script>
+    <script src="l8ui/shared/layer8-file-upload.js"></script>
     <!-- Data Source & View Factory -->
     <script src="l8ui/shared/layer8d-data-source.js"></script>
     <script src="l8ui/shared/layer8d-view-factory.js"></script>
@@ -247,12 +274,15 @@ limitations under the License.
     <!-- Dashboard Widget Component -->
     <script src="l8ui/dashboard/layer8d-widget.js"></script>
     <!-- Shared Module Abstractions -->
+    <script src="l8ui/shared/layer8d-permission-filter.js"></script>
     <script src="l8ui/shared/layer8d-service-registry.js"></script>
     <script src="l8ui/shared/layer8d-module-crud.js"></script>
     <script src="l8ui/shared/layer8d-module-navigation.js"></script>
     <script src="l8ui/shared/layer8d-toggle-tree.js"></script>
     <script src="l8ui/shared/layer8d-module-filter.js"></script>
+    <script src="l8ui/shared/layer8-module-factory-core.js"></script>
     <script src="l8ui/shared/layer8d-module-factory.js"></script>
+    <script src="l8ui/shared/layer8-markdown.js"></script>
     <!-- ALM Module -->
     <script src="alm/alm-config.js"></script>
     <script src="alm/alm-section-config.js"></script>
@@ -265,9 +295,6 @@ limitations under the License.
     <script src="alm/policies/policies-enums.js"></script>
     <script src="alm/policies/policies-columns.js"></script>
     <script src="alm/policies/policies-forms.js"></script>
-    <script src="alm/maintenance/maintenance-enums.js"></script>
-    <script src="alm/maintenance/maintenance-columns.js"></script>
-    <script src="alm/maintenance/maintenance-forms.js"></script>
     <script src="alm/archive/archive-enums.js"></script>
     <script src="alm/archive/archive-columns.js"></script>
     <script src="alm/archive/archive-forms.js"></script>
@@ -281,13 +308,27 @@ limitations under the License.
     <script src="l8ui/sys/security/l8security-columns.js"></script>
     <script src="l8ui/sys/security/l8security-forms.js"></script>
     <script src="l8ui/sys/security/l8security.js"></script>
+    <script src="l8ui/sys/security/l8security-password-strength.js"></script>
+    <script src="l8ui/sys/security/l8security-change-password.js"></script>
     <script src="l8ui/sys/security/l8security-users-crud.js"></script>
     <script src="l8ui/sys/security/l8security-roles-crud.js"></script>
     <script src="l8ui/sys/security/l8security-credentials-crud.js"></script>
+    <script src="l8ui/sys/security/l8security-events-enums.js"></script>
+    <script src="l8ui/sys/security/l8security-events-columns.js"></script>
     <script src="l8ui/sys/modules/l8sys-dependency-graph.js"></script>
     <script src="l8ui/sys/modules/l8sys-modules-map.js"></script>
     <script src="l8ui/sys/modules/l8sys-modules.js"></script>
     <script src="l8ui/sys/logs/l8logs.js"></script>
+    <script src="l8ui/sys/dataimport/l8dataimport.js"></script>
+    <script src="l8ui/sys/dataimport/l8dataimport-templates.js"></script>
+    <script src="l8ui/sys/dataimport/l8dataimport-transfer.js"></script>
+    <script src="l8ui/sys/dataimport/l8dataimport-execute.js"></script>
     <script src="l8ui/sys/l8sys-init.js"></script>
+    <!-- JS: AI Agent Module -->
+    <script src="l8ui/l8agent/l8agent-enums.js"></script>
+    <script src="l8ui/l8agent/l8agent-columns.js"></script>
+    <script src="l8ui/l8agent/l8agent-forms.js"></script>
+    <script src="l8ui/l8agent/l8agent-chat.js"></script>
+    <script src="l8ui/l8agent/l8agent-bubble.js"></script>
 </body>
 </html>

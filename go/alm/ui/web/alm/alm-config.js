@@ -34,12 +34,6 @@ Layer8ModuleConfigFactory.create({
                 { key: 'escalation-policies', label: 'Escalation', endpoint: '/10/EscPolicy', model: 'EscalationPolicy' }
             ]
         },
-        'maintenance': {
-            label: 'Maintenance',
-            services: [
-                { key: 'maintenance-windows', label: 'Windows', endpoint: '/10/MaintWin', model: 'MaintenanceWindow', supportedViews: ['table', 'calendar'] }
-            ]
-        },
         'archive': {
             label: 'Archive',
             services: [
@@ -47,5 +41,5 @@ Layer8ModuleConfigFactory.create({
             ]
         }
     },
-    submodules: ['AlmAlarms', 'AlmCorrelation', 'AlmPolicies', 'AlmMaintenance', 'AlmArchive']
+    submodules: ['AlmAlarms', 'AlmCorrelation', 'AlmPolicies', 'AlmArchive']
 });
