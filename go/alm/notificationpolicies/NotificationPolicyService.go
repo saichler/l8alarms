@@ -12,10 +12,9 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService(common.ServiceConfig{
-		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "PolicyId", Callback: newNotificationPolicyServiceCallback(vnic),
-	}, &alm.NotificationPolicy{}, &alm.NotificationPolicyList{}, creds, dbname, vnic)
+	sla := common.NewOrmSLA(ServiceName, ServiceArea, "PolicyId", newNotificationPolicyServiceCallback(vnic),
+		&alm.NotificationPolicy{}, &alm.NotificationPolicyList{})
+	common.ActivateService(sla, creds, dbname, vnic)
 }
 
 func NotificationPolicies(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {

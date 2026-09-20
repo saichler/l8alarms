@@ -12,10 +12,9 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService(common.ServiceConfig{
-		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "RuleId", Callback: newCorrelationRuleServiceCallback(vnic),
-	}, &alm.CorrelationRule{}, &alm.CorrelationRuleList{}, creds, dbname, vnic)
+	sla := common.NewOrmSLA(ServiceName, ServiceArea, "RuleId", newCorrelationRuleServiceCallback(vnic),
+		&alm.CorrelationRule{}, &alm.CorrelationRuleList{})
+	common.ActivateService(sla, creds, dbname, vnic)
 }
 
 func CorrelationRules(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {

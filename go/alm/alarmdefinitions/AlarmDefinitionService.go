@@ -12,10 +12,9 @@ const (
 )
 
 func Activate(creds, dbname string, vnic ifs.IVNic) {
-	common.ActivateService(common.ServiceConfig{
-		ServiceName: ServiceName, ServiceArea: ServiceArea,
-		PrimaryKey: "DefinitionId", Callback: newAlarmDefinitionServiceCallback(vnic),
-	}, &alm.AlarmDefinition{}, &alm.AlarmDefinitionList{}, creds, dbname, vnic)
+	sla := common.NewOrmSLA(ServiceName, ServiceArea, "DefinitionId", newAlarmDefinitionServiceCallback(vnic),
+		&alm.AlarmDefinition{}, &alm.AlarmDefinitionList{})
+	common.ActivateService(sla, creds, dbname, vnic)
 }
 
 func AlarmDefinitions(vnic ifs.IVNic) (ifs.IServiceHandler, bool) {
