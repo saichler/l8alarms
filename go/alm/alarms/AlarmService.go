@@ -49,7 +49,7 @@ func Activate(creds, dbname string, vnic ifs.IVNic) {
 	ws.AddEndpoint(&l8api.L8Query{}, ifs.GET, &alm.AlarmList{})
 	sla.SetWebService(ws)
 
-	sla.SetServiceGroup("L8SG")
+	sla.SetServiceGroup("L8AL")
 	vnic.Resources().Services().Activate(sla, vnic)
 }
 

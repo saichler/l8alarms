@@ -14,6 +14,7 @@ const (
 func Activate(creds, dbname string, vnic ifs.IVNic) {
 	sla := common.NewOrmSLA(ServiceName, ServiceArea, "RuleId", newCorrelationRuleServiceCallback(vnic),
 		&alm.CorrelationRule{}, &alm.CorrelationRuleList{})
+	sla.SetServiceGroup("L8AL")
 	common.ActivateService(sla, creds, dbname, vnic)
 }
 

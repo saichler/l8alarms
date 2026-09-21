@@ -34,6 +34,9 @@ func Activate(vnic ifs.IVNic) {
 	ws.AddEndpoint(&l8topo.L8TopologyMetadata{}, ifs.GET, &l8topo.L8Topology{})
 	sla.SetWebService(ws)
 
+	// Same process as the rest of the alm services, so same service group.
+	sla.SetServiceGroup("L8AL")
+
 	vnic.Resources().Services().Activate(sla, vnic)
 }
 

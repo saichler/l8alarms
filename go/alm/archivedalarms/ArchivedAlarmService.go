@@ -14,6 +14,7 @@ const (
 func Activate(creds, dbname string, vnic ifs.IVNic) {
 	sla := common.NewOrmSLA(ServiceName, ServiceArea, "AlarmId", newArchivedAlarmServiceCallback(vnic),
 		&alm.ArchivedAlarm{}, &alm.ArchivedAlarmList{})
+	sla.SetServiceGroup("L8AL")
 	common.ActivateService(sla, creds, dbname, vnic)
 }
 
