@@ -42,8 +42,6 @@ func Activate(creds, dbname string, vnic ifs.IVNic) {
 	sla.SetPrimaryKeys("AlarmId")
 	sla.SetArgs(p, true)
 	sla.SetTransactional(true)
-	sla.SetReplication(true)
-	sla.SetReplicationCount(3)
 
 	ws := web.New(ServiceName, ServiceArea, 0)
 	ws.AddEndpoint(&alm.Alarm{}, ifs.PATCH, &l8web.L8Empty{})

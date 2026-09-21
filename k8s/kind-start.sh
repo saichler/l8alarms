@@ -2,6 +2,12 @@
 set -e
 
 CLUSTER_NAME="l8alarms"
+
+# Pin the target cluster instead of inheriting the ambient context. `kind
+# create cluster` rewrites the global current-context, so whichever kind
+# cluster was created last would otherwise own every kubectl call here --
+# which is how one project's pods end up inside another's cluster.
+KUBECTL=(kubectl --context "kind-${CLUSTER_NAME}")
 KIND_CONFIG="kind-cluster.yaml"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -49,7 +55,7 @@ echo "Creating KIND cluster '${CLUSTER_NAME}' (1 control-plane + 1 worker)..."
 kind create cluster --name "${CLUSTER_NAME}" --config "${SCRIPT_DIR}/${KIND_CONFIG}"
 
 echo "Waiting for nodes to be Ready..."
-kubectl wait --for=condition=Ready nodes --all --timeout=120s
+"${KUBECTL[@]}" wait --for=condition=Ready nodes --all --timeout=120s
 
 echo "Loading Docker images into KIND cluster..."
 IMAGES=(
@@ -69,18 +75,18 @@ for img in "${IMAGES[@]}"; do
 done
 
 echo "Phase 1: Deploying namespace + postgres + vnet..."
-kubectl apply -f "${SCRIPT_DIR}/l8alarms-kind.yaml"
+"${KUBECTL[@]}" apply -f "${SCRIPT_DIR}/l8alarms-kind.yaml"
 
 echo "Waiting for alm-postgres to be Ready..."
-kubectl -n l8alarms rollout status statefulset/alm-postgres --timeout=120s
+"${KUBECTL[@]}" -n l8alarms rollout status statefulset/alm-postgres --timeout=120s
 
 echo "Waiting for alm-vnet to be Ready..."
-kubectl -n l8alarms rollout status statefulset/alm-vnet --timeout=120s
+"${KUBECTL[@]}" -n l8alarms rollout status statefulset/alm-vnet --timeout=120s
 
 echo "Phase 2: Waiting for remaining services to be Ready..."
 for sts in alm alm-web; do
   echo "  Waiting for ${sts}..."
-  kubectl -n l8alarms rollout status statefulset/"${sts}" --timeout=180s
+  "${KUBECTL[@]}" -n l8alarms rollout status statefulset/"${sts}" --timeout=180s
 done
 
 echo ""
